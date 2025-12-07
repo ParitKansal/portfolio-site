@@ -4,7 +4,9 @@ import { HeroSection } from "../HeroSection";
 export default function HeroSectionExample() {
   return (
     <ThemeProvider>
-      <HeroSection />
+      <div className="min-h-screen bg-background">
+        <HeroSection />
+      </div>
     </ThemeProvider>
   );
 }
