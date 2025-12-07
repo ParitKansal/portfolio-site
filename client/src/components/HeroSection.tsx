@@ -1,12 +1,21 @@
-import { Mail, Phone, ArrowDown, Sparkles } from "lucide-react";
-import { SiGithub, SiLinkedin } from "react-icons/si";
+import { Mail, Phone, ArrowDown, Sparkles, Brain, Eye, MessageSquare, Network, Cpu, Database } from "lucide-react";
+import { SiGithub, SiLinkedin, SiPython, SiPytorch, SiTensorflow } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
-const stats = [
-  { value: "100K+", label: "Documents Processed Monthly" },
-  { value: "97%+", label: "Model Accuracy" },
-  { value: "8M+", label: "Sessions Analyzed" },
+const floatingIcons = [
+  { Icon: Brain, delay: 0, x: "10%", y: "20%" },
+  { Icon: Eye, delay: 0.2, x: "85%", y: "25%" },
+  { Icon: Network, delay: 0.4, x: "15%", y: "70%" },
+  { Icon: Cpu, delay: 0.6, x: "80%", y: "65%" },
+  { Icon: Database, delay: 0.8, x: "25%", y: "45%" },
+  { Icon: MessageSquare, delay: 1, x: "75%", y: "40%" },
+];
+
+const techStack = [
+  { Icon: SiPython, label: "Python" },
+  { Icon: SiPytorch, label: "PyTorch" },
+  { Icon: SiTensorflow, label: "TensorFlow" },
 ];
 
 export function HeroSection() {
@@ -22,17 +31,88 @@ export function HeroSection() {
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-3xl" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] border border-border/30 rounded-full opacity-20" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] border border-border/20 rounded-full opacity-10" />
+        <div className="absolute top-1/3 right-1/3 w-64 h-64 bg-primary/3 rounded-full blur-2xl" />
         
-        <svg className="absolute inset-0 w-full h-full opacity-[0.03]" xmlns="http://www.w3.org/2000/svg">
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-primary/10 rounded-full opacity-30" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border border-border/20 rounded-full opacity-20" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] border border-border/10 rounded-full opacity-10" />
+        
+        <svg className="absolute inset-0 w-full h-full opacity-[0.02]" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1"/>
+            <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" strokeWidth="1"/>
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
         </svg>
+
+        {floatingIcons.map(({ Icon, delay, x, y }, index) => (
+          <motion.div
+            key={index}
+            className="absolute hidden md:block"
+            style={{ left: x, top: y }}
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: delay + 0.5, duration: 0.5, type: "spring" }}
+          >
+            <motion.div
+              animate={{ 
+                y: [0, -10, 0],
+                rotate: [0, 5, -5, 0]
+              }}
+              transition={{ 
+                duration: 4 + index, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+              className="p-3 rounded-xl bg-card/80 border border-border/50 backdrop-blur-sm shadow-lg"
+            >
+              <Icon className="h-6 w-6 text-primary/70" />
+            </motion.div>
+          </motion.div>
+        ))}
+
+        <motion.div
+          className="absolute hidden lg:block left-[5%] top-[30%] w-48"
+          initial={{ opacity: 0, x: -50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1, duration: 0.6 }}
+        >
+          <div className="p-3 rounded-lg bg-card/90 border border-border/50 backdrop-blur-sm font-mono text-xs">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 rounded-full bg-red-400" />
+              <div className="w-2 h-2 rounded-full bg-yellow-400" />
+              <div className="w-2 h-2 rounded-full bg-green-400" />
+            </div>
+            <div className="text-muted-foreground">
+              <span className="text-primary">model</span>.predict()
+            </div>
+            <div className="text-green-500 dark:text-green-400">
+              {">"} accuracy: 0.97
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="absolute hidden lg:block right-[5%] top-[35%] w-52"
+          initial={{ opacity: 0, x: 50 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 1.2, duration: 0.6 }}
+        >
+          <div className="p-3 rounded-lg bg-card/90 border border-border/50 backdrop-blur-sm font-mono text-xs">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-2 h-2 rounded-full bg-red-400" />
+              <div className="w-2 h-2 rounded-full bg-yellow-400" />
+              <div className="w-2 h-2 rounded-full bg-green-400" />
+            </div>
+            <div className="text-muted-foreground">
+              <span className="text-blue-500">import</span> torch
+            </div>
+            <div className="text-muted-foreground">
+              <span className="text-blue-500">from</span> transformers
+            </div>
+          </div>
+        </motion.div>
       </div>
 
       <div className="relative max-w-5xl mx-auto text-center z-10">
@@ -54,9 +134,7 @@ export function HeroSection() {
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6"
         >
-          <span className="bg-gradient-to-r from-foreground via-foreground to-muted-foreground bg-clip-text">
-            Parit Kansal
-          </span>
+          Parit Kansal
         </motion.h1>
         
         <motion.p
@@ -76,6 +154,23 @@ export function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
+          className="flex items-center justify-center gap-4 mb-8"
+        >
+          {techStack.map(({ Icon, label }, index) => (
+            <div
+              key={label}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/50 border border-border/50"
+            >
+              <Icon className="h-4 w-4" />
+              <span className="text-sm text-muted-foreground">{label}</span>
+            </div>
+          ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
           className="flex flex-wrap items-center justify-center gap-4 mb-10"
         >
           <a href="mailto:paritkansal121@gmail.com" data-testid="link-email">
@@ -95,8 +190,8 @@ export function HeroSection() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="flex items-center justify-center gap-3 mb-12"
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="flex items-center justify-center gap-3 mb-16"
         >
           <a href="https://github.com/ParitKansal" target="_blank" rel="noopener noreferrer" data-testid="link-github">
             <Button variant="secondary" size="icon">
@@ -108,28 +203,6 @@ export function HeroSection() {
               <SiLinkedin className="h-5 w-5" />
             </Button>
           </a>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-16 max-w-3xl mx-auto"
-        >
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="p-4 rounded-lg bg-card/50 border border-border/50 backdrop-blur-sm"
-              data-testid={`stat-${index}`}
-            >
-              <div className="text-2xl md:text-3xl font-bold text-primary mb-1">
-                {stat.value}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {stat.label}
-              </div>
-            </div>
-          ))}
         </motion.div>
 
         <motion.div
