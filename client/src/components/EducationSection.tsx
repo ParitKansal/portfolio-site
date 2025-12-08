@@ -1,31 +1,15 @@
 import { GraduationCap } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-
-const education = [
-  {
-    institution: "Harcourt Butler Technical University",
-    degree: "Bachelor of Technology in Computer Science & Engineering",
-    date: "May 2025",
-    location: "Kanpur, India",
-    score: "CGPA: 8.3/10.0",
-  },
-  {
-    institution: "Dewan Public School",
-    degree: "Senior Secondary Education (Class XII)",
-    date: "May 2020",
-    location: "Hapur, India",
-    score: "Percentage: 94%",
-  },
-  {
-    institution: "Dewan Public School",
-    degree: "Secondary Education (Class X)",
-    date: "May 2018",
-    location: "Hapur, India",
-    score: "Percentage: 98%",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import type { Education } from "@shared/schema";
 
 export function EducationSection() {
+  const { data: education, isLoading } = useQuery<Education[]>({
+    queryKey: ["/api/education"]
+  });
+
+  if (isLoading) return <div className="py-20 text-center"><span className="loading loading-spinner">Loading...</span></div>;
+
   return (
     <section className="py-16 md:py-24 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
@@ -35,7 +19,7 @@ export function EducationSection() {
         </div>
 
         <div className="grid gap-6">
-          {education.map((edu, index) => (
+          {education?.map((edu, index) => (
             <Card key={index} data-testid={`card-education-${index}`}>
               <CardContent className="p-6">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">

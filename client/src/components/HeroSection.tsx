@@ -1,7 +1,9 @@
-import { Mail, Phone, ArrowDown, Sparkles, Brain, Eye, MessageSquare, Network, Cpu, Database } from "lucide-react";
+import { Mail, Phone, ArrowDown, Sparkles, Brain, Eye, MessageSquare, Network, Cpu, Database, FileText } from "lucide-react";
 import { SiGithub, SiLinkedin, SiPython, SiPytorch, SiTensorflow } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
+import type { Resume } from "@shared/schema";
 
 const floatingIcons = [
   { Icon: Brain, delay: 0, x: "10%", y: "20%" },
@@ -19,6 +21,8 @@ const techStack = [
 ];
 
 export function HeroSection() {
+  const { data: resume } = useQuery<Resume>({ queryKey: ["/api/resume"] });
+
   const scrollToWork = () => {
     const element = document.querySelector("#experience");
     if (element) {
@@ -32,15 +36,15 @@ export function HeroSection() {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-accent/10 rounded-full blur-3xl" />
         <div className="absolute top-1/3 right-1/3 w-64 h-64 bg-primary/3 rounded-full blur-2xl" />
-        
+
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] border border-primary/10 rounded-full opacity-30" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] border border-border/20 rounded-full opacity-20" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] border border-border/10 rounded-full opacity-10" />
-        
+
         <svg className="absolute inset-0 w-full h-full opacity-[0.02]" xmlns="http://www.w3.org/2000/svg">
           <defs>
             <pattern id="grid" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" strokeWidth="1"/>
+              <path d="M 60 0 L 0 0 0 60" fill="none" stroke="currentColor" strokeWidth="1" />
             </pattern>
           </defs>
           <rect width="100%" height="100%" fill="url(#grid)" />
@@ -56,14 +60,14 @@ export function HeroSection() {
             transition={{ delay: delay + 0.5, duration: 0.5, type: "spring" }}
           >
             <motion.div
-              animate={{ 
+              animate={{
                 y: [0, -10, 0],
                 rotate: [0, 5, -5, 0]
               }}
-              transition={{ 
-                duration: 4 + index, 
-                repeat: Infinity, 
-                ease: "easeInOut" 
+              transition={{
+                duration: 4 + index,
+                repeat: Infinity,
+                ease: "easeInOut"
               }}
               className="p-3 rounded-xl bg-card/80 border border-border/50 backdrop-blur-sm shadow-lg"
             >
@@ -127,7 +131,7 @@ export function HeroSection() {
             Machine Learning Scientist
           </span>
         </motion.div>
-        
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -136,7 +140,7 @@ export function HeroSection() {
         >
           Parit Kansal
         </motion.h1>
-        
+
         <motion.p
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -204,6 +208,21 @@ export function HeroSection() {
             </Button>
           </a>
         </motion.div>
+
+        {resume?.url && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="mb-16"
+          >
+            <a href={resume.url} target="_blank" rel="noopener noreferrer">
+              <Button variant="default" size="lg" className="gap-2">
+                <FileText className="h-5 w-5" /> Download Resume
+              </Button>
+            </a>
+          </motion.div>
+        )}
 
         <motion.div
           initial={{ opacity: 0 }}
