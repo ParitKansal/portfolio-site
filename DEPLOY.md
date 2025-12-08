@@ -122,3 +122,86 @@ This project supports Replit natively.
 1. Create a new Repl and import this repository.
 2. Add your secrets used in `.env` to the Replit "Secrets" tool.
 3. Click "Run".
+
+### ❌ Why not GitHub Pages?
+**You cannot deploy this full application to GitHub Pages.**
+
+GitHub Pages only hosts **static** websites (HTML/CSS/JS). This application requires a **server** (Node.js) to handle:
+- Google OAuth Login
+- SQLite Database (storing blogs/messages)
+- Sending Emails via Gmail
+- Admin Dashboard protection
+
+If you deploy to GitHub Pages, none of these features will work. Use one of the options above (Railway/Render/VPS) instead.
+
+## Estimated Monthly Costs (Continuous Running)
+For a small application like this (Node.js + SQLite), here are the estimated costs for running 24/7:
+
+| Provider | Service | Spec | Est. Price/Month | Free Tier? |
+| :--- | :--- | :--- | :--- | :--- |
+| **AWS** | EC2 (t3.micro) | 2 vCPU, 1GB RAM | **~$7.50** | 12 months free |
+| **Azure** | VM (B1s) | 1 vCPU, 1GB RAM | **~$8.00** | 12 months free |
+| **Google Cloud** | Compute (e2-micro) | 2 vCPU, 1GB RAM | **~$7.00** | **Always Free** (in US regions) |
+| **DigitalOcean** | Droplet | 1 vCPU, 1GB RAM | **$6.00** | No |
+| **Hetzner** | Cloud | 2 vCPU, 4GB RAM | **~$5.00** | No (Cheapest performance) |
+| **Railway** | Starter | Shared RAM | **$5.00** | Trial credits |
+| **Render** | Web Service | 512MB RAM | **$7.00** | Free plan (spins down) |
+
+> **Recommendation**: **Google Cloud (e2-micro)** is likely your best option if you want it free forever (requires configuration). **Hetzner** or **DigitalOcean** are the easiest/cheapest paid options for raw power.
+
+### ⚠️ Important: GCP "Always Free" Conditions
+To get Google Cloud for **$0/month**, you must strictly follow these rules:
+1.  **Region**: You MUST select `us-central1`, `us-west1`, or `us-east1`. (Other regions cost money).
+2.  **Instance**: You MUST select `e2-micro`.
+3.  **Disk**: Standard Persistent Disk up to 30GB.
+4.  **Traffic**: 1GB network egress is free (usually enough for a small portfolio).
+
+*If you pick a different region (like Asia/Europe) or a larger server, you will be charged ~$7/month.*
+
+### Google Cloud Deployment Guide
+Here is exactly how to set up the free server:
+
+1.  **Create Instance**:
+    *   Go to **Compute Engine** > **VM Instances**.
+    *   Click **Create Instance**.
+    *   **Name**: `portfolio-server`.
+    *   **Region**: `us-central1` (Important!).
+    *   **Machine configuration**: Series `E2`, Machine type `e2-micro` (2 vCPU, 1 GB memory).
+    *   **Boot Disk**: Click Change. Select `Standard persistent disk`, Size `30 GB`.
+    *   **Firewall**: Check "Allow HTTP traffic" and "Allow HTTPS traffic".
+    *   Click **Create**.
+
+2.  **Connect**:
+    *   Click the **SSH** button next to your new instance in the list.
+    *   A terminal window will open.
+
+3.  **Install Software** (Run these commands in the SSH window):
+    ```bash
+    # Install Docker & Git
+    sudo apt-get update
+    sudo apt-get install -y docker.io docker-compose git
+
+    # Start Docker
+    sudo systemctl start docker
+    sudo systemctl enable docker
+    ```
+
+4.  **Deploy App**:
+    ```bash
+    # Clone your code (Use your own GitHub URL!)
+    git clone https://github.com/ParitKansal/portfolio-site.git
+    cd portfolio-site
+
+    # Create .env file
+    nano .env
+    # (Paste your .env content here: ADMIN_EMAIL, GMAIL_APP_PASSWORD, etc.)
+    # Press Ctrl+X, then Y, then Enter to save.
+
+    # Start the app
+    sudo docker-compose up -d --build
+    ```
+
+5.  **Access**:
+    *   Go back to the VM list.
+    *   Copy the **External IP**.
+    *   Open `http://YOUR_EXTERNAL_IP:5000` in your browser.
