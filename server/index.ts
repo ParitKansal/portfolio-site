@@ -1,20 +1,47 @@
+import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { serveStatic } from "./static";
 import { createServer } from "http";
+import { setupAuth } from "./auth";
+import helmet from "helmet";
+import compression from "compression";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 const httpServer = createServer(app);
 
-declare module "http" {
-  interface IncomingMessage {
-    rawBody: unknown;
-  }
-}
+// Security & Performance
+app.use(helmet());
+app.use(compression());
+
+// Rate Limiting
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  limit: 100, // Limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later."
+});
+
+const authLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  limit: 10, // Limit each IP to 10 login attempts per hour
+  message: "Too many login attempts, please try again later."
+});
+
+const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  limit: 5, // Limit each IP to 5 contact messages per hour
+  message: "Too many messages sent, please try again later."
+});
+
+app.use(globalLimiter);
+app.use("/api/auth", authLimiter);
+app.use("/api/contact", contactLimiter);
 
 app.use(
   express.json({
-    verify: (req, _res, buf) => {
+    verify: (req, res, buf) => {
+      // @ts-expect-error rawBody needed for some webhooks if added later
       req.rawBody = buf;
     },
   }),
@@ -48,11 +75,14 @@ app.use((req, res, next) => {
     const duration = Date.now() - start;
     if (path.startsWith("/api")) {
       let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
+      // Only log payload in development
+      if (process.env.NODE_ENV !== "production" && capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
 
-      log(logLine);
+      if (process.env.NODE_ENV !== "production") {
+        log(logLine);
+      }
     }
   });
 
@@ -60,6 +90,7 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  setupAuth(app);
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -89,7 +120,6 @@ app.use((req, res, next) => {
     {
       port,
       host: "0.0.0.0",
-      reusePort: true,
     },
     () => {
       log(`serving on port ${port}`);

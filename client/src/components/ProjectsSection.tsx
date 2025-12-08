@@ -1,32 +1,19 @@
 import { FolderGit2, FlaskConical, Microscope } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-
-const academicProjects = [
-  {
-    title: "Comparative Analysis of Recommendation Algorithms",
-    date: "June 2024",
-    description: "Benchmarked SVD, SVD++, KNN, RBM, and AutoRec models on RMSE, Hit Rate, and Novelty, providing a comprehensive performance comparison.",
-    tags: ["Machine Learning", "Recommendation Systems", "Benchmarking"],
-  },
-  {
-    title: "Question Pair Similarity Detection",
-    date: "October 2023",
-    description: "Developed a duplicate question detection model on the 400K+ Quora dataset using Optuna-based hyperparameter tuning, achieving 83.7% accuracy.",
-    tags: ["NLP", "Deep Learning", "Optuna"],
-  },
-];
-
-const researchProjects = [
-  {
-    title: "Few-Shot Layout Detection",
-    status: "In Progress",
-    description: "Building a few-shot document layout detection model that generalizes layout understanding from a limited set of annotated exemplars. For instance, when a user provides bounding boxes around headings in a few sample images, the model learns the visual and spatial characteristics of those regions and predicts the corresponding heading boundaries in unseen documents.",
-    tags: ["Few-Shot Learning", "Document AI", "Computer Vision"],
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import type { Project } from "@shared/schema";
 
 export function ProjectsSection() {
+  const { data: projects, isLoading } = useQuery<Project[]>({
+    queryKey: ["/api/projects"]
+  });
+
+  const academicProjects = projects?.filter(p => p.category === "Academic") || [];
+  const researchProjects = projects?.filter(p => p.category === "Research") || [];
+
+  if (isLoading) return null;
+
   return (
     <section id="projects" className="py-16 md:py-24 px-4 sm:px-6 bg-muted/30">
       <div className="max-w-6xl mx-auto">

@@ -3,6 +3,8 @@ import { Menu, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import resumePdf from "@assets/Parit_Kansal_1765124752768.pdf";
+import { useAuth } from "@/hooks/use-auth";
+import { Link } from "wouter";
 
 const navItems = [
   { label: "Home", href: "#home" },
@@ -11,11 +13,13 @@ const navItems = [
   { label: "Projects", href: "#projects" },
   { label: "Knowledge Vault", href: "#knowledge-vault" },
   { label: "Blog", href: "#blog" },
+  { label: "Contact", href: "#contact" },
 ];
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { user, logoutMutation } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -35,20 +39,19 @@ export function Navigation() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-background/90 backdrop-blur-xl border-b border-border shadow-sm"
-          : "bg-transparent"
-      }`}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
+        ? "bg-background/90 backdrop-blur-xl border-b border-border shadow-sm"
+        : "bg-transparent"
+        }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-16">
           <button
             onClick={() => scrollToSection("#home")}
-            className="font-bold text-xl tracking-tight hover:text-primary transition-colors"
+            className="font-bold text-xl tracking-tight hover:opacity-80 transition-opacity"
             data-testid="link-logo"
           >
-            PK<span className="text-primary">.</span>
+            <img src="/logo.png" alt="Logo" className="h-10 w-auto" />
           </button>
 
           <div className="hidden md:flex items-center gap-1">
@@ -68,6 +71,27 @@ export function Navigation() {
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
+
+            {user ? (
+              <>
+                <Link href="/admin">
+                  <Button variant="ghost" size="sm">Dashboard</Button>
+                </Link>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => logoutMutation.mutate()}
+                  disabled={logoutMutation.isPending}
+                >
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <Link href="/auth">
+                <Button variant="ghost" size="sm">Login</Button>
+              </Link>
+            )}
+
             <a href={resumePdf} download="Parit_Kansal_Resume.pdf">
               <Button size="sm" className="hidden sm:flex gap-2" data-testid="button-download-resume">
                 <Download className="h-4 w-4" />
