@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./sqlite.db:/app/sqlite.db
+    env_file:
+      - .env
+    restart: always

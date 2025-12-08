@@ -1,21 +1,16 @@
 import { Award, ExternalLink } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
-const certifications = [
-  {
-    name: "TensorFlow: Advanced Techniques",
-    issuer: "Coursera & DeepLearning.AI",
-    date: "June 2024",
-  },
-  {
-    name: "Machine Learning with Python",
-    issuer: "freeCodeCamp",
-    date: "April 2024",
-  },
-];
+import { useQuery } from "@tanstack/react-query";
+import type { Certification } from "@shared/schema";
 
 export function CertificationsSection() {
+  const { data: certifications, isLoading } = useQuery<Certification[]>({
+    queryKey: ["/api/certifications"]
+  });
+
+  if (isLoading) return null;
+
   return (
     <section className="py-16 md:py-24 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
@@ -25,7 +20,7 @@ export function CertificationsSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {certifications.map((cert, index) => (
+          {certifications?.map((cert, index) => (
             <Card key={index} className="hover-elevate" data-testid={`card-certification-${index}`}>
               <CardContent className="p-6 flex items-start justify-between gap-4">
                 <div className="flex items-start gap-4">
@@ -38,9 +33,13 @@ export function CertificationsSection() {
                     <p className="text-sm text-muted-foreground">{cert.date}</p>
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" className="shrink-0" data-testid={`button-cert-link-${index}`}>
-                  <ExternalLink className="h-4 w-4" />
-                </Button>
+                {cert.link && (
+                  <Button variant="ghost" size="icon" className="shrink-0" asChild>
+                    <a href={cert.link} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </Button>
+                )}
               </CardContent>
             </Card>
           ))}

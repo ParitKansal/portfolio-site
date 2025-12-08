@@ -1,0 +1,124 @@
+# Deployment Guide
+
+## Prerequisites
+- Docker and Docker Compose installed on your server.
+- A Google Cloud Project with OAuth credentials configured.
+
+## Google OAuth Setup (Step-by-Step)
+
+### Phase 1: Create Project
+1. Go to the **[Google Cloud Console](https://console.cloud.google.com/)**.
+2. Sign in with your Google account.
+3. Click the project dropdown in the top-left (next to the Google Cloud logo).
+4. Click **New Project**.
+5. Name it "Portfolio Admin" (or similar) and click **Create**.
+6. Wait a moment, then select your new project from the notification or dropdown.
+
+### Phase 2: Configure Consent Screen
+1. In the left sidebar, click **APIs & Services** > **OAuth consent screen**.
+2. Select **External** for User Type and click **Create**.
+3. **App Information**:
+   - **App name**: Portfolio Admin
+   - **User support email**: Select your email.
+4. Scroll down to **Developer contact information** and enter your email again.
+5. Click **Save and Continue**.
+6. Skip "Scopes" (just click **Save and Continue**).
+7. Skip "Test Users" (click **Save and Continue**).
+8. Click **Back to Dashboard**.
+
+### Phase 3: Create Credentials
+1. In the left sidebar, click **Credentials**.
+2. Click **+ CREATE CREDENTIALS** (top of screen) and select **OAuth client ID**.
+3. **Application type**: Select **Web application**.
+4. **Name**: Leave as "Web client 1" or name it "Portfolio App".
+5. **Authorized redirect URIs** (Crucial Step):
+   - Click **+ ADD URI**.
+   - Enter: `http://localhost:5000/api/auth/google/callback`
+   - *(If running on a public domain later, add `https://your-domain.com/api/auth/google/callback` as well)*.
+6. Click **Create**.
+
+### Phase 4: Copy Secrets
+1. A popup will appear with "Your Client ID" and "Your Client Secret".
+2. **Copy these strings**. You need them for the next step.
+   - **Client ID** looks like: `12345...apps.googleusercontent.com`
+   - **Client Secret** is a random string.
+
+## Configuration
+1. Create a `.env` file from the example:
+   ```bash
+   cp .env.example .env
+   ```
+2. Update `.env` with your values:
+   - `SESSION_SECRET`: A long random string.
+   - `GOOGLE_CLIENT_ID`: From Google Cloud Console.
+   - `GOOGLE_CLIENT_SECRET`: From Google Cloud Console.
+
+## Local Deployment (Node.js)
+1. **Install Dependencies**:
+   ```bash
+   npm install
+   ```
+2. **Setup Database**:
+   ```bash
+   npm run db:push
+   # Optional: Seed data
+   npm run seed
+   ```
+3. **Build the Application**:
+   ```bash
+   npm run build
+   ```
+4. **Start the Production Server**:
+   ```bash
+   npm run start
+   ```
+   The app will serve at `http://localhost:5000`.
+
+## Deploying with Docker
+1. Build and start the container:
+   ```bash
+   docker-compose up -d --build
+   ```
+2. The application will be available at port 5000 (e.g., `http://localhost:5000`).
+
+## Persistent Data
+- The SQLite database is stored in `sqlite.db`. 
+- The `docker-compose.yml` file maps this file to a volume, so your data persists across restarts.
+
+## Gmail App Password Setup
+To enable email notifications, you need a Google App Password (not your login password).
+
+1. Go to your **[Google Account Security](https://myaccount.google.com/security)** page.
+2. Under "How you sign in to Google", ensure **2-Step Verification** is turned **ON**.
+3. Search for **"App passwords"** in the search bar at the top (or look under 2-Step Verification).
+4. Create a new app password:
+   - **App name**: Portfolio
+   - Click **Create**.
+5. Copy the 16-character code (e.g., `xxxx xxxx xxxx xxxx`).
+6. Paste it into your `.env` file as `GMAIL_APP_PASSWORD`.
+
+## Cloud Deployment Options
+
+Since this application is containerized with Docker, you can deploy it to almost any cloud provider.
+
+### Option 1: Railway / Render (Easiest)
+These platforms support deployments directly from a GitHub repository.
+1. Push your code to GitHub.
+2. Connect your repository to **Railway** or **Render**.
+3. They will automatically detect the `Dockerfile` and build it.
+4. **Important**: Add your Environment Variables (`GOOGLE_CLIENT_ID`, `ADMIN_EMAIL`, etc.) in the dashboard of the cloud provider.
+
+### Option 2: VPS (DigitalOcean, AWS, Hetzner)
+For full control, rent a Linux server.
+1. SSH into your server.
+2. Install Docker and Docker Compose.
+3. Clone your repository.
+4. Create your `.env` file with production values.
+5. Run `docker-compose up -d --build`.
+6. Use Nginx or Caddy as a reverse proxy to handle HTTPS (SSL) and forward traffic to port 5000.
+
+### Option 3: Replit
+This project supports Replit natively.
+1. Create a new Repl and import this repository.
+2. Add your secrets used in `.env` to the Replit "Secrets" tool.
+3. Click "Run".
