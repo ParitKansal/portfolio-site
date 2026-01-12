@@ -12,7 +12,7 @@ RUN npm install
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN NODE_OPTIONS="--max-old-space-size=3072" npm run build
 
 # Expose port
 EXPOSE 5000
