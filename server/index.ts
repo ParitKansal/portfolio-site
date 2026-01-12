@@ -12,25 +12,27 @@ const app = express();
 const httpServer = createServer(app);
 
 // Security & Performance
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy: false,
+}));
 app.use(compression());
 
 // Rate Limiting
 const globalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // Limit each IP to 100 requests per windowMs
+  limit: 10000, // Relaxed for development
   message: "Too many requests from this IP, please try again later."
 });
 
 const authLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  limit: 10, // Limit each IP to 10 login attempts per hour
+  limit: 100, // Relaxed for development
   message: "Too many login attempts, please try again later."
 });
 
 const contactLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  limit: 5, // Limit each IP to 5 contact messages per hour
+  limit: 50, // Relaxed for development
   message: "Too many messages sent, please try again later."
 });
 

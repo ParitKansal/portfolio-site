@@ -76,6 +76,16 @@ async function seed() {
       tags: ["Database", "RAG"],
       date: new Date(Date.now() - 86400000 * 2),
     },
+    {
+      title: "Transformer Self-Attention",
+      content: [
+        { type: "text", value: "The core mechanism of the Transformer architecture is Scaled Dot-Product Attention." },
+        { type: "text", value: "$$ Attention(Q, K, V) = \\text{softmax}\\left(\\frac{QK^T}{\\sqrt{d_k}}\\right)V $$" },
+        { type: "text", value: "Where $Q$ is Query, $K$ is Key, and $V$ is Value matrices." }
+      ] as ContentBlock[],
+      tags: ["Deep Learning", "Transformers", "Math"],
+      date: new Date(Date.now() - 86400000 * 1),
+    },
   ]);
 
 
