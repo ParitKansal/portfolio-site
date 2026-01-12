@@ -223,10 +223,20 @@ Here is exactly how to set up the free server:
     *   **Protocols and ports**: Check `tcp` and type `5000`.
     *   Click **Create**.
 
-6.  **Access**:
-    *   Go back to the VM list.
-    *   Copy the **External IP**.
-    *   Open `http://YOUR_EXTERNAL_IP:5000` in your browser.
+6.  **Access with Magic DNS (Crucial for Login)**:
+    *   Google Login will **FAIL** if you use the raw IP.
+    *   You MUST use this magic domain: `http://YOUR_EXTERNAL_IP.nip.io:5000`
+    *   Example: `http://34.30.174.42.nip.io:5000`
+
+7.  **Initialize Database (First Time Only)**:
+    Only do this once to set up the admin user.
+    ```bash
+    # Create the tables
+    sudo docker-compose exec app npm run db:push
+
+    # Create the admin user
+    here does login is allowedmt
+    ```
 
 ## 🔄 Updating Your Live Site
 Since you have already deployed once, you don't need to do everything again! 

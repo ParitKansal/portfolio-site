@@ -94,6 +94,21 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                                 )}
                             </div>
                         );
+                    case "pdf":
+                        return (
+                            <div key={index} className="rounded-lg overflow-hidden border bg-muted/50 h-[600px]">
+                                <iframe
+                                    src={block.url}
+                                    title={block.caption || "PDF Viewer"}
+                                    className="w-full h-full"
+                                />
+                                {block.caption && (
+                                    <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t">
+                                        {block.caption}
+                                    </p>
+                                )}
+                            </div>
+                        );
                     // ... rest of the file
 
                     case "code":
