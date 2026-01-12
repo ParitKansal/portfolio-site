@@ -175,45 +175,72 @@ Here is exactly how to set up the free server:
     *   Click the **SSH** button next to your new instance in the list.
     *   A terminal window will open.
 
-3.  **Install Software** (Run these commands in the SSH window):
+3.  **Install Software & Configure Swap** (Run these commands in the SSH window):
+    *   **Crucial Step:** The free `e2-micro` only has 1GB RAM. You MUST create a swap file or the build will crash.
     ```bash
-    # Install Docker & Git
+    # 1. Update and install tools
     sudo apt-get update
     sudo apt-get install -y docker.io docker-compose git
 
-    # Start Docker
+    # 2. Start Docker
     sudo systemctl start docker
     sudo systemctl enable docker
+
+    # 3. Create 2GB Swap File (Prevents "Out of Memory" crashes)
+    sudo fallocate -l 2G /swapfile
+    sudo chmod 600 /swapfile
+    sudo mkswap /swapfile
+    sudo swapon /swapfile
+    echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
     ```
 
 4.  **Deploy App**:
     ```bash
-    # Clone your code (Use your own GitHub URL!)
+    # 1. Clone your code
     git clone https://github.com/ParitKansal/portfolio-site.git
     cd portfolio-site
 
-    # Create .env file
+    # 2. Create .env file
     nano .env
-    # (Paste your .env content here: ADMIN_EMAIL, GMAIL_APP_PASSWORD, etc.)
+    # (Paste your .env content: ADMIN_EMAIL, GMAIL_APP_PASSWORD, etc.)
     # Press Ctrl+X, then Y, then Enter to save.
 
-    # Start the app
+    # 3. PRE-CREATE DATABASE FILE (Prevents "SQLITE_CANTOPEN" error)
+    touch sqlite.db
+    chmod 666 sqlite.db
+
+    # 4. Start the app (This takes ~5-10 mins on the free tier)
     sudo docker-compose up -d --build
     ```
 
-5.  **Access**:
-    *   Go back to the VM list.
-    *   Copy the **External IP** (`34.30.174.42`).
-    *   Open `http://34.30.174.42:5000` in your browser.
+5.  **allow Port 5000 (Firewall)**:
+    *   By default, Google Cloud blocks everything except port 80/443.
+    *   Go to **VPC Network** > **Firewall**.
+    *   Click **Create Firewall Rule**.
+    *   **Name**: `allow-port-5000`.
+    *   **Targets**: All instances in the network.
+    *   **Source IPv4 ranges**: `0.0.0.0/0`.
+    *   **Protocols and ports**: Check `tcp` and type `5000`.
+    *   Click **Create**.
 
-### 🐛 Common Error: "SQLITE_CANTOPEN"
-If your logs say `SqliteError: unable to open database file`, run this Fix:
-Docker sometimes creates a *directory* named `sqlite.db` if the file is missing.
-```bash
-# Fix the broken mount
-sudo docker-compose down
-sudo rm -rf sqlite.db     # Delete the accidental directory
-touch sqlite.db           # Create the empty file manually
-chmod 666 sqlite.db       # Give permissions
-sudo docker-compose up -d # Restart
-```
+6.  **Access**:
+    *   Go back to the VM list.
+    *   Copy the **External IP**.
+    *   Open `http://YOUR_EXTERNAL_IP:5000` in your browser.
+
+## 🔄 Updating Your Live Site
+Since you have already deployed once, you don't need to do everything again! 
+To update your website with new changes:
+
+1.  **Push your changes** from your computer:
+    ```bash
+    git push
+    ```
+2.  **Connect to your Server** (Click "SSH" on Google Cloud Console).
+3.  **Run these update commands**:
+    ```bash
+    cd portfolio-site
+    git pull                          # Get the new code
+    sudo docker-compose up -d --build # Rebuild and restart
+    ```
+    *Wait ~3-5 minutes for it to finish rebuilding.*
