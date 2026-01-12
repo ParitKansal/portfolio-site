@@ -22,7 +22,8 @@ export type ContentBlock =
   | { type: "text"; value: string }
   | { type: "image"; url: string; caption?: string }
   | { type: "code"; value: string; language?: string }
-  | { type: "video"; url: string; caption?: string };
+  | { type: "video"; url: string; caption?: string }
+  | { type: "pdf"; url: string; caption?: string };
 
 export const knowledgeEntries = sqliteTable("knowledge_entries", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -35,7 +36,7 @@ export const knowledgeEntries = sqliteTable("knowledge_entries", {
 export const insertKnowledgeEntrySchema = createInsertSchema(knowledgeEntries, {
   tags: z.array(z.string()),
   content: z.array(z.object({
-    type: z.enum(["text", "image", "code", "video"]),
+    type: z.enum(["text", "image", "code", "video", "pdf"]),
     value: z.string().optional(),
     url: z.string().optional(),
     caption: z.string().optional(),
@@ -62,7 +63,7 @@ export const blogPosts = sqliteTable("blog_posts", {
 export const insertBlogPostSchema = createInsertSchema(blogPosts, {
   tags: z.array(z.string()),
   content: z.array(z.object({
-    type: z.enum(["text", "image", "code", "video"]),
+    type: z.enum(["text", "image", "code", "video", "pdf"]),
     value: z.string().optional(),
     url: z.string().optional(),
     caption: z.string().optional(),
