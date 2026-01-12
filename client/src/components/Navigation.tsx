@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
-import resumePdf from "@assets/Parit_Kansal_1765124752768.pdf";
+import resumePdf from "@assets/Parit.pdf";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 
