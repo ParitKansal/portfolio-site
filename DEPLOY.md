@@ -203,5 +203,17 @@ Here is exactly how to set up the free server:
 
 5.  **Access**:
     *   Go back to the VM list.
-    *   Copy the **External IP**.
-    *   Open `http://YOUR_EXTERNAL_IP:5000` in your browser.
+    *   Copy the **External IP** (`34.30.174.42`).
+    *   Open `http://34.30.174.42:5000` in your browser.
+
+### 🐛 Common Error: "SQLITE_CANTOPEN"
+If your logs say `SqliteError: unable to open database file`, run this Fix:
+Docker sometimes creates a *directory* named `sqlite.db` if the file is missing.
+```bash
+# Fix the broken mount
+sudo docker-compose down
+sudo rm -rf sqlite.db     # Delete the accidental directory
+touch sqlite.db           # Create the empty file manually
+chmod 666 sqlite.db       # Give permissions
+sudo docker-compose up -d # Restart
+```
