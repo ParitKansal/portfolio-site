@@ -235,8 +235,24 @@ Here is exactly how to set up the free server:
     sudo docker-compose exec app npm run db:push
 
     # Create the admin user
-    here does login is allowedmt
+    sudo docker-compose exec app npx tsx server/seed.ts
     ```
+
+8.  **Connect Custom Domain (paritkansal.in)**:
+    *   **GoDaddy DNS**:
+        *   Go to your Domain DNS Management.
+        *   Add an **A Record**:
+            *   **Name**: `@`
+            *   **Value**: `34.30.174.42`
+            *   **TTL**: `600` (or leaving default is fine)
+    *   **Google Cloud Firewall**:
+        *   Go to **VPC network** > **Firewall**.
+        *   Create Firewall Rule: `allow-http-80`.
+        *   **Targets**: All instances in the network.
+        *   **Source IPv4 ranges**: `0.0.0.0/0`.
+        *   **Protocols and ports**: `tcp` and `80`.
+    *   **Google OAuth**:
+        *   Add `http://paritkansal.in/api/auth/google/callback` to Authorized Redirect URIs.
 
 ## 🔄 Updating Your Live Site
 Since you have already deployed once, you don't need to do everything again! 
