@@ -40,6 +40,29 @@ function getEmbedUrl(url: string) {
     }
 }
 
+function getPdfEmbedUrl(url: string) {
+    try {
+        if (!url) return "";
+
+        // Handle Google Drive links
+        // Convert /view or /open to /preview
+        if (url.includes("drive.google.com")) {
+            // Extract ID
+            const idMatch = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (idMatch && idMatch[1]) {
+                return `https://drive.google.com/file/d/${idMatch[1]}/preview`;
+            }
+            // If it's already a specialized link (like export=download), finding ID is key or just returning if complex
+            // Simple replacement for typical share links
+            return url.replace(/\/view.*$/, "/preview").replace(/\/open.*$/, "/preview");
+        }
+
+        return url;
+    } catch (e) {
+        return url;
+    }
+}
+
 export function ContentRenderer({ content }: ContentRendererProps) {
     return (
         <div className="space-y-6">
@@ -98,7 +121,7 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                         return (
                             <div key={index} className="rounded-lg overflow-hidden border bg-muted/50 h-[600px]">
                                 <iframe
-                                    src={block.url}
+                                    src={getPdfEmbedUrl(block.url)}
                                     title={block.caption || "PDF Viewer"}
                                     className="w-full h-full"
                                 />
