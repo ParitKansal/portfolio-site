@@ -96,7 +96,7 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                                 />
                             )}
 
-                            {(block.type === "image" || block.type === "video") && (
+                            {(block.type === "image" || block.type === "video" || block.type === "pdf") && (
                                 <>
                                     <div className="space-y-2">
                                         <Label>URL</Label>
@@ -159,6 +159,10 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                 <Button variant="outline" onClick={() => addBlock("code")}>
                     <Code className="mr-2 h-4 w-4" />
                     Add Code
+                </Button>
+                <Button variant="outline" onClick={() => addBlock("pdf")}>
+                    <FileText className="mr-2 h-4 w-4" />
+                    Add PDF
                 </Button>
             </div>
         </div>
