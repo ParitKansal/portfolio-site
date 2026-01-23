@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { Plus, X, Image, FileText, Code, Video, MoveUp, MoveDown } from "lucide-react";
+import { ContentRenderer } from "./ContentRenderer";
 
 interface ContentEditorProps {
     value: ContentBlock[];
@@ -48,122 +49,138 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
     };
 
     return (
-        <div className="space-y-4">
-            {value.map((block, index) => (
-                <Card key={index} className="relative group">
-                    <CardContent className="pt-6">
-                        <div className="absolute top-2 right-2 flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => moveBlock(index, "up")}
-                                disabled={index === 0}
-                            >
-                                <MoveUp className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                onClick={() => moveBlock(index, "down")}
-                                disabled={index === value.length - 1}
-                            >
-                                <MoveDown className="h-4 w-4" />
-                            </Button>
-                            <Button
-                                variant="destructive"
-                                size="icon"
-                                onClick={() => removeBlock(index)}
-                            >
-                                <X className="h-4 w-4" />
-                            </Button>
-                        </div>
-
-                        <div className="grid gap-4">
-                            <div className="flex items-center gap-2 mb-2">
-                                {block.type === "text" && <FileText className="h-4 w-4 text-muted-foreground" />}
-                                {block.type === "image" && <Image className="h-4 w-4 text-muted-foreground" />}
-                                {block.type === "video" && <Video className="h-4 w-4 text-muted-foreground" />}
-                                {block.type === "code" && <Code className="h-4 w-4 text-muted-foreground" />}
-                                <span className="text-sm font-medium capitalize">{block.type} Block</span>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full">
+            {/* Editor Partition */}
+            <div className="space-y-4 order-2 lg:order-1">
+                <div className="flex items-center justify-between pb-2 border-b">
+                    <h3 className="text-lg font-semibold">Editor</h3>
+                </div>
+                {value.map((block, index) => (
+                    <Card key={index} className="relative group">
+                        <CardContent className="pt-6">
+                            <div className="absolute top-2 right-2 flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10">
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => moveBlock(index, "up")}
+                                    disabled={index === 0}
+                                >
+                                    <MoveUp className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={() => moveBlock(index, "down")}
+                                    disabled={index === value.length - 1}
+                                >
+                                    <MoveDown className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    variant="destructive"
+                                    size="icon"
+                                    onClick={() => removeBlock(index)}
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
                             </div>
 
-                            {block.type === "text" && (
-                                <Textarea
-                                    placeholder="Enter text content (Markdown supported)..."
-                                    value={block.value}
-                                    onChange={(e) => updateBlock(index, { value: e.target.value })}
-                                    className="min-h-[150px]"
-                                />
-                            )}
+                            <div className="grid gap-4">
+                                <div className="flex items-center gap-2 mb-2">
+                                    {block.type === "text" && <FileText className="h-4 w-4 text-muted-foreground" />}
+                                    {block.type === "image" && <Image className="h-4 w-4 text-muted-foreground" />}
+                                    {block.type === "video" && <Video className="h-4 w-4 text-muted-foreground" />}
+                                    {block.type === "code" && <Code className="h-4 w-4 text-muted-foreground" />}
+                                    <span className="text-sm font-medium capitalize">{block.type} Block</span>
+                                </div>
 
-                            {(block.type === "image" || block.type === "video" || block.type === "pdf") && (
-                                <>
-                                    <div className="space-y-2">
-                                        <Label>URL</Label>
-                                        <Input
-                                            placeholder={`Enter ${block.type} URL...`}
-                                            value={block.url}
-                                            onChange={(e) => updateBlock(index, { url: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Caption (Optional)</Label>
-                                        <Input
-                                            placeholder="Enter caption..."
-                                            value={block.caption || ""}
-                                            onChange={(e) => updateBlock(index, { caption: e.target.value })}
-                                        />
-                                    </div>
-                                </>
-                            )}
+                                {block.type === "text" && (
+                                    <Textarea
+                                        placeholder="Enter text content (Markdown supported)..."
+                                        value={block.value}
+                                        onChange={(e) => updateBlock(index, { value: e.target.value })}
+                                        className="min-h-[150px]"
+                                    />
+                                )}
 
-                            {block.type === "code" && (
-                                <>
-                                    <div className="space-y-2">
-                                        <Label>Language</Label>
-                                        <Input
-                                            placeholder="typescript, python, etc."
-                                            value={block.language || ""}
-                                            onChange={(e) => updateBlock(index, { language: e.target.value })}
-                                        />
-                                    </div>
-                                    <div className="space-y-2">
-                                        <Label>Code</Label>
-                                        <Textarea
-                                            placeholder="Enter code..."
-                                            value={block.value}
-                                            onChange={(e) => updateBlock(index, { value: e.target.value })}
-                                            className="font-mono min-h-[150px]"
-                                        />
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
+                                {(block.type === "image" || block.type === "video" || block.type === "pdf") && (
+                                    <>
+                                        <div className="space-y-2">
+                                            <Label>URL</Label>
+                                            <Input
+                                                placeholder={`Enter ${block.type} URL...`}
+                                                value={block.url}
+                                                onChange={(e) => updateBlock(index, { url: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Caption (Optional)</Label>
+                                            <Input
+                                                placeholder="Enter caption..."
+                                                value={block.caption || ""}
+                                                onChange={(e) => updateBlock(index, { caption: e.target.value })}
+                                            />
+                                        </div>
+                                    </>
+                                )}
 
-            <div className="flex flex-wrap gap-2 justify-center p-4 border rounded-lg border-dashed">
-                <Button variant="outline" onClick={() => addBlock("text")}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Add Text
-                </Button>
-                <Button variant="outline" onClick={() => addBlock("image")}>
-                    <Image className="mr-2 h-4 w-4" />
-                    Add Image
-                </Button>
-                <Button variant="outline" onClick={() => addBlock("video")}>
-                    <Video className="mr-2 h-4 w-4" />
-                    Add Video
-                </Button>
-                <Button variant="outline" onClick={() => addBlock("code")}>
-                    <Code className="mr-2 h-4 w-4" />
-                    Add Code
-                </Button>
-                <Button variant="outline" onClick={() => addBlock("pdf")}>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Add PDF
-                </Button>
+                                {block.type === "code" && (
+                                    <>
+                                        <div className="space-y-2">
+                                            <Label>Language</Label>
+                                            <Input
+                                                placeholder="typescript, python, etc."
+                                                value={block.language || ""}
+                                                onChange={(e) => updateBlock(index, { language: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Code</Label>
+                                            <Textarea
+                                                placeholder="Enter code..."
+                                                value={block.value}
+                                                onChange={(e) => updateBlock(index, { value: e.target.value })}
+                                                className="font-mono min-h-[150px]"
+                                            />
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        </CardContent>
+                    </Card>
+                ))}
+
+                <div className="flex flex-wrap gap-2 justify-center p-4 border rounded-lg border-dashed">
+                    <Button variant="outline" onClick={() => addBlock("text")}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Add Text
+                    </Button>
+                    <Button variant="outline" onClick={() => addBlock("image")}>
+                        <Image className="mr-2 h-4 w-4" />
+                        Add Image
+                    </Button>
+                    <Button variant="outline" onClick={() => addBlock("video")}>
+                        <Video className="mr-2 h-4 w-4" />
+                        Add Video
+                    </Button>
+                    <Button variant="outline" onClick={() => addBlock("code")}>
+                        <Code className="mr-2 h-4 w-4" />
+                        Add Code
+                    </Button>
+                    <Button variant="outline" onClick={() => addBlock("pdf")}>
+                        <FileText className="mr-2 h-4 w-4" />
+                        Add PDF
+                    </Button>
+                </div>
+            </div>
+
+            {/* Preview Partition */}
+            <div className="space-y-4 order-1 lg:order-2 border-l pl-0 lg:pl-6">
+                <div className="flex items-center justify-between pb-2 border-b sticky top-0 bg-background z-10">
+                    <h3 className="text-lg font-semibold">Preview</h3>
+                </div>
+                <div className="h-full overflow-y-auto pr-2">
+                    <ContentRenderer content={value} />
+                </div>
             </div>
         </div>
     );
