@@ -364,7 +364,7 @@ export default function AdminDashboard() {
 
                 {/* Editor Modal */}
                 <Dialog open={isEditorOpen} onOpenChange={setIsEditorOpen}>
-                    <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+                    <DialogContent className="max-w-[90vw] h-[90vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>
                                 {currentId ? "Edit" : "Create"} {editingType === "blog" ? "Blog Post" : "Knowledge Entry"}
