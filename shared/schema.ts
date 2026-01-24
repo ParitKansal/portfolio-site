@@ -42,9 +42,9 @@ export const insertKnowledgeEntrySchema = createInsertSchema(knowledgeEntries, {
     caption: z.string().optional(),
     language: z.string().optional(),
   })),
+  date: z.coerce.date().optional(),
 }).omit({
-  id: true,
-  date: true
+  id: true
 });
 
 export type InsertKnowledgeEntry = z.infer<typeof insertKnowledgeEntrySchema>;
@@ -69,9 +69,9 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts, {
     caption: z.string().optional(),
     language: z.string().optional(),
   })),
+  date: z.coerce.date().optional(),
 }).omit({
-  id: true,
-  date: true
+  id: true
 });
 
 export type InsertBlogPost = z.infer<typeof insertBlogPostSchema>;

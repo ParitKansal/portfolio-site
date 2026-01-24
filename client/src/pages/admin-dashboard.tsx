@@ -20,6 +20,11 @@ import { formatDate } from "@/lib/utils";
 import {
     EducationForm, ExperienceForm, ProjectForm, SkillForm, CertificationForm, ResumeForm
 } from "@/components/SectionForms";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { CalendarIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { format } from "date-fns";
 
 export default function AdminDashboard() {
     const { user, isLoading: isAuthLoading } = useAuth();
@@ -377,6 +382,32 @@ export default function AdminDashboard() {
                                     <div className="space-y-2">
                                         <Label>Title</Label>
                                         <Input value={formData.title || ""} onChange={(e) => setFormData({ ...formData, title: e.target.value })} placeholder="Title" />
+                                    </div>
+
+                                    <div className="flex flex-col space-y-2">
+                                        <Label>Date</Label>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant={"outline"}
+                                                    className={cn(
+                                                        "w-full justify-start text-left font-normal",
+                                                        !formData.date && "text-muted-foreground"
+                                                    )}
+                                                >
+                                                    <CalendarIcon className="mr-2 h-4 w-4" />
+                                                    {formData.date ? format(new Date(formData.date), "PPP") : <span>Pick a date</span>}
+                                                </Button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-auto p-0">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={formData.date ? new Date(formData.date) : undefined}
+                                                    onSelect={(date) => setFormData({ ...formData, date: date })}
+                                                    initialFocus
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
                                     </div>
 
                                     {editingType === "blog" && (
