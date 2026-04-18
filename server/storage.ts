@@ -17,6 +17,7 @@ import {
   type Skill, type InsertSkill, skills,
   type Certification, type InsertCertification, certifications,
   type Resume, type InsertResume, resumes,
+  type SectionSetting, sectionSettings, SECTION_KEYS,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, like, or } from "drizzle-orm";
@@ -81,6 +82,10 @@ export interface IStorage {
   // Resume
   getResume(): Promise<Resume | undefined>;
   createResume(resume: InsertResume): Promise<Resume>;
+
+  // Section visibility
+  getSectionSettings(): Promise<SectionSetting[]>;
+  setSectionVisibility(section: string, visible: boolean): Promise<SectionSetting>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -280,6 +285,33 @@ export class DatabaseStorage implements IStorage {
   async createResume(resume: InsertResume): Promise<Resume> {
     const [newResume] = await db.insert(resumes).values(resume).returning();
     return newResume;
+  }
+
+  // Section visibility
+  async getSectionSettings(): Promise<SectionSetting[]> {
+    const existing = await db.select().from(sectionSettings);
+    // Ensure all known sections have a row (upsert defaults on first call)
+    const existingKeys = new Set(existing.map(s => s.section));
+    const missing = SECTION_KEYS.filter(k => !existingKeys.has(k));
+    if (missing.length > 0) {
+      await db.insert(sectionSettings)
+        .values(missing.map(section => ({ section, visible: true })));
+      return db.select().from(sectionSettings);
+    }
+    return existing;
+  }
+
+  async setSectionVisibility(section: string, visible: boolean): Promise<SectionSetting> {
+    const [existing] = await db.select().from(sectionSettings).where(eq(sectionSettings.section, section));
+    if (existing) {
+      const [updated] = await db.update(sectionSettings)
+        .set({ visible })
+        .where(eq(sectionSettings.section, section))
+        .returning();
+      return updated;
+    }
+    const [created] = await db.insert(sectionSettings).values({ section, visible }).returning();
+    return created;
   }
 }
 

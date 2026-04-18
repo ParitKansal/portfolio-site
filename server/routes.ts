@@ -299,6 +299,30 @@ export async function registerRoutes(
     }
   });
 
+  // Section visibility routes
+  app.get("/api/section-settings", async (req, res) => {
+    try {
+      const settings = await storage.getSectionSettings();
+      res.json(settings);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch section settings" });
+    }
+  });
+
+  app.put("/api/section-settings/:section", isAuthenticated, async (req, res) => {
+    try {
+      const { section } = req.params;
+      const { visible } = req.body;
+      if (typeof visible !== "boolean") {
+        return res.status(400).json({ error: "visible must be a boolean" });
+      }
+      const setting = await storage.setSectionVisibility(section, visible);
+      res.json(setting);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update section visibility" });
+    }
+  });
+
   return httpServer;
 }
 

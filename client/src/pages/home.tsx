@@ -9,6 +9,7 @@ import { KnowledgeVaultSection } from "@/components/KnowledgeVaultSection";
 import { BlogSection } from "@/components/BlogSection";
 import { Footer } from "@/components/Footer";
 import { ContactSection } from "@/components/ContactSection";
+import { SectionWrapper } from "@/components/SectionWrapper";
 
 export default function Home() {
   return (
@@ -16,14 +17,30 @@ export default function Home() {
       <Navigation />
       <main>
         <HeroSection />
-        <EducationSection />
-        <ExperienceSection />
-        <SkillsSection />
-        <ProjectsSection />
-        <CertificationsSection />
-        <KnowledgeVaultSection />
-        <BlogSection />
-        <ContactSection />
+        <SectionWrapper sectionKey="education" adminTab="education">
+          <EducationSection />
+        </SectionWrapper>
+        <SectionWrapper sectionKey="experience" adminTab="experience">
+          <ExperienceSection />
+        </SectionWrapper>
+        <SectionWrapper sectionKey="skills" adminTab="skills">
+          <SkillsSection />
+        </SectionWrapper>
+        <SectionWrapper sectionKey="projects" adminTab="projects">
+          <ProjectsSection />
+        </SectionWrapper>
+        <SectionWrapper sectionKey="certifications" adminTab="certifications">
+          <CertificationsSection />
+        </SectionWrapper>
+        <SectionWrapper sectionKey="knowledge-vault" adminTab="knowledge">
+          <KnowledgeVaultSection />
+        </SectionWrapper>
+        <SectionWrapper sectionKey="blog" adminTab="blog">
+          <BlogSection />
+        </SectionWrapper>
+        <SectionWrapper sectionKey="contact">
+          <ContactSection />
+        </SectionWrapper>
       </main>
       <Footer />
     </div>

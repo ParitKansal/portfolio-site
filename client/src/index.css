@@ -47,14 +47,14 @@
   --font-serif: Georgia, serif;
   --font-mono: JetBrains Mono, monospace;
   --radius: .5rem;
-  --shadow-2xs: 0px 2px 0px 0px hsl(210 85% 42% / 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(210 85% 42% / 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(210 85% 42% / 0.00), 0px 1px 2px -1px hsl(210 85% 42% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(210 85% 42% / 0.00), 0px 1px 2px -1px hsl(210 85% 42% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(210 85% 42% / 0.00), 0px 2px 4px -1px hsl(210 85% 42% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(210 85% 42% / 0.00), 0px 4px 6px -1px hsl(210 85% 42% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(210 85% 42% / 0.00), 0px 8px 10px -1px hsl(210 85% 42% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(210 85% 42% / 0.00);
+  --shadow-2xs: 0px 1px 2px 0px hsl(210 30% 20% / 0.04);
+  --shadow-xs: 0px 1px 3px 0px hsl(210 30% 20% / 0.06), 0px 1px 2px -1px hsl(210 30% 20% / 0.04);
+  --shadow-sm: 0px 2px 4px 0px hsl(210 30% 20% / 0.07), 0px 1px 2px -1px hsl(210 30% 20% / 0.05);
+  --shadow: 0px 3px 6px 0px hsl(210 30% 20% / 0.08), 0px 2px 4px -1px hsl(210 30% 20% / 0.06);
+  --shadow-md: 0px 4px 8px -1px hsl(210 30% 20% / 0.10), 0px 2px 4px -2px hsl(210 30% 20% / 0.06);
+  --shadow-lg: 0px 8px 16px -2px hsl(210 30% 20% / 0.12), 0px 4px 6px -3px hsl(210 30% 20% / 0.06);
+  --shadow-xl: 0px 16px 32px -4px hsl(210 30% 20% / 0.14), 0px 8px 12px -4px hsl(210 30% 20% / 0.08);
+  --shadow-2xl: 0px 24px 48px -8px hsl(210 30% 20% / 0.18);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
@@ -127,14 +127,14 @@
   --chart-3: 180 65% 70%;
   --chart-4: 165 60% 72%;
   --chart-5: 150 55% 75%;
-  --shadow-2xs: 0px 2px 0px 0px hsl(210 82% 48% / 0.00);
-  --shadow-xs: 0px 2px 0px 0px hsl(210 82% 48% / 0.00);
-  --shadow-sm: 0px 2px 0px 0px hsl(210 82% 48% / 0.00), 0px 1px 2px -1px hsl(210 82% 48% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(210 82% 48% / 0.00), 0px 1px 2px -1px hsl(210 82% 48% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(210 82% 48% / 0.00), 0px 2px 4px -1px hsl(210 82% 48% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(210 82% 48% / 0.00), 0px 4px 6px -1px hsl(210 82% 48% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(210 82% 48% / 0.00), 0px 8px 10px -1px hsl(210 82% 48% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(210 82% 48% / 0.00);
+  --shadow-2xs: 0px 1px 2px 0px hsl(210 18% 0% / 0.16);
+  --shadow-xs: 0px 1px 3px 0px hsl(210 18% 0% / 0.20), 0px 1px 2px -1px hsl(210 18% 0% / 0.14);
+  --shadow-sm: 0px 2px 4px 0px hsl(210 18% 0% / 0.22), 0px 1px 2px -1px hsl(210 18% 0% / 0.16);
+  --shadow: 0px 3px 6px 0px hsl(210 18% 0% / 0.24), 0px 2px 4px -1px hsl(210 18% 0% / 0.18);
+  --shadow-md: 0px 4px 8px -1px hsl(210 18% 0% / 0.28), 0px 2px 4px -2px hsl(210 18% 0% / 0.18);
+  --shadow-lg: 0px 8px 16px -2px hsl(210 18% 0% / 0.32), 0px 4px 6px -3px hsl(210 18% 0% / 0.18);
+  --shadow-xl: 0px 16px 32px -4px hsl(210 18% 0% / 0.36), 0px 8px 12px -4px hsl(210 18% 0% / 0.22);
+  --shadow-2xl: 0px 24px 48px -8px hsl(210 18% 0% / 0.40);
 
 /* Fallback for older browsers */
   --sidebar-primary-border: hsl(var(--sidebar-primary));
@@ -284,5 +284,45 @@
   .border.active-elevate-2:not(.no-active-interaction-elevate)::after,
   .border.hover-elevate:not(.no-hover-interaction-elevate)::after {
     inset: -1px;
+  }
+
+  /* Scroll-triggered fade-in animation */
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .animate-fade-up {
+    animation: fade-up 0.5s ease-out forwards;
+  }
+
+  /* Section label badge */
+  .section-label {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase border border-primary/20 bg-primary/8 text-primary mb-3;
+  }
+
+  /* Card hover lift */
+  .card-lift {
+    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+  }
+
+  /* Gradient skill card variants */
+  .skill-card-blue {
+    @apply bg-gradient-to-br from-blue-500/5 to-blue-500/[0.02] border-blue-500/20;
+  }
+  .skill-card-violet {
+    @apply bg-gradient-to-br from-violet-500/5 to-violet-500/[0.02] border-violet-500/20;
+  }
+  .skill-card-emerald {
+    @apply bg-gradient-to-br from-emerald-500/5 to-emerald-500/[0.02] border-emerald-500/20;
+  }
+  .skill-card-amber {
+    @apply bg-gradient-to-br from-amber-500/5 to-amber-500/[0.02] border-amber-500/20;
   }
 }
