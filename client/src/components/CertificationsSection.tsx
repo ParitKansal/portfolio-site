@@ -1,7 +1,8 @@
 import { Award, ExternalLink } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+import { SectionHeader } from "./SectionHeader";
 import type { Certification } from "@shared/schema";
 
 export function CertificationsSection() {
@@ -14,34 +15,42 @@ export function CertificationsSection() {
   return (
     <section className="py-16 md:py-24 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-3 mb-12">
-          <Award className="h-8 w-8 text-primary" />
-          <h2 className="text-3xl md:text-4xl font-semibold">Certifications</h2>
-        </div>
+        <SectionHeader
+          icon={Award}
+          label="Certifications"
+          title="Certifications"
+        />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {certifications?.map((cert, index) => (
-            <Card key={index} className="hover-elevate" data-testid={`card-certification-${index}`}>
-              <CardContent className="p-6 flex items-start justify-between gap-4">
-                <div className="flex items-start gap-4">
-                  <div className="p-2 rounded-md bg-primary/10">
-                    <Award className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold mb-1">{cert.name}</h3>
-                    <p className="text-sm text-muted-foreground">{cert.issuer}</p>
-                    <p className="text-sm text-muted-foreground">{cert.date}</p>
-                  </div>
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.4, delay: index * 0.07 }}
+              whileHover={{ y: -3, transition: { duration: 0.15 } }}
+              className="flex items-start justify-between gap-4 p-5 rounded-xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow duration-200"
+              data-testid={`card-certification-${index}`}
+            >
+              <div className="flex items-start gap-4">
+                <div className="p-2.5 rounded-lg bg-primary/10 shrink-0">
+                  <Award className="h-5 w-5 text-primary" />
                 </div>
-                {cert.link && (
-                  <Button variant="ghost" size="icon" className="shrink-0" asChild>
-                    <a href={cert.link} target="_blank" rel="noopener noreferrer">
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
+                <div>
+                  <h3 className="font-semibold text-sm mb-0.5">{cert.name}</h3>
+                  <p className="text-sm text-muted-foreground">{cert.issuer}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{cert.date}</p>
+                </div>
+              </div>
+              {cert.link && (
+                <a href={cert.link} target="_blank" rel="noopener noreferrer" className="shrink-0">
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <ExternalLink className="h-3.5 w-3.5" />
                   </Button>
-                )}
-              </CardContent>
-            </Card>
+                </a>
+              )}
+            </motion.div>
           ))}
         </div>
       </div>

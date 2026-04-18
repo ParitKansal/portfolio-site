@@ -30,7 +30,13 @@ export default function AdminDashboard() {
     const { user, isLoading: isAuthLoading } = useAuth();
     const [, setLocation] = useLocation();
     const search = useSearch();
-    const [activeTab, setActiveTab] = useState("blog");
+    const tabFromUrl = new URLSearchParams(search).get("tab");
+    const [activeTab, setActiveTab] = useState(tabFromUrl || "blog");
+
+    // Keep tab in sync if URL param changes
+    useEffect(() => {
+      if (tabFromUrl) setActiveTab(tabFromUrl);
+    }, [tabFromUrl]);
     const { toast } = useToast();
     const queryClient = useQueryClient();
 

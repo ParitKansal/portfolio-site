@@ -178,3 +178,14 @@ export const resumes = sqliteTable("resumes", {
 export const insertResumeSchema = createInsertSchema(resumes).omit({ id: true, uploadedAt: true });
 export type InsertResume = z.infer<typeof insertResumeSchema>;
 export type Resume = typeof resumes.$inferSelect;
+
+export const SECTION_KEYS = ["education", "experience", "skills", "projects", "certifications", "knowledge-vault", "blog", "contact"] as const;
+export type SectionKey = typeof SECTION_KEYS[number];
+
+export const sectionSettings = sqliteTable("section_settings", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
+  section: text("section").notNull().unique(),
+  visible: integer("visible", { mode: "boolean" }).notNull().default(true),
+});
+
+export type SectionSetting = typeof sectionSettings.$inferSelect;
