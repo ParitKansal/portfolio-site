@@ -174,11 +174,6 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 
-  /* Center KaTeX display/block equations ($$...$$) */
-  .katex-display {
-    text-align: center !important;
-    overflow-x: auto;
-  }
 }
 
 /**
@@ -331,4 +326,21 @@
   .skill-card-amber {
     @apply bg-gradient-to-br from-amber-500/5 to-amber-500/[0.02] border-amber-500/20;
   }
+}
+
+/* KaTeX display math centering — outside @layer so it is never purged */
+.katex-display {
+  display: block;
+  text-align: center !important;
+  margin: 1.5rem 0 !important;
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.katex-display > .katex {
+  display: inline-block !important;
+  text-align: center !important;
+  margin: 0 auto !important;
+  white-space: normal;
 }
