@@ -255,18 +255,29 @@ Here is exactly how to set up the free server:
         *   Add `http://paritkansal.in/api/auth/google/callback` to Authorized Redirect URIs.
 
 ## 🔄 Updating Your Live Site
-Since you have already deployed once, you don't need to do everything again! 
-To update your website with new changes:
 
-1.  **Push your changes** from your computer:
-    ```bash
-    git push
-    ```
-2.  **Connect to your Server** (Click "SSH" on Google Cloud Console).
-3.  **Run these update commands**:
-    ```bash
-    cd portfolio-site
-    git pull                          # Get the new code
-    sudo docker-compose up -d --build # Rebuild and restart
-    ```
-    *Wait ~3-5 minutes for it to finish rebuilding.*
+When you want to push new code changes (like the ones we just made) to your live website:
+
+### Step 1: Push changes from your computer
+In your local terminal (where you are writing code), run:
+```bash
+git add .
+git commit -m "Describe your changes"
+git push
+```
+
+### Step 2: Connect to the Server
+1.  Open the **[Google Cloud Console](https://console.cloud.google.com/)**.
+2.  In the "Quick Access" grid, click **Compute Engine**.
+3.  On the left menu, ensure you are on **VM Instances**.
+4.  Find your server (e.g., `portfolio-server`) and click the **SSH** button in the row.
+
+### Step 3: Pull and Rebuild
+In the SSH terminal window that opens, run these commands:
+```bash
+cd portfolio-site
+git pull                          # Downloads the new code from GitHub
+sudo docker-compose up -d --build # Rebuilds the app and restarts the server
+```
+*Wait ~3-5 minutes for the build to finish. Your site will automatically stay online during the process.*
+
