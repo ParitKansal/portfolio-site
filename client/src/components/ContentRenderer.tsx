@@ -83,17 +83,22 @@ export function ContentRenderer({ content }: ContentRendererProps) {
 
                     case "image":
                         return (
-                            <div key={index} className="rounded-lg overflow-hidden border bg-muted/50">
-                                <img
-                                    src={block.url}
-                                    alt={block.caption || "Blog content image"}
-                                    className="w-full h-auto"
-                                />
-                                {block.caption && (
-                                    <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm">
-                                        {block.caption}
-                                    </p>
-                                )}
+                            <div key={index} className="flex justify-center">
+                                <div
+                                    className="rounded-lg overflow-hidden border bg-muted/50"
+                                    style={{ width: block.width ? `${block.width}%` : "100%" }}
+                                >
+                                    <img
+                                        src={block.url}
+                                        alt={block.caption || "Blog content image"}
+                                        className="w-full h-auto"
+                                    />
+                                    {block.caption && (
+                                        <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm">
+                                            {block.caption}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
                         );
                     case "video":

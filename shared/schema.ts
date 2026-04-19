@@ -20,7 +20,7 @@ export type User = typeof users.$inferSelect;
 
 export type ContentBlock =
   | { type: "text"; value: string }
-  | { type: "image"; url: string; caption?: string }
+  | { type: "image"; url: string; caption?: string; width?: number }
   | { type: "code"; value: string; language?: string }
   | { type: "video"; url: string; caption?: string }
   | { type: "pdf"; url: string; caption?: string };
@@ -41,6 +41,7 @@ export const insertKnowledgeEntrySchema = createInsertSchema(knowledgeEntries, {
     url: z.string().optional(),
     caption: z.string().optional(),
     language: z.string().optional(),
+    width: z.number().min(1).max(100).optional(),
   })),
   date: z.coerce.date().optional(),
 }).omit({
@@ -68,6 +69,7 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts, {
     url: z.string().optional(),
     caption: z.string().optional(),
     language: z.string().optional(),
+    width: z.number().min(1).max(100).optional(),
   })),
   date: z.coerce.date().optional(),
 }).omit({
