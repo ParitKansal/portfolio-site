@@ -8,6 +8,50 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Plus, X, Image, FileText, Code, Video, MoveUp, MoveDown, Link, Globe, BookOpen, PlayCircle } from "lucide-react";
 import { ContentRenderer } from "./ContentRenderer";
 
+const BLOCK_TYPES = [
+    { type: "text"  as const, icon: FileText, label: "Text"  },
+    { type: "image" as const, icon: Image,    label: "Image" },
+    { type: "video" as const, icon: Video,    label: "Video" },
+    { type: "code"  as const, icon: Code,     label: "Code"  },
+    { type: "pdf"   as const, icon: FileText, label: "PDF"   },
+    { type: "link"  as const, icon: Link,     label: "Link"  },
+];
+
+function InsertStrip({ onInsert }: { onInsert: (type: ContentBlock["type"]) => void }) {
+    const [open, setOpen] = useState(false);
+    return (
+        <div
+            className="relative flex items-center justify-center h-8 group/strip"
+            onMouseEnter={() => setOpen(true)}
+            onMouseLeave={() => setOpen(false)}
+        >
+            <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-px bg-border" />
+            {open ? (
+                <div className="relative z-10 flex items-center gap-1 bg-background border rounded-full px-2 py-1 shadow-sm">
+                    {BLOCK_TYPES.map(({ type, icon: Icon, label }) => (
+                        <button
+                            key={type}
+                            type="button"
+                            onClick={() => { onInsert(type); setOpen(false); }}
+                            className="flex items-center gap-1 px-2 py-1 rounded-full text-xs text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                        >
+                            <Icon className="h-3 w-3" />
+                            {label}
+                        </button>
+                    ))}
+                </div>
+            ) : (
+                <button
+                    type="button"
+                    className="relative z-10 flex items-center justify-center h-5 w-5 rounded-full bg-background border text-muted-foreground hover:text-foreground hover:border-foreground transition-colors"
+                >
+                    <Plus className="h-3 w-3" />
+                </button>
+            )}
+        </div>
+    );
+}
+
 const ICON_OPTIONS = [
     { key: "youtube",  icon: PlayCircle, label: "YouTube" },
     { key: "video",    icon: Video,      label: "Video" },
@@ -23,7 +67,7 @@ interface ContentEditorProps {
 }
 
 export function ContentEditor({ value, onChange }: ContentEditorProps) {
-    const addBlock = (type: ContentBlock["type"]) => {
+    const addBlock = (type: ContentBlock["type"], insertAt?: number) => {
         const newBlock = type === "text"
             ? { type, value: "" }
             : type === "code"
@@ -32,7 +76,13 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                     ? { type, url: "", caption: "", thumbnail: "" }
                     : { type, url: "", caption: "" };
 
-        onChange([...value, newBlock as ContentBlock]);
+        if (insertAt !== undefined) {
+            const newBlocks = [...value];
+            newBlocks.splice(insertAt, 0, newBlock as ContentBlock);
+            onChange(newBlocks);
+        } else {
+            onChange([...value, newBlock as ContentBlock]);
+        }
     };
 
     const updateBlock = (index: number, updates: Partial<ContentBlock>) => {
@@ -67,7 +117,9 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                     <h3 className="text-lg font-semibold">Editor</h3>
                 </div>
                 {value.map((block, index) => (
-                    <Card key={index} className="relative group">
+                    <div key={index}>
+                    <InsertStrip onInsert={(type) => addBlock(type, index)} />
+                    <Card className="relative group">
                         <CardContent className="pt-6">
                             <div className="absolute top-2 right-2 flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity z-10">
                                 <Button
@@ -222,6 +274,7 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                             </div>
                         </CardContent>
                     </Card>
+                    </div>
                 ))}
 
                 <div className="flex flex-wrap gap-2 justify-center p-4 border rounded-lg border-dashed">
