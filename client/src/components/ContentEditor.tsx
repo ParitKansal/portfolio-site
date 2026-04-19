@@ -5,8 +5,17 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, X, Image, FileText, Code, Video, MoveUp, MoveDown } from "lucide-react";
+import { Plus, X, Image, FileText, Code, Video, MoveUp, MoveDown, Link, Globe, BookOpen, PlayCircle } from "lucide-react";
 import { ContentRenderer } from "./ContentRenderer";
+
+const ICON_OPTIONS = [
+    { key: "youtube",  icon: PlayCircle, label: "YouTube" },
+    { key: "video",    icon: Video,      label: "Video" },
+    { key: "link",     icon: Link,       label: "Link" },
+    { key: "globe",    icon: Globe,      label: "Website" },
+    { key: "article",  icon: BookOpen,   label: "Article" },
+    { key: "document", icon: FileText,   label: "Doc" },
+] as const;
 
 interface ContentEditorProps {
     value: ContentBlock[];
@@ -19,7 +28,9 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
             ? { type, value: "" }
             : type === "code"
                 ? { type, value: "", language: "typescript" }
-                : { type, url: "", caption: "" };
+                : type === "link"
+                    ? { type, url: "", caption: "", thumbnail: "" }
+                    : { type, url: "", caption: "" };
 
         onChange([...value, newBlock as ContentBlock]);
     };
@@ -90,6 +101,7 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                                     {block.type === "image" && <Image className="h-4 w-4 text-muted-foreground" />}
                                     {block.type === "video" && <Video className="h-4 w-4 text-muted-foreground" />}
                                     {block.type === "code" && <Code className="h-4 w-4 text-muted-foreground" />}
+                                    {block.type === "link" && <Link className="h-4 w-4 text-muted-foreground" />}
                                     <span className="text-sm font-medium capitalize">{block.type} Block</span>
                                 </div>
 
@@ -100,6 +112,54 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                                         onChange={(e) => updateBlock(index, { value: e.target.value })}
                                         className="min-h-[150px]"
                                     />
+                                )}
+
+                                {block.type === "link" && (
+                                    <>
+                                        <div className="space-y-2">
+                                            <Label>URL</Label>
+                                            <Input
+                                                placeholder="Enter link URL..."
+                                                value={block.url}
+                                                onChange={(e) => updateBlock(index, { url: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Title (Optional)</Label>
+                                            <Input
+                                                placeholder="Enter link title..."
+                                                value={block.caption || ""}
+                                                onChange={(e) => updateBlock(index, { caption: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Thumbnail Image URL (Optional)</Label>
+                                            <Input
+                                                placeholder="Enter thumbnail image URL..."
+                                                value={block.thumbnail || ""}
+                                                onChange={(e) => updateBlock(index, { thumbnail: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Icon (Optional)</Label>
+                                            <div className="flex flex-wrap gap-2">
+                                                {ICON_OPTIONS.map(({ key, icon: Icon, label }) => {
+                                                    const selected = block.icon === key;
+                                                    return (
+                                                        <button
+                                                            key={key}
+                                                            type="button"
+                                                            onClick={() => updateBlock(index, { icon: selected ? undefined : key })}
+                                                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${selected ? "bg-foreground text-background border-foreground" : "bg-background text-muted-foreground hover:text-foreground"}`}
+                                                        >
+                                                            <Icon className="h-3.5 w-3.5" />
+                                                            {label}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    </>
                                 )}
 
                                 {(block.type === "image" || block.type === "video" || block.type === "pdf") && (
@@ -184,6 +244,10 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                     <Button variant="outline" onClick={() => addBlock("pdf")}>
                         <FileText className="mr-2 h-4 w-4" />
                         Add PDF
+                    </Button>
+                    <Button variant="outline" onClick={() => addBlock("link")}>
+                        <Link className="mr-2 h-4 w-4" />
+                        Add Link
                     </Button>
                 </div>
             </div>

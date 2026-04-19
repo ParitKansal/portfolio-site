@@ -23,7 +23,8 @@ export type ContentBlock =
   | { type: "image"; url: string; caption?: string; width?: number }
   | { type: "code"; value: string; language?: string }
   | { type: "video"; url: string; caption?: string }
-  | { type: "pdf"; url: string; caption?: string };
+  | { type: "pdf"; url: string; caption?: string }
+  | { type: "link"; url: string; caption?: string; thumbnail?: string; icon?: string };
 
 export const knowledgeEntries = sqliteTable("knowledge_entries", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -36,12 +37,14 @@ export const knowledgeEntries = sqliteTable("knowledge_entries", {
 export const insertKnowledgeEntrySchema = createInsertSchema(knowledgeEntries, {
   tags: z.array(z.string()),
   content: z.array(z.object({
-    type: z.enum(["text", "image", "code", "video", "pdf"]),
+    type: z.enum(["text", "image", "code", "video", "pdf", "link"]),
     value: z.string().optional(),
     url: z.string().optional(),
     caption: z.string().optional(),
     language: z.string().optional(),
     width: z.number().min(1).max(100).optional(),
+    thumbnail: z.string().optional(),
+    icon: z.string().optional(),
   })),
   date: z.coerce.date().optional(),
 }).omit({
@@ -64,12 +67,14 @@ export const blogPosts = sqliteTable("blog_posts", {
 export const insertBlogPostSchema = createInsertSchema(blogPosts, {
   tags: z.array(z.string()),
   content: z.array(z.object({
-    type: z.enum(["text", "image", "code", "video", "pdf"]),
+    type: z.enum(["text", "image", "code", "video", "pdf", "link"]),
     value: z.string().optional(),
     url: z.string().optional(),
     caption: z.string().optional(),
     language: z.string().optional(),
     width: z.number().min(1).max(100).optional(),
+    thumbnail: z.string().optional(),
+    icon: z.string().optional(),
   })),
   date: z.coerce.date().optional(),
 }).omit({
