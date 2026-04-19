@@ -1,10 +1,20 @@
 import { type ContentBlock } from "@shared/schema";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { ExternalLink, Video, Link as LinkIcon, Globe, BookOpen, FileText, PlayCircle } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+
+const LINK_ICONS: Record<string, { component: React.ElementType; label: string }> = {
+    youtube:  { component: PlayCircle, label: "YouTube" },
+    video:    { component: Video,      label: "Video" },
+    link:     { component: LinkIcon,   label: "Link" },
+    globe:    { component: Globe,      label: "Website" },
+    article:  { component: BookOpen,   label: "Article" },
+    document: { component: FileText,   label: "Document" },
+};
 
 interface ContentRendererProps {
     content: ContentBlock[];
@@ -136,6 +146,49 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                             </div>
                         );
                     // ... rest of the file
+
+                    case "link": {
+                        const iconDef = block.icon ? LINK_ICONS[block.icon] : null;
+                        const IconComponent = iconDef?.component;
+                        return (
+                            <a
+                                key={index}
+                                href={block.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="block rounded-lg overflow-hidden border bg-muted/50 hover:bg-muted transition-colors no-underline"
+                            >
+                                        {block.thumbnail ? (
+                                    <div className="relative w-full">
+                                        <img
+                                            src={block.thumbnail}
+                                            alt={block.caption || "Link preview"}
+                                            className="w-full h-48 object-cover"
+                                        />
+                                        {IconComponent && (
+                                            <span className="absolute top-2 left-2 flex items-center gap-1.5 px-2 py-1 rounded-full text-xs font-medium bg-background/80 text-foreground backdrop-blur-sm border">
+                                                <IconComponent className="h-3.5 w-3.5" />
+                                                {iconDef.label}
+                                            </span>
+                                        )}
+                                    </div>
+                                ) : IconComponent ? (
+                                    <div className="flex items-center justify-center h-24 w-full bg-muted">
+                                        <IconComponent className="h-12 w-12 text-muted-foreground" />
+                                    </div>
+                                ) : null}
+                                <div className="flex items-center justify-between p-4 gap-3">
+                                    <div className="min-w-0">
+                                        {block.caption && (
+                                            <p className="font-medium text-foreground truncate">{block.caption}</p>
+                                        )}
+                                        <p className="text-sm text-muted-foreground truncate">{block.url}</p>
+                                    </div>
+                                    <ExternalLink className="h-4 w-4 text-muted-foreground shrink-0" />
+                                </div>
+                            </a>
+                        );
+                    }
 
                     case "code":
                         return (
