@@ -120,6 +120,21 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                                                 onChange={(e) => updateBlock(index, { caption: e.target.value })}
                                             />
                                         </div>
+                                        {block.type === "image" && (
+                                            <div className="space-y-2">
+                                                <Label>Width % (Optional, default 100%)</Label>
+                                                <Input
+                                                    type="number"
+                                                    min={1}
+                                                    max={100}
+                                                    placeholder="100"
+                                                    value={block.width ?? ""}
+                                                    onChange={(e) => updateBlock(index, {
+                                                        width: e.target.value ? Math.min(100, Math.max(1, Number(e.target.value))) : undefined
+                                                    })}
+                                                />
+                                            </div>
+                                        )}
                                     </>
                                 )}
 
