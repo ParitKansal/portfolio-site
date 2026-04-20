@@ -6,6 +6,49 @@ import remarkGfm from "remark-gfm";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import "katex/dist/katex.min.css";
+import { useRef, useState, useEffect } from "react";
+
+const CONTENT_WIDTH = 1200;
+
+function ScaledIframe({ url, height, caption }: { url: string; height: number; caption?: string }) {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const [scale, setScale] = useState(1);
+
+    useEffect(() => {
+        const el = containerRef.current;
+        if (!el) return;
+        const obs = new ResizeObserver(([entry]) => {
+            setScale(entry.contentRect.width / CONTENT_WIDTH);
+        });
+        obs.observe(el);
+        return () => obs.disconnect();
+    }, []);
+
+    return (
+        <div className="rounded-lg overflow-hidden border bg-muted/50">
+            <div ref={containerRef} style={{ height: `${height * scale}px`, overflow: "hidden", position: "relative" }}>
+                <iframe
+                    src={url}
+                    title={caption || "Interactive content"}
+                    style={{
+                        overflow: "hidden",
+                        width: `${CONTENT_WIDTH}px`,
+                        height: `${height}px`,
+                        border: "none",
+                        transform: `scale(${scale})`,
+                        transformOrigin: "top left",
+                    }}
+                    allowFullScreen
+                />
+            </div>
+            {caption && (
+                <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t">
+                    {caption}
+                </p>
+            )}
+        </div>
+    );
+}
 
 const LINK_ICONS: Record<string, { component: React.ElementType; label: string }> = {
     youtube:  { component: PlayCircle, label: "YouTube" },
@@ -192,20 +235,12 @@ export function ContentRenderer({ content }: ContentRendererProps) {
 
                     case "iframe":
                         return (
-                            <div key={index} className="rounded-lg overflow-hidden border bg-muted/50">
-                                <iframe
-                                    src={block.url}
-                                    title={block.caption || "Interactive content"}
-                                    className="w-full"
-                                    style={{ height: block.height ? `${block.height}px` : "500px" }}
-                                    allowFullScreen
-                                />
-                                {block.caption && (
-                                    <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t">
-                                        {block.caption}
-                                    </p>
-                                )}
-                            </div>
+                            <ScaledIframe
+                                key={index}
+                                url={block.url}
+                                height={block.height ?? 500}
+                                caption={block.caption}
+                            />
                         );
 
                     case "code":
