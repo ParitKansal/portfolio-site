@@ -190,6 +190,24 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                         );
                     }
 
+                    case "iframe":
+                        return (
+                            <div key={index} className="rounded-lg overflow-hidden border bg-muted/50">
+                                <iframe
+                                    src={block.url}
+                                    title={block.caption || "Interactive content"}
+                                    className="w-full"
+                                    style={{ height: block.height ? `${block.height}px` : "500px" }}
+                                    allowFullScreen
+                                />
+                                {block.caption && (
+                                    <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t">
+                                        {block.caption}
+                                    </p>
+                                )}
+                            </div>
+                        );
+
                     case "code":
                         return (
                             <div key={index} className="rounded-md bg-muted p-4 overflow-x-auto font-mono text-sm my-4">

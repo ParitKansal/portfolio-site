@@ -5,7 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import { Plus, X, Image, FileText, Code, Video, MoveUp, MoveDown, Link, Globe, BookOpen, PlayCircle } from "lucide-react";
+import { Plus, X, Image, FileText, Code, Video, MoveUp, MoveDown, Link, Globe, BookOpen, PlayCircle, AppWindow } from "lucide-react";
 import { ContentRenderer } from "./ContentRenderer";
 
 const BLOCK_TYPES = [
@@ -14,7 +14,8 @@ const BLOCK_TYPES = [
     { type: "video" as const, icon: Video,    label: "Video" },
     { type: "code"  as const, icon: Code,     label: "Code"  },
     { type: "pdf"   as const, icon: FileText, label: "PDF"   },
-    { type: "link"  as const, icon: Link,     label: "Link"  },
+    { type: "link"  as const, icon: Link,      label: "Link"   },
+    { type: "iframe" as const, icon: AppWindow, label: "Embed" },
 ];
 
 function InsertStrip({ onInsert }: { onInsert: (type: ContentBlock["type"]) => void }) {
@@ -74,7 +75,9 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                 ? { type, value: "", language: "typescript" }
                 : type === "link"
                     ? { type, url: "", caption: "", thumbnail: "" }
-                    : { type, url: "", caption: "" };
+                    : type === "iframe"
+                        ? { type, url: "", caption: "", height: 500 }
+                        : { type, url: "", caption: "" };
 
         if (insertAt !== undefined) {
             const newBlocks = [...value];
@@ -154,6 +157,7 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                                     {block.type === "video" && <Video className="h-4 w-4 text-muted-foreground" />}
                                     {block.type === "code" && <Code className="h-4 w-4 text-muted-foreground" />}
                                     {block.type === "link" && <Link className="h-4 w-4 text-muted-foreground" />}
+                                    {block.type === "iframe" && <AppWindow className="h-4 w-4 text-muted-foreground" />}
                                     <span className="text-sm font-medium capitalize">{block.type} Block</span>
                                 </div>
 
@@ -210,6 +214,40 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                                                     );
                                                 })}
                                             </div>
+                                        </div>
+                                    </>
+                                )}
+
+                                {block.type === "iframe" && (
+                                    <>
+                                        <div className="space-y-2">
+                                            <Label>URL</Label>
+                                            <Input
+                                                placeholder="e.g. https://paritkansal.github.io/interactive/file.html"
+                                                value={block.url}
+                                                onChange={(e) => updateBlock(index, { url: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Caption (Optional)</Label>
+                                            <Input
+                                                placeholder="Enter caption..."
+                                                value={block.caption || ""}
+                                                onChange={(e) => updateBlock(index, { caption: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Height px (default 500)</Label>
+                                            <Input
+                                                type="number"
+                                                min={200}
+                                                max={2000}
+                                                placeholder="500"
+                                                value={block.height ?? ""}
+                                                onChange={(e) => updateBlock(index, {
+                                                    height: e.target.value ? Number(e.target.value) : undefined
+                                                })}
+                                            />
                                         </div>
                                     </>
                                 )}
@@ -301,6 +339,10 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                     <Button variant="outline" onClick={() => addBlock("link")}>
                         <Link className="mr-2 h-4 w-4" />
                         Add Link
+                    </Button>
+                    <Button variant="outline" onClick={() => addBlock("iframe")}>
+                        <AppWindow className="mr-2 h-4 w-4" />
+                        Add Embed
                     </Button>
                 </div>
             </div>

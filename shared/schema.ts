@@ -24,7 +24,8 @@ export type ContentBlock =
   | { type: "code"; value: string; language?: string }
   | { type: "video"; url: string; caption?: string }
   | { type: "pdf"; url: string; caption?: string }
-  | { type: "link"; url: string; caption?: string; thumbnail?: string; icon?: string };
+  | { type: "link"; url: string; caption?: string; thumbnail?: string; icon?: string }
+  | { type: "iframe"; url: string; caption?: string; height?: number };
 
 export const knowledgeEntries = sqliteTable("knowledge_entries", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -37,7 +38,7 @@ export const knowledgeEntries = sqliteTable("knowledge_entries", {
 export const insertKnowledgeEntrySchema = createInsertSchema(knowledgeEntries, {
   tags: z.array(z.string()),
   content: z.array(z.object({
-    type: z.enum(["text", "image", "code", "video", "pdf", "link"]),
+    type: z.enum(["text", "image", "code", "video", "pdf", "link", "iframe"]),
     value: z.string().optional(),
     url: z.string().optional(),
     caption: z.string().optional(),
@@ -45,6 +46,7 @@ export const insertKnowledgeEntrySchema = createInsertSchema(knowledgeEntries, {
     width: z.number().min(1).max(100).optional(),
     thumbnail: z.string().optional(),
     icon: z.string().optional(),
+    height: z.number().optional(),
   })),
   date: z.coerce.date().optional(),
 }).omit({
@@ -67,7 +69,7 @@ export const blogPosts = sqliteTable("blog_posts", {
 export const insertBlogPostSchema = createInsertSchema(blogPosts, {
   tags: z.array(z.string()),
   content: z.array(z.object({
-    type: z.enum(["text", "image", "code", "video", "pdf", "link"]),
+    type: z.enum(["text", "image", "code", "video", "pdf", "link", "iframe"]),
     value: z.string().optional(),
     url: z.string().optional(),
     caption: z.string().optional(),
@@ -75,6 +77,7 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts, {
     width: z.number().min(1).max(100).optional(),
     thumbnail: z.string().optional(),
     icon: z.string().optional(),
+    height: z.number().optional(),
   })),
   date: z.coerce.date().optional(),
 }).omit({
