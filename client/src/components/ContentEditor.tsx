@@ -76,7 +76,7 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                 : type === "link"
                     ? { type, url: "", caption: "", thumbnail: "" }
                     : type === "iframe"
-                        ? { type, url: "", caption: "", height: 500 }
+                        ? { type, url: "", caption: "", height: 500, contentWidth: undefined }
                         : { type, url: "", caption: "" };
 
         if (insertAt !== undefined) {
@@ -246,6 +246,19 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
                                                 value={block.height ?? ""}
                                                 onChange={(e) => updateBlock(index, {
                                                     height: e.target.value ? Number(e.target.value) : undefined
+                                                })}
+                                            />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <Label>Content Width px (default 1200)</Label>
+                                            <Input
+                                                type="number"
+                                                min={200}
+                                                max={4000}
+                                                placeholder="1200"
+                                                value={block.contentWidth ?? ""}
+                                                onChange={(e) => updateBlock(index, {
+                                                    contentWidth: e.target.value ? Number(e.target.value) : undefined
                                                 })}
                                             />
                                         </div>

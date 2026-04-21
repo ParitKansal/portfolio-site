@@ -10,19 +10,20 @@ import { useRef, useState, useEffect } from "react";
 
 const CONTENT_WIDTH = 1200;
 
-function ScaledIframe({ url, height, caption }: { url: string; height: number; caption?: string }) {
+function ScaledIframe({ url, height, caption, contentWidth }: { url: string; height: number; caption?: string; contentWidth?: number }) {
     const containerRef = useRef<HTMLDivElement>(null);
     const [scale, setScale] = useState(1);
+    const effectiveWidth = contentWidth ?? CONTENT_WIDTH;
 
     useEffect(() => {
         const el = containerRef.current;
         if (!el) return;
         const obs = new ResizeObserver(([entry]) => {
-            setScale(entry.contentRect.width / CONTENT_WIDTH);
+            setScale(entry.contentRect.width / effectiveWidth);
         });
         obs.observe(el);
         return () => obs.disconnect();
-    }, []);
+    }, [effectiveWidth]);
 
     return (
         <div className="rounded-lg overflow-hidden border bg-muted/50">
@@ -32,7 +33,7 @@ function ScaledIframe({ url, height, caption }: { url: string; height: number; c
                     title={caption || "Interactive content"}
                     style={{
                         overflow: "hidden",
-                        width: `${CONTENT_WIDTH}px`,
+                        width: `${effectiveWidth}px`,
                         height: `${height}px`,
                         border: "none",
                         transform: `scale(${scale})`,
@@ -240,6 +241,7 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                                 url={block.url}
                                 height={block.height ?? 500}
                                 caption={block.caption}
+                                contentWidth={block.contentWidth}
                             />
                         );
 

@@ -25,7 +25,7 @@ export type ContentBlock =
   | { type: "video"; url: string; caption?: string }
   | { type: "pdf"; url: string; caption?: string }
   | { type: "link"; url: string; caption?: string; thumbnail?: string; icon?: string }
-  | { type: "iframe"; url: string; caption?: string; height?: number };
+  | { type: "iframe"; url: string; caption?: string; height?: number; contentWidth?: number };
 
 export const knowledgeEntries = sqliteTable("knowledge_entries", {
   id: integer("id").primaryKey({ autoIncrement: true }),
@@ -47,6 +47,7 @@ export const insertKnowledgeEntrySchema = createInsertSchema(knowledgeEntries, {
     thumbnail: z.string().optional(),
     icon: z.string().optional(),
     height: z.number().optional(),
+    contentWidth: z.number().optional(),
   })),
   date: z.coerce.date().optional(),
 }).omit({
@@ -78,6 +79,7 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts, {
     thumbnail: z.string().optional(),
     icon: z.string().optional(),
     height: z.number().optional(),
+    contentWidth: z.number().optional(),
   })),
   date: z.coerce.date().optional(),
 }).omit({
