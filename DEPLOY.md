@@ -280,11 +280,21 @@ In the SSH terminal window that opens, run:
 cd portfolio-site
 git fetch origin
 git reset --hard origin/main
-sudo docker-compose up -d --build
-sudo systemctl restart caddy
+nohup sudo docker-compose up -d --build > ~/build.log 2>&1 &
 ```
 
-*Wait ~3-5 minutes for the build to finish. Your site will automatically stay online during the process.*
+This runs the build in the background — you can safely close the SSH window or lose internet and it will keep running.
+
+To check build progress anytime:
+```bash
+tail -f ~/build.log
+```
+Press `Ctrl+C` to stop watching the log (the build keeps running).
+
+Once the build is done (check log for "Done"), restart Caddy:
+```bash
+sudo systemctl restart caddy
+```
 
 ---
 
