@@ -256,7 +256,7 @@ Here is exactly how to set up the free server:
 
 ## 🔄 Updating Your Live Site
 
-When you want to push new code changes (like the ones we just made) to your live website:
+When you want to push new code changes to your live website:
 
 ### Step 1: Push changes from your computer
 In your local terminal (where you are writing code), run:
@@ -272,12 +272,46 @@ git push
 3.  On the left menu, ensure you are on **VM Instances**.
 4.  Find your server (e.g., `portfolio-server`) and click the **SSH** button in the row.
 
-### Step 3: Pull and Rebuild
-In the SSH terminal window that opens, run these commands:
+### Step 3: Deploy
+In the SSH terminal window that opens, run:
 ```bash
 cd portfolio-site
-git pull                          # Downloads the new code from GitHub
-sudo docker-compose up -d --build # Rebuilds the app and restarts the server
+bash deploy.sh
 ```
-*Wait ~3-5 minutes for the build to finish. Your site will automatically stay online during the process.*
+
+The script automatically detects whether dependencies changed:
+- **Code-only changes** → fast build + restart (~30 seconds)
+- **New npm packages added** → full Docker rebuild (~3-5 minutes)
+
+You never need to decide which one to run — it handles it for you.
+
+---
+
+## ⚠️ One-Time Server Git Setup
+
+Run these once on a fresh server to prevent git pull errors:
+
+```bash
+git config --global user.email "paritkansal121@gmail.com"
+git config --global user.name "paritkansal121"
+git config --global pull.rebase false
+```
+
+This prevents the *"Need to specify how to reconcile divergent branches"* error on every pull.
+
+### If git pull says "divergent branches" anyway
+
+This happens when the server has local commits that aren't on GitHub (e.g. a manual edit or merge commit directly on the server). Fix it by resetting the server to exactly match GitHub:
+
+```bash
+git fetch origin
+git reset --hard origin/main
+```
+
+Then do a full rebuild once:
+```bash
+sudo docker-compose up -d --build
+```
+
+> **Rule:** Never edit files directly on the server. Always edit on your Mac → push to GitHub → `bash deploy.sh` on the server.
 
