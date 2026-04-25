@@ -6,7 +6,7 @@ services:
       - "80:5000"
     volumes:
       - ./sqlite.db:/app/sqlite.db
-      - ./dist:/app/dist
+
     env_file:
       - .env
     restart: always
