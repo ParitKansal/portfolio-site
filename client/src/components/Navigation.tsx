@@ -2,9 +2,10 @@ import { useState, useEffect } from "react";
 import { Menu, X, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
-import resumePdf from "@assets/Parit.pdf";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import type { Resume } from "@shared/schema";
 
 const navItems = [
   { label: "Home", href: "#home" },
@@ -20,6 +21,7 @@ export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, logoutMutation } = useAuth();
+  const { data: resume } = useQuery<Resume>({ queryKey: ["/api/resume"] });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -92,12 +94,14 @@ export function Navigation() {
               </Link>
             )}
 
-            <a href={resumePdf} download="Parit_Kansal_Resume.pdf">
-              <Button size="sm" className="hidden sm:flex gap-2" data-testid="button-download-resume">
-                <Download className="h-4 w-4" />
-                Resume
-              </Button>
-            </a>
+            {resume?.url && (
+              <a href={resume.url} target="_blank" rel="noopener noreferrer">
+                <Button size="sm" className="hidden sm:flex gap-2" data-testid="button-download-resume">
+                  <Download className="h-4 w-4" />
+                  Resume
+                </Button>
+              </a>
+            )}
             <Button
               variant="ghost"
               size="icon"
@@ -123,12 +127,14 @@ export function Navigation() {
                 {item.label}
               </Button>
             ))}
-            <a href={resumePdf} download="Parit_Kansal_Resume.pdf" className="sm:hidden">
-              <Button className="w-full gap-2 mt-2" data-testid="button-download-resume-mobile">
-                <Download className="h-4 w-4" />
-                Download Resume
-              </Button>
-            </a>
+            {resume?.url && (
+              <a href={resume.url} target="_blank" rel="noopener noreferrer" className="sm:hidden">
+                <Button className="w-full gap-2 mt-2" data-testid="button-download-resume-mobile">
+                  <Download className="h-4 w-4" />
+                  Download Resume
+                </Button>
+              </a>
+            )}
           </div>
         )}
       </div>
