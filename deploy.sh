@@ -7,7 +7,8 @@ git fetch origin
 # Check if package.json changed in the incoming commits
 DEPS_CHANGED=$(git diff HEAD origin/main -- package.json package-lock.json | wc -l)
 
-git pull
+# Always sync server to match GitHub exactly (discards any local server changes)
+git reset --hard origin/main
 
 if [ "$DEPS_CHANGED" -gt 0 ]; then
   echo "Dependencies changed — doing full Docker rebuild..."
