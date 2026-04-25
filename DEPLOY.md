@@ -180,7 +180,7 @@ Here is exactly how to set up the free server:
     ```bash
     # 1. Update and install tools
     sudo apt-get update
-    sudo apt-get install -y docker.io docker-compose git nodejs npm
+    sudo apt-get install -y docker.io docker-compose git
 
     # 2. Start Docker
     sudo systemctl start docker
@@ -194,7 +194,6 @@ Here is exactly how to set up the free server:
     echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
     ```
 
-    > **Why Node.js on the host?** The `deploy.sh` fast-deploy script builds the app directly on the server (outside Docker) so it can skip the slow Docker image rebuild on every update. Docker still runs the app — Node is only needed for building.
 
 4.  **Deploy App**:
     ```bash
@@ -275,18 +274,17 @@ git push
 3.  On the left menu, ensure you are on **VM Instances**.
 4.  Find your server (e.g., `portfolio-server`) and click the **SSH** button in the row.
 
-### Step 3: Deploy
+### Step 3: Pull and Rebuild
 In the SSH terminal window that opens, run:
 ```bash
 cd portfolio-site
-bash deploy.sh
+git fetch origin
+git reset --hard origin/main
+sudo docker-compose up -d --build
+sudo systemctl restart caddy
 ```
 
-The script automatically detects whether dependencies changed:
-- **Code-only changes** → fast build + restart (~30 seconds)
-- **New npm packages added** → full Docker rebuild (~3-5 minutes)
-
-You never need to decide which one to run — it handles it for you.
+*Wait ~3-5 minutes for the build to finish. Your site will automatically stay online during the process.*
 
 ---
 
