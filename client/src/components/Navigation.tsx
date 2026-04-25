@@ -5,16 +5,16 @@ import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import type { Resume } from "@shared/schema";
+import type { Resume, SectionSetting } from "@shared/schema";
 
-const navItems = [
-  { label: "Home", href: "#home" },
-  { label: "Experience", href: "#experience" },
-  { label: "Skills", href: "#skills" },
-  { label: "Projects", href: "#projects" },
-  { label: "Knowledge Vault", href: "#knowledge-vault" },
-  { label: "Blog", href: "#blog" },
-  { label: "Contact", href: "#contact" },
+const allNavItems = [
+  { label: "Home", href: "#home", sectionKey: null },
+  { label: "Experience", href: "#experience", sectionKey: "experience" },
+  { label: "Skills", href: "#skills", sectionKey: "skills" },
+  { label: "Projects", href: "#projects", sectionKey: "projects" },
+  { label: "Knowledge Vault", href: "#knowledge-vault", sectionKey: "knowledge-vault" },
+  { label: "Blog", href: "#blog", sectionKey: "blog" },
+  { label: "Contact", href: "#contact", sectionKey: "contact" },
 ];
 
 export function Navigation() {
@@ -22,6 +22,11 @@ export function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const { user, logoutMutation } = useAuth();
   const { data: resume } = useQuery<Resume>({ queryKey: ["/api/resume"] });
+  const { data: sectionSettings = [] } = useQuery<SectionSetting[]>({ queryKey: ["/api/section-settings"] });
+
+  const navItems = allNavItems.filter(item =>
+    item.sectionKey === null || (sectionSettings.find(s => s.section === item.sectionKey)?.visible ?? true)
+  );
 
   useEffect(() => {
     const handleScroll = () => {
