@@ -180,7 +180,7 @@ Here is exactly how to set up the free server:
     ```bash
     # 1. Update and install tools
     sudo apt-get update
-    sudo apt-get install -y docker.io docker-compose git
+    sudo apt-get install -y docker.io docker-compose git nodejs npm
 
     # 2. Start Docker
     sudo systemctl start docker
@@ -193,6 +193,8 @@ Here is exactly how to set up the free server:
     sudo swapon /swapfile
     echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
     ```
+
+    > **Why Node.js on the host?** The `deploy.sh` fast-deploy script builds the app directly on the server (outside Docker) so it can skip the slow Docker image rebuild on every update. Docker still runs the app — Node is only needed for building.
 
 4.  **Deploy App**:
     ```bash
@@ -209,8 +211,9 @@ Here is exactly how to set up the free server:
     touch sqlite.db
     chmod 666 sqlite.db
 
-    # 4. Start the app (This takes ~5-10 mins on the free tier)
+    # 4. Start the app — first time only (takes ~5-10 mins on the free tier)
     sudo docker-compose up -d --build
+    sudo systemctl restart caddy
     ```
 
 5.  **allow Port 5000 (Firewall)**:
