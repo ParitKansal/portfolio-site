@@ -20,4 +20,7 @@ else
   sudo docker-compose up -d --no-build --force-recreate
 fi
 
+echo "Restarting Caddy (HTTPS)..."
+sudo systemctl restart caddy
+
 echo "Done! Site is live."
