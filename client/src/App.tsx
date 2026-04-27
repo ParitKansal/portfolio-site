@@ -10,6 +10,7 @@ import Home from "@/pages/home";
 import { AuthProvider } from "@/hooks/use-auth";
 import AuthPage from "@/pages/auth-page";
 import AdminDashboard from "@/pages/admin-dashboard";
+import ImageTool from "@/pages/image-tool";
 
 function Router() {
   return (
@@ -17,6 +18,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/auth" component={AuthPage} />
       <Route path="/admin" component={AdminDashboard} />
+      <Route path="/image-tool" component={ImageTool} />
       <Route component={NotFound} />
     </Switch>
   );

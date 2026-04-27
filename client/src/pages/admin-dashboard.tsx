@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, ExternalLink } from "lucide-react";
 import { ContentEditor } from "@/components/ContentEditor";
 import { useToast } from "@/hooks/use-toast";
 import type {
@@ -39,12 +39,6 @@ export default function AdminDashboard() {
     }, [tabFromUrl]);
     const { toast } = useToast();
     const queryClient = useQueryClient();
-
-    // Redirect if not logged in
-    if (!isAuthLoading && !user) {
-        setLocation("/auth");
-        return null;
-    }
 
     // --- Blog Management ---
     const { data: blogPosts, isLoading: isBlogLoading } = useQuery<BlogPost[]>({ queryKey: ["/api/blog"] });
@@ -169,7 +163,15 @@ export default function AdminDashboard() {
         },
     });
 
+    // Redirect if not logged in
+    useEffect(() => {
+        if (!isAuthLoading && !user) {
+            setLocation("/auth");
+        }
+    }, [user, isAuthLoading, setLocation]);
+
     if (isAuthLoading) return <div className="flex justify-center pt-20"><Loader2 className="animate-spin" /></div>;
+    if (!user) return null;
 
     return (
         <div className="min-h-screen bg-background p-6">
@@ -183,8 +185,14 @@ export default function AdminDashboard() {
                         </Link>
                         <h1 className="text-3xl font-bold">Admin Dashboard</h1>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <span className="text-muted-foreground mr-2">Hello, {user?.username}</span>
+                    <div className="flex items-center gap-4">
+                        <span className="text-muted-foreground">Hello, {user?.username}</span>
+                        <Link href="/image-tool">
+                            <Button variant="outline" size="sm" className="gap-2">
+                                <ExternalLink className="h-4 w-4" />
+                                Image Utility Tool
+                            </Button>
+                        </Link>
                     </div>
                 </div>
 
