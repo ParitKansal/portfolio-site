@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, ExternalLink } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, ExternalLink, Eye, EyeOff } from "lucide-react";
 import { ContentEditor } from "@/components/ContentEditor";
 import { useToast } from "@/hooks/use-toast";
 import type {
@@ -63,6 +63,21 @@ export default function AdminDashboard() {
                     `/api/${variables.type}`;
             queryClient.invalidateQueries({ queryKey: [queryKey] });
             toast({ title: "Item deleted" });
+        },
+    });
+
+    const toggleVisibilityMutation = useMutation({
+        mutationFn: async ({ id, visible }: { id: number; visible: boolean }) => {
+            const res = await fetch(`/api/blog/${id}/visibility`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ visible }),
+            });
+            if (!res.ok) throw new Error("Failed to update visibility");
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
         },
     });
 
@@ -216,10 +231,21 @@ export default function AdminDashboard() {
                         </div>
                         <div className="grid gap-4">
                             {blogPosts?.map((post) => (
-                                <Card key={post.id}>
+                                <Card key={post.id} className={post.visible ? "" : "opacity-60"}>
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                        <CardTitle className="text-xl font-medium">{post.title}</CardTitle>
+                                        <CardTitle className="text-xl font-medium flex items-center gap-2">
+                                            {post.title}
+                                            {!post.visible && <span className="text-xs font-normal text-muted-foreground">(hidden)</span>}
+                                        </CardTitle>
                                         <div className="flex items-center gap-2">
+                                            <Button
+                                                variant="ghost"
+                                                size="icon"
+                                                title={post.visible ? "Hide post" : "Show post"}
+                                                onClick={() => toggleVisibilityMutation.mutate({ id: post.id, visible: !post.visible })}
+                                            >
+                                                {post.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
+                                            </Button>
                                             <Button variant="ghost" size="icon" onClick={() => openEditor("blog", post)}><Pencil className="h-4 w-4" /></Button>
                                             <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"
                                                 onClick={() => { if (confirm("Delete?")) deleteMutation.mutate({ id: post.id, type: "blog" }); }}>

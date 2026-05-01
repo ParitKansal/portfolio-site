@@ -46,7 +46,7 @@ export function BlogSection() {
   if (selectedBlog) {
     return (
       <section id="blog" className="py-16 md:py-24 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <Button
               variant="ghost"
