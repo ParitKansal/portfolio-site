@@ -123,7 +123,8 @@ export async function registerRoutes(
   app.get("/api/blog", async (req, res) => {
     try {
       const posts = await storage.getBlogPosts();
-      res.json(posts);
+      const isAdmin = req.isAuthenticated?.();
+      res.json(isAdmin ? posts : posts.filter((p) => p.visible !== false));
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch blog posts" });
     }
@@ -178,6 +179,20 @@ export async function registerRoutes(
       res.json(post);
     } catch (error) {
       res.status(500).json({ error: "Failed to update blog post" });
+    }
+  });
+
+  app.patch("/api/blog/:id/visibility", isAuthenticated, async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "Invalid ID format" });
+      const { visible } = req.body;
+      if (typeof visible !== "boolean") return res.status(400).json({ error: "visible must be a boolean" });
+      const post = await storage.updateBlogPost(id, { visible } as any);
+      if (!post) return res.status(404).json({ error: "Blog post not found" });
+      res.json(post);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update visibility" });
     }
   });
 

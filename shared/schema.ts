@@ -65,6 +65,7 @@ export const blogPosts = sqliteTable("blog_posts", {
   tags: text("tags", { mode: "json" }).$type<string[]>(),
   readTime: text("read_time").notNull(),
   date: integer("date", { mode: "timestamp" }).notNull().default(new Date()),
+  visible: integer("visible", { mode: "boolean" }).notNull().default(true),
 });
 
 export const insertBlogPostSchema = createInsertSchema(blogPosts, {
