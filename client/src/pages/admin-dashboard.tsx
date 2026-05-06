@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, ExternalLink, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, ExternalLink, Eye, EyeOff, Download, CheckSquare, Square } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { ContentEditor } from "@/components/ContentEditor";
 import { useToast } from "@/hooks/use-toast";
 import type {
@@ -80,6 +81,42 @@ export default function AdminDashboard() {
             queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
         },
     });
+
+    // --- Blog Selection State ---
+    const [isSelectMode, setIsSelectMode] = useState(false);
+    const [selectedBlogIds, setSelectedBlogIds] = useState<Set<number>>(new Set());
+
+    const toggleSelectMode = () => {
+        setIsSelectMode(prev => !prev);
+        setSelectedBlogIds(new Set());
+    };
+
+    const togglePostSelection = (id: number) => {
+        setSelectedBlogIds(prev => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            return next;
+        });
+    };
+
+    const selectAllPosts = () => {
+        if (blogPosts) setSelectedBlogIds(new Set(blogPosts.map(p => p.id)));
+    };
+
+    const deselectAllPosts = () => setSelectedBlogIds(new Set());
+
+    const downloadSelectedPosts = () => {
+        if (!blogPosts || selectedBlogIds.size === 0) return;
+        const selected = blogPosts.filter(p => selectedBlogIds.has(p.id));
+        const blob = new Blob([JSON.stringify(selected, null, 2)], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `blog-posts-${new Date().toISOString().split("T")[0]}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+    };
 
     // --- Editor State ---
     const [isEditorOpen, setIsEditorOpen] = useState(false);
@@ -224,34 +261,69 @@ export default function AdminDashboard() {
                     </TabsList>
 
                     <TabsContent value="blog" className="space-y-4">
-                        <div className="flex justify-end">
+                        <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                                <Button variant={isSelectMode ? "secondary" : "outline"} size="sm" onClick={toggleSelectMode}>
+                                    {isSelectMode ? <CheckSquare className="mr-2 h-4 w-4" /> : <Square className="mr-2 h-4 w-4" />}
+                                    {isSelectMode ? "Cancel" : "Select"}
+                                </Button>
+                                {isSelectMode && (
+                                    <>
+                                        <Button variant="ghost" size="sm" onClick={selectAllPosts}>All</Button>
+                                        <Button variant="ghost" size="sm" onClick={deselectAllPosts}>None</Button>
+                                        <Button
+                                            variant="outline"
+                                            size="sm"
+                                            disabled={selectedBlogIds.size === 0}
+                                            onClick={downloadSelectedPosts}
+                                        >
+                                            <Download className="mr-2 h-4 w-4" />
+                                            Download ({selectedBlogIds.size})
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
                             <Button onClick={() => openEditor("blog")}>
                                 <Plus className="mr-2 h-4 w-4" /> New Post
                             </Button>
                         </div>
                         <div className="grid gap-4">
                             {blogPosts?.map((post) => (
-                                <Card key={post.id} className={post.visible ? "" : "opacity-60"}>
+                                <Card
+                                    key={post.id}
+                                    className={`${post.visible ? "" : "opacity-60"} ${isSelectMode && selectedBlogIds.has(post.id) ? "ring-2 ring-primary" : ""}`}
+                                    onClick={isSelectMode ? () => togglePostSelection(post.id) : undefined}
+                                    style={isSelectMode ? { cursor: "pointer" } : undefined}
+                                >
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                         <CardTitle className="text-xl font-medium flex items-center gap-2">
+                                            {isSelectMode && (
+                                                <Checkbox
+                                                    checked={selectedBlogIds.has(post.id)}
+                                                    onCheckedChange={() => togglePostSelection(post.id)}
+                                                    onClick={e => e.stopPropagation()}
+                                                />
+                                            )}
                                             {post.title}
                                             {!post.visible && <span className="text-xs font-normal text-muted-foreground">(hidden)</span>}
                                         </CardTitle>
-                                        <div className="flex items-center gap-2">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                title={post.visible ? "Hide post" : "Show post"}
-                                                onClick={() => toggleVisibilityMutation.mutate({ id: post.id, visible: !post.visible })}
-                                            >
-                                                {post.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
-                                            </Button>
-                                            <Button variant="ghost" size="icon" onClick={() => openEditor("blog", post)}><Pencil className="h-4 w-4" /></Button>
-                                            <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"
-                                                onClick={() => { if (confirm("Delete?")) deleteMutation.mutate({ id: post.id, type: "blog" }); }}>
-                                                <Trash2 className="h-4 w-4" />
-                                            </Button>
-                                        </div>
+                                        {!isSelectMode && (
+                                            <div className="flex items-center gap-2">
+                                                <Button
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    title={post.visible ? "Hide post" : "Show post"}
+                                                    onClick={() => toggleVisibilityMutation.mutate({ id: post.id, visible: !post.visible })}
+                                                >
+                                                    {post.visible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4 text-muted-foreground" />}
+                                                </Button>
+                                                <Button variant="ghost" size="icon" onClick={() => openEditor("blog", post)}><Pencil className="h-4 w-4" /></Button>
+                                                <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive"
+                                                    onClick={() => { if (confirm("Delete?")) deleteMutation.mutate({ id: post.id, type: "blog" }); }}>
+                                                    <Trash2 className="h-4 w-4" />
+                                                </Button>
+                                            </div>
+                                        )}
                                     </CardHeader>
                                     <CardContent>
                                         <p className="text-sm text-muted-foreground mb-2">{formatDate(post.date)} • {post.readTime}</p>
