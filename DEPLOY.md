@@ -269,10 +269,85 @@ git push
 ```
 
 ### Step 2: Connect to the Server
+
+**Option A — Local terminal (recommended):**
+```bash
+ssh portfolio
+```
+This works because `~/.ssh/config` has the alias configured:
+- Host: `34.30.174.42`
+- User: `parit`
+- Key: `~/.ssh/id_ed25519`
+
+**Option B — Browser SSH (fallback):**
 1.  Open the **[Google Cloud Console](https://console.cloud.google.com/)**.
 2.  In the "Quick Access" grid, click **Compute Engine**.
 3.  On the left menu, ensure you are on **VM Instances**.
-4.  Find your server (e.g., `portfolio-server`) and click the **SSH** button in the row.
+4.  Find your server and click the **SSH** button in the row.
+
+---
+
+### SSH Troubleshooting (if `ssh portfolio` stops working)
+
+#### Root Cause
+GCP browser SSH creates temporary `google-ssh` keys with an `expireOn` timestamp. These accumulate in the instance metadata. The `google_guest_agent` running on the VM processes all keys every minute — when it hits expired keys, it logs errors and may stop syncing your real key to `~/.ssh/authorized_keys`.
+
+#### Permanent Fix Applied (May 7, 2026)
+The `google_guest_agent` accounts daemon was disabled so it no longer overwrites `authorized_keys`:
+```
+/etc/default/instance_configs.cfg → accounts_daemon = false
+```
+The `parit` user was created via startup script with the permanent key hardcoded into `~/.ssh/authorized_keys`.
+
+#### If SSH breaks again — Step by step fix:
+
+**Step 1 — Clean up expired keys in GCP Console:**
+1. GCP Console → VM instances → `instance-20260112-102320` → **Edit**
+2. Under **SSH keys**, delete all entries containing `google-ssh` or `expireOn`
+3. Keep only: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDMNU/uFWDiM/F9wkqV9tG+com2b6CS42/CdFZFORWHe parit`
+4. Save
+
+**Step 2 — Re-disable the accounts daemon (if it got reset):**
+```bash
+ssh portfolio
+sudo sed -i 's/accounts_daemon = true/accounts_daemon = false/' /etc/default/instance_configs.cfg
+sudo systemctl restart google-guest-agent
+```
+
+**Step 3 — If `parit` user is missing (e.g. after VM recreation):**
+
+Add this to Edit → Automation → Startup script, then click **Reset** (safe reboot, no data loss):
+```bash
+#!/bin/bash
+useradd -m parit 2>/dev/null
+mkdir -p /home/parit/.ssh
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDMNU/uFWDiM/F9wkqV9tG+com2b6CS42/CdFZFORWHe parit" >> /home/parit/.ssh/authorized_keys
+chmod 700 /home/parit/.ssh
+chmod 600 /home/parit/.ssh/authorized_keys
+chown -R parit:parit /home/parit/.ssh
+```
+
+#### Key facts
+| Item | Value |
+|---|---|
+| VM name | `instance-20260112-102320` |
+| Zone | `us-central1-c` |
+| External IP | `34.30.174.42` |
+| SSH user | `parit` |
+| Local private key | `~/.ssh/id_ed25519` |
+| Local public key fingerprint | `SHA256:3yhsxfofShhQ6WPr7XhraE97WD0+g7xHd/Rgl9b4n1w` |
+| SSH config alias | `portfolio` (in `~/.ssh/config`) |
+
+#### Debugging tools
+View serial port logs (no SSH needed) — GCP Console → instance → **Serial port 1 (console)**
+
+Enable serial console if needed:
+- Edit instance → Remote access → check **"Enable connecting to serial ports"** → Save
+
+Check what the guest agent is doing on the VM:
+```bash
+sudo journalctl -u google-guest-agent -n 50 --no-pager
+```
 
 ### Step 3: Pull and Rebuild
 In the SSH terminal window that opens, run:
