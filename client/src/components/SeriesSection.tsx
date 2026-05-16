@@ -19,6 +19,10 @@ export function SeriesSection() {
     queryKey: ["/api/blog"],
   });
 
+  const { data: seriesOrder = [] } = useQuery<{ name: string; displayOrder: number }[]>({
+    queryKey: ["/api/series-order"],
+  });
+
   const seriesMap = new Map<string, BlogPost[]>();
   posts
     .filter((p) => p.seriesName)
@@ -34,6 +38,13 @@ export function SeriesSection() {
       if (b.seriesOrder != null) return 1;
       return new Date(a.date).getTime() - new Date(b.date).getTime();
     }));
+  });
+
+  const orderMap = new Map(seriesOrder.map((s) => [s.name, s.displayOrder]));
+  const sortedSeriesEntries = Array.from(seriesMap.entries()).sort(([a], [b]) => {
+    const oa = orderMap.get(a) ?? Infinity;
+    const ob = orderMap.get(b) ?? Infinity;
+    return oa - ob;
   });
 
   if (!isLoading && seriesMap.size === 0) return null;
@@ -278,7 +289,7 @@ export function SeriesSection() {
         ) : (
           <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {Array.from(seriesMap.entries()).slice(0, visibleCount).map(([seriesName, seriesPosts]) => {
+            {sortedSeriesEntries.slice(0, visibleCount).map(([seriesName, seriesPosts]) => {
               const tags = allTags(seriesPosts);
               const readTime = totalReadTime(seriesPosts);
               const isExpanded = expandedSeries.has(seriesName);
@@ -357,7 +368,7 @@ export function SeriesSection() {
               );
             })}
           </div>
-          {visibleCount < seriesMap.size && (
+          {visibleCount < sortedSeriesEntries.length && (
             <div className="flex justify-center mt-8">
               <button
                 onClick={() => setVisibleCount(prev => prev + 4)}

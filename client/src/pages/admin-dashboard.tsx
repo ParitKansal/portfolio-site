@@ -43,6 +43,7 @@ export default function AdminDashboard() {
 
     // --- Blog Management ---
     const { data: blogPosts, isLoading: isBlogLoading } = useQuery<BlogPost[]>({ queryKey: ["/api/blog"] });
+    const { data: seriesOrder = [] } = useQuery<{ name: string; displayOrder: number }[]>({ queryKey: ["/api/series-order"] });
     const { data: knowledgeEntries, isLoading: isKnowledgeLoading } = useQuery<KnowledgeEntry[]>({ queryKey: ["/api/knowledge"] });
     const { data: educationList, isLoading: isEducationLoading } = useQuery<Education[]>({ queryKey: ["/api/education"] });
     const { data: experienceList, isLoading: isExperienceLoading } = useQuery<Experience[]>({ queryKey: ["/api/experience"] });
@@ -357,12 +358,48 @@ export default function AdminDashboard() {
                                 </div>
                             );
 
-                            return Array.from(seriesMap.entries()).map(([seriesName, chapters]) => (
+                            // Sort series entries by displayOrder from the API
+                            const orderMap = new Map(seriesOrder.map(s => [s.name, s.displayOrder]));
+                            const sortedEntries = Array.from(seriesMap.entries()).sort(([a], [b]) => {
+                                const oa = orderMap.get(a) ?? Infinity;
+                                const ob = orderMap.get(b) ?? Infinity;
+                                return oa - ob;
+                            });
+
+                            const reorderSeries = async (entries: [string, BlogPost[]][], fromIdx: number, toIdx: number) => {
+                                const reordered = [...entries];
+                                [reordered[fromIdx], reordered[toIdx]] = [reordered[toIdx], reordered[fromIdx]];
+                                await fetch("/api/series-order", {
+                                    method: "PATCH",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify(reordered.map(([name], i) => ({ name, displayOrder: i }))),
+                                });
+                                queryClient.invalidateQueries({ queryKey: ["/api/series-order"] });
+                            };
+
+                            return sortedEntries.map(([seriesName, chapters], seriesIdx) => (
                                 <Card key={seriesName}>
                                     <CardHeader className="flex flex-row items-center gap-3 pb-3">
                                         <BookOpen className="h-5 w-5 text-primary shrink-0" />
                                         <CardTitle className="text-lg">{seriesName}</CardTitle>
                                         <span className="text-sm text-muted-foreground ml-auto">{chapters.length} chapters</span>
+                                        {/* Series-level reorder buttons */}
+                                        <div className="flex items-center gap-0.5 ml-2">
+                                            <Button
+                                                variant="ghost" size="icon"
+                                                disabled={seriesIdx === 0}
+                                                onClick={() => reorderSeries(sortedEntries, seriesIdx, seriesIdx - 1)}
+                                            >
+                                                <ChevronUp className="h-4 w-4" />
+                                            </Button>
+                                            <Button
+                                                variant="ghost" size="icon"
+                                                disabled={seriesIdx === sortedEntries.length - 1}
+                                                onClick={() => reorderSeries(sortedEntries, seriesIdx, seriesIdx + 1)}
+                                            >
+                                                <ChevronDownIcon className="h-4 w-4" />
+                                            </Button>
+                                        </div>
                                     </CardHeader>
                                     <CardContent className="space-y-2">
                                         {chapters.map((chapter, idx) => (

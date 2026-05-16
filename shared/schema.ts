@@ -196,6 +196,13 @@ export const insertResumeSchema = createInsertSchema(resumes).omit({ id: true, u
 export type InsertResume = z.infer<typeof insertResumeSchema>;
 export type Resume = typeof resumes.$inferSelect;
 
+export const seriesMetadata = sqliteTable("series_metadata", {
+  name: text("name").primaryKey(),
+  displayOrder: integer("display_order").notNull().default(0),
+});
+
+export type SeriesMetadata = typeof seriesMetadata.$inferSelect;
+
 export const SECTION_KEYS = ["education", "experience", "skills", "projects", "certifications", "knowledge-vault", "blog", "contact"] as const;
 export type SectionKey = typeof SECTION_KEYS[number];
 
