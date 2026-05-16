@@ -309,14 +309,14 @@ export function SeriesSection() {
                   <CardContent>
                     {isExpanded ? (
                       <div className="divide-y divide-border -mx-6 mb-4 max-h-72 overflow-y-auto">
-                        {seriesPosts.map((post) => (
+                        {seriesPosts.map((post, idx) => (
                           <div
                             key={post.id}
                             className="flex items-start gap-3 px-6 py-3 hover:bg-muted/30 cursor-pointer transition-colors group"
                             onClick={() => setOpenPost(post)}
                           >
                             <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold shrink-0 mt-0.5">
-                              {post.seriesOrder ?? "·"}
+                              {idx + 1}
                             </span>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-medium leading-snug group-hover:text-primary transition-colors">
@@ -332,10 +332,10 @@ export function SeriesSection() {
                       </div>
                     ) : (
                       <div className="space-y-2 mb-4">
-                        {seriesPosts.map((post) => (
+                        {seriesPosts.map((post, idx) => (
                           <div key={post.id} className="flex items-center gap-2 text-sm">
                             <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold shrink-0">
-                              {post.seriesOrder ?? "·"}
+                              {idx + 1}
                             </span>
                             <span className="text-muted-foreground line-clamp-1">{post.title}</span>
                           </div>
