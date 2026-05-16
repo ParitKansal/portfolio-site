@@ -342,7 +342,12 @@ export default function AdminDashboard() {
                                 seriesMap.set(p.seriesName!, [...(seriesMap.get(p.seriesName!) || []), p]);
                             });
                             seriesMap.forEach((posts, name) => {
-                                seriesMap.set(name, posts.sort((a, b) => (a.seriesOrder ?? 999) - (b.seriesOrder ?? 999)));
+                                seriesMap.set(name, posts.sort((a, b) => {
+                                    if (a.seriesOrder != null && b.seriesOrder != null) return a.seriesOrder - b.seriesOrder;
+                                    if (a.seriesOrder != null) return -1;
+                                    if (b.seriesOrder != null) return 1;
+                                    return new Date(a.date).getTime() - new Date(b.date).getTime();
+                                }));
                             });
 
                             if (seriesMap.size === 0) return (
@@ -376,8 +381,8 @@ export default function AdminDashboard() {
                                                         onClick={async () => {
                                                             const above = chapters[idx - 1];
                                                             await Promise.all([
-                                                                fetch(`/api/blog/${chapter.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: above.seriesOrder }) }),
-                                                                fetch(`/api/blog/${above.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: chapter.seriesOrder }) }),
+                                                                fetch(`/api/blog/${chapter.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: idx }) }),
+                                                                fetch(`/api/blog/${above.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: idx + 1 }) }),
                                                             ]);
                                                             queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
                                                         }}
@@ -390,8 +395,8 @@ export default function AdminDashboard() {
                                                         onClick={async () => {
                                                             const below = chapters[idx + 1];
                                                             await Promise.all([
-                                                                fetch(`/api/blog/${chapter.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: below.seriesOrder }) }),
-                                                                fetch(`/api/blog/${below.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: chapter.seriesOrder }) }),
+                                                                fetch(`/api/blog/${chapter.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: idx + 2 }) }),
+                                                                fetch(`/api/blog/${below.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: idx + 1 }) }),
                                                             ]);
                                                             queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
                                                         }}

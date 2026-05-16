@@ -13,11 +13,14 @@ sqlite.exec(`
   );
 `);
 
-// Add visible column to blog_posts if it doesn't exist yet
-try {
-  sqlite.exec(`ALTER TABLE blog_posts ADD COLUMN visible INTEGER NOT NULL DEFAULT 1;`);
-} catch {
-  // Column already exists — ignore
+// Add missing columns to blog_posts if they don't exist yet
+const blogPostMigrations = [
+  `ALTER TABLE blog_posts ADD COLUMN visible INTEGER NOT NULL DEFAULT 1;`,
+  `ALTER TABLE blog_posts ADD COLUMN series_name TEXT;`,
+  `ALTER TABLE blog_posts ADD COLUMN series_order INTEGER;`,
+];
+for (const sql of blogPostMigrations) {
+  try { sqlite.exec(sql); } catch { /* column already exists — ignore */ }
 }
 
 export const db = drizzle(sqlite, { schema });
