@@ -273,6 +273,7 @@ ssh portfolio
 ### Step 3 — Pull and rebuild
 ```bash
 cd /home/paritkansal121/portfolio-site
+sudo chown -R parit:parit /home/paritkansal121/portfolio-site
 git fetch origin
 git reset --hard origin/main
 nohup sudo docker-compose up -d --build > ~/build.log 2>&1 &
