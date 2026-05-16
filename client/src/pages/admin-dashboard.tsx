@@ -368,7 +368,7 @@ export default function AdminDashboard() {
                                         {chapters.map((chapter, idx) => (
                                             <div key={chapter.id} className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/20">
                                                 <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
-                                                    {chapter.seriesOrder ?? idx + 1}
+                                                    {idx + 1}
                                                 </span>
                                                 <div className="flex-1 min-w-0">
                                                     <p className="text-sm font-medium truncate">{chapter.title}</p>

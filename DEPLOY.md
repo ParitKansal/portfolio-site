@@ -258,34 +258,33 @@ Here is exactly how to set up the free server:
 
 ## 🔄 Deploying Changes to Live Site
 
-### Step 1 — Push from your Mac
+### Every deploy — run this on your Mac:
 ```bash
-git add .
-git commit -m "your message"
-git push
+git add . && git commit -m "your message" && git push
+./deploy.sh
 ```
 
-### Step 2 — SSH into server
+`deploy.sh` does everything automatically:
+1. Builds the Docker image on your Mac (~2 min, fast)
+2. Pushes it to Docker Hub
+3. SSHs into the server, pulls the new image, restarts the container
+
+**You never need to manually SSH in for normal deploys.**
+
+### Verifying the deploy worked (optional)
 ```bash
 ssh portfolio
+sudo docker-compose -f /home/paritkansal121/portfolio-site/docker-compose.yml ps
+curl -s http://localhost:5000/api/blog | head -c 100
 ```
+Container should show `Up` and the curl should return JSON.
 
-### Step 3 — Pull and rebuild
-```bash
-cd /home/paritkansal121/portfolio-site
-sudo chown -R parit:parit /home/paritkansal121/portfolio-site
-git fetch origin
-git reset --hard origin/main
-nohup sudo docker-compose up -d --build > ~/build.log 2>&1 &
-```
+### Caddy (reverse proxy)
+Caddy runs separately from Docker and does **not** need to be restarted on normal deploys. It keeps proxying traffic to port 5000 automatically even when the container restarts.
 
-The build runs in the background (~5-10 min). Check progress with:
-```bash
-tail -f ~/build.log
-```
-Press `Ctrl+C` to stop watching (build keeps running).
-
-### Step 4 — Restart Caddy when done
+Only restart Caddy if:
+- You changed the Caddy config (domain, SSL settings)
+- Caddy crashed
 ```bash
 sudo systemctl restart caddy
 ```
