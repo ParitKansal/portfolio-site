@@ -11,7 +11,10 @@ import {
   insertSkillSchema,
   insertCertificationSchema,
   insertResumeSchema,
+  seriesMetadata,
 } from "@shared/schema";
+import { db } from "./db";
+import { asc } from "drizzle-orm";
 import nodemailer from "nodemailer";
 
 const updateKnowledgeEntrySchema = insertKnowledgeEntrySchema.partial();
@@ -212,6 +215,30 @@ export async function registerRoutes(
     }
   });
 
+
+  app.get("/api/series-order", async (_req, res) => {
+    try {
+      const rows = await db.select().from(seriesMetadata).orderBy(asc(seriesMetadata.displayOrder));
+      res.json(rows);
+    } catch {
+      res.status(500).json({ error: "Failed to fetch series order" });
+    }
+  });
+
+  app.patch("/api/series-order", isAuthenticated, async (req, res) => {
+    try {
+      const items = req.body as { name: string; displayOrder: number }[];
+      if (!Array.isArray(items)) return res.status(400).json({ error: "Expected array" });
+      for (const { name, displayOrder } of items) {
+        await db.insert(seriesMetadata)
+          .values({ name, displayOrder })
+          .onConflictDoUpdate({ target: seriesMetadata.name, set: { displayOrder } });
+      }
+      res.json({ ok: true });
+    } catch {
+      res.status(500).json({ error: "Failed to update series order" });
+    }
+  });
 
   app.post("/api/contact", async (req, res) => {
     try {
