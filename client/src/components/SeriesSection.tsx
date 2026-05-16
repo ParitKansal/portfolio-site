@@ -331,7 +331,7 @@ export function SeriesSection() {
                         ))}
                       </div>
                     ) : (
-                      <div className="space-y-2 mb-4">
+                      <div className="space-y-2 mb-4 max-h-48 overflow-y-auto">
                         {seriesPosts.map((post, idx) => (
                           <div key={post.id} className="flex items-center gap-2 text-sm">
                             <span className="w-5 h-5 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-semibold shrink-0">
