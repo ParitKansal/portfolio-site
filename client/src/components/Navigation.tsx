@@ -13,6 +13,7 @@ const allNavItems = [
   { label: "Skills", href: "#skills", sectionKey: "skills" },
   { label: "Projects", href: "#projects", sectionKey: "projects" },
   { label: "Knowledge Vault", href: "#knowledge-vault", sectionKey: "knowledge-vault" },
+  { label: "Series", href: "#series", sectionKey: "blog" },
   { label: "Blog", href: "#blog", sectionKey: "blog" },
   { label: "Contact", href: "#contact", sectionKey: "contact" },
 ];

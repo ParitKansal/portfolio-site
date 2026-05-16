@@ -66,6 +66,8 @@ export const blogPosts = sqliteTable("blog_posts", {
   readTime: text("read_time").notNull(),
   date: integer("date", { mode: "timestamp" }).notNull().default(new Date()),
   visible: integer("visible", { mode: "boolean" }).notNull().default(true),
+  seriesName: text("series_name"),
+  seriesOrder: integer("series_order"),
 });
 
 export const insertBlogPostSchema = createInsertSchema(blogPosts, {
@@ -83,6 +85,8 @@ export const insertBlogPostSchema = createInsertSchema(blogPosts, {
     contentWidth: z.number().optional(),
   })),
   date: z.coerce.date().optional(),
+  seriesName: z.string().nullable().optional(),
+  seriesOrder: z.coerce.number().nullable().optional(),
 }).omit({
   id: true
 });

@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, ExternalLink, Eye, EyeOff, Download, CheckSquare, Square } from "lucide-react";
+import { Plus, Pencil, Trash2, ArrowLeft, Loader2, ExternalLink, Eye, EyeOff, Download, CheckSquare, Square, BookOpen, ChevronUp, ChevronDown as ChevronDownIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ContentEditor } from "@/components/ContentEditor";
 import { useToast } from "@/hooks/use-toast";
@@ -251,6 +251,7 @@ export default function AdminDashboard() {
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
                     <TabsList className="flex flex-wrap h-auto">
                         <TabsTrigger value="blog">Blog</TabsTrigger>
+                        <TabsTrigger value="series">Series</TabsTrigger>
                         <TabsTrigger value="knowledge">Knowledge</TabsTrigger>
                         <TabsTrigger value="education">Education</TabsTrigger>
                         <TabsTrigger value="experience">Experience</TabsTrigger>
@@ -332,6 +333,81 @@ export default function AdminDashboard() {
                                 </Card>
                             ))}
                         </div>
+                    </TabsContent>
+
+                    <TabsContent value="series" className="space-y-6">
+                        {(() => {
+                            const seriesMap = new Map<string, BlogPost[]>();
+                            (blogPosts || []).filter(p => p.seriesName).forEach(p => {
+                                seriesMap.set(p.seriesName!, [...(seriesMap.get(p.seriesName!) || []), p]);
+                            });
+                            seriesMap.forEach((posts, name) => {
+                                seriesMap.set(name, posts.sort((a, b) => (a.seriesOrder ?? 999) - (b.seriesOrder ?? 999)));
+                            });
+
+                            if (seriesMap.size === 0) return (
+                                <div className="text-center py-16 text-muted-foreground">
+                                    <BookOpen className="h-10 w-10 mx-auto mb-3 opacity-40" />
+                                    <p>No series yet. Create blog posts and assign them a Series Name to get started.</p>
+                                </div>
+                            );
+
+                            return Array.from(seriesMap.entries()).map(([seriesName, chapters]) => (
+                                <Card key={seriesName}>
+                                    <CardHeader className="flex flex-row items-center gap-3 pb-3">
+                                        <BookOpen className="h-5 w-5 text-primary shrink-0" />
+                                        <CardTitle className="text-lg">{seriesName}</CardTitle>
+                                        <span className="text-sm text-muted-foreground ml-auto">{chapters.length} chapters</span>
+                                    </CardHeader>
+                                    <CardContent className="space-y-2">
+                                        {chapters.map((chapter, idx) => (
+                                            <div key={chapter.id} className="flex items-center gap-3 p-3 rounded-lg border border-border bg-muted/20">
+                                                <span className="w-6 h-6 rounded-full bg-primary/10 text-primary flex items-center justify-center text-xs font-bold shrink-0">
+                                                    {chapter.seriesOrder ?? idx + 1}
+                                                </span>
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium truncate">{chapter.title}</p>
+                                                    <p className="text-xs text-muted-foreground">{formatDate(chapter.date)} · {chapter.readTime}</p>
+                                                </div>
+                                                <div className="flex items-center gap-1 shrink-0">
+                                                    <Button
+                                                        variant="ghost" size="icon"
+                                                        disabled={idx === 0}
+                                                        onClick={async () => {
+                                                            const above = chapters[idx - 1];
+                                                            await Promise.all([
+                                                                fetch(`/api/blog/${chapter.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: above.seriesOrder }) }),
+                                                                fetch(`/api/blog/${above.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: chapter.seriesOrder }) }),
+                                                            ]);
+                                                            queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
+                                                        }}
+                                                    >
+                                                        <ChevronUp className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost" size="icon"
+                                                        disabled={idx === chapters.length - 1}
+                                                        onClick={async () => {
+                                                            const below = chapters[idx + 1];
+                                                            await Promise.all([
+                                                                fetch(`/api/blog/${chapter.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: below.seriesOrder }) }),
+                                                                fetch(`/api/blog/${below.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: chapter.seriesOrder }) }),
+                                                            ]);
+                                                            queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
+                                                        }}
+                                                    >
+                                                        <ChevronDownIcon className="h-4 w-4" />
+                                                    </Button>
+                                                    <Button variant="ghost" size="icon" onClick={() => openEditor("blog", chapter)}>
+                                                        <Pencil className="h-4 w-4" />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </CardContent>
+                                </Card>
+                            ));
+                        })()}
                     </TabsContent>
 
                     <TabsContent value="knowledge" className="space-y-4">
@@ -523,16 +599,38 @@ export default function AdminDashboard() {
                                     </div>
 
                                     {editingType === "blog" && (
-                                        <div className="grid grid-cols-2 gap-4">
-                                            <div className="space-y-2">
-                                                <Label>Excerpt</Label>
-                                                <Textarea value={formData.excerpt || ""} onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })} placeholder="Short summary" />
+                                        <>
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label>Excerpt</Label>
+                                                    <Textarea value={formData.excerpt || ""} onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })} placeholder="Short summary" />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>Read Time</Label>
+                                                    <Input value={formData.readTime || ""} onChange={(e) => setFormData({ ...formData, readTime: e.target.value })} placeholder="e.g. 5 min read" />
+                                                </div>
                                             </div>
-                                            <div className="space-y-2">
-                                                <Label>Read Time</Label>
-                                                <Input value={formData.readTime || ""} onChange={(e) => setFormData({ ...formData, readTime: e.target.value })} placeholder="e.g. 5 min read" />
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <div className="space-y-2">
+                                                    <Label>Series Name <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                                                    <Input
+                                                        value={formData.seriesName || ""}
+                                                        onChange={(e) => setFormData({ ...formData, seriesName: e.target.value || null })}
+                                                        placeholder="e.g. Building a RAG System"
+                                                    />
+                                                </div>
+                                                <div className="space-y-2">
+                                                    <Label>Part # <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                                                    <Input
+                                                        type="number"
+                                                        min={1}
+                                                        value={formData.seriesOrder ?? ""}
+                                                        onChange={(e) => setFormData({ ...formData, seriesOrder: e.target.value ? parseInt(e.target.value) : null })}
+                                                        placeholder="e.g. 1"
+                                                    />
+                                                </div>
                                             </div>
-                                        </div>
+                                        </>
                                     )}
 
                                     <div className="space-y-2">

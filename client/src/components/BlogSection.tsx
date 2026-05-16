@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ContentRenderer } from "./ContentRenderer";
-import { PenLine, Clock, ArrowRight, ArrowLeft, Loader2, Plus, Pencil, Search, Tag } from "lucide-react";
+import { PenLine, Clock, ArrowRight, ArrowLeft, Loader2, Plus, Pencil, Search, Tag, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ export function BlogSection() {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(6);
   const { user } = useAuth();
+
 
   const { data: posts = [], isLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog"],
@@ -69,6 +70,13 @@ export function BlogSection() {
 
           <article>
             <div className="flex flex-wrap items-center gap-3 mb-4">
+              {selectedBlog.seriesName && (
+                <Badge variant="outline" className="gap-1 text-primary border-primary/30">
+                  <BookOpen className="h-3 w-3" />
+                  {selectedBlog.seriesName}
+                  {selectedBlog.seriesOrder != null && ` · Part ${selectedBlog.seriesOrder}`}
+                </Badge>
+              )}
               {(selectedBlog.tags || []).map((tag) => (
                 <Badge key={tag} variant="secondary">
                   {tag}
@@ -167,7 +175,7 @@ export function BlogSection() {
                         variant="secondary"
                         size="icon"
                         className="absolute top-2 right-2 z-10 opacity-0 group-hover/card-wrapper:opacity-100 transition-opacity shadow-sm"
-                        onClick={(e) => e.stopPropagation()} // Prevent card click
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -180,6 +188,12 @@ export function BlogSection() {
                   >
                     <CardHeader>
                       <div className="flex flex-wrap gap-2 mb-2">
+                        {post.seriesName && (
+                          <Badge variant="outline" className="text-xs gap-1 text-primary border-primary/30">
+                            <BookOpen className="h-3 w-3" />
+                            {post.seriesName}
+                          </Badge>
+                        )}
                         {(post.tags || []).map((tag) => (
                           <Badge key={tag} variant="secondary" className="text-xs">
                             {tag}
@@ -224,7 +238,7 @@ export function BlogSection() {
           <div className="text-center py-12">
             <Search className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
             <p className="text-muted-foreground">
-              {searchQuery || selectedTag 
+              {searchQuery || selectedTag
                 ? "No posts found matching your current filters."
                 : "No blog posts yet. Check back soon!"}
             </p>

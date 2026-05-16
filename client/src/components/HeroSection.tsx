@@ -1,9 +1,9 @@
-import { Mail, Phone, ArrowDown, Sparkles, Brain, Eye, MessageSquare, Network, Cpu, Database, FileText } from "lucide-react";
+import { Mail, Phone, ArrowDown, Sparkles, Brain, Eye, MessageSquare, Network, Cpu, Database, FileText, BookOpen, ArrowRight } from "lucide-react";
 import { SiGithub, SiLinkedin, SiPython, SiPytorch, SiTensorflow } from "react-icons/si";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import type { Resume } from "@shared/schema";
+import type { Resume, BlogPost } from "@shared/schema";
 
 const floatingIcons = [
   { Icon: Brain, delay: 0, x: "10%", y: "20%" },
@@ -22,6 +22,16 @@ const techStack = [
 
 export function HeroSection() {
   const { data: resume } = useQuery<Resume>({ queryKey: ["/api/resume"] });
+  const { data: posts = [] } = useQuery<BlogPost[]>({ queryKey: ["/api/blog"] });
+
+  // Pick the series with the most recent post as the featured one
+  const seriesMap = new Map<string, BlogPost[]>();
+  posts.filter(p => p.seriesName).forEach(p => {
+    seriesMap.set(p.seriesName!, [...(seriesMap.get(p.seriesName!) || []), p]);
+  });
+  const featuredSeries = Array.from(seriesMap.entries())
+    .sort((a, b) => Math.max(...b[1].map(p => new Date(p.date).getTime())) - Math.max(...a[1].map(p => new Date(p.date).getTime())))
+  [0] ?? null;
 
   const scrollToWork = () => {
     const element = document.querySelector("#experience");
@@ -221,6 +231,29 @@ export function HeroSection() {
                 <FileText className="h-5 w-5" /> Download Resume
               </Button>
             </a>
+          </motion.div>
+        )}
+
+        {featuredSeries && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.65 }}
+            className="mb-10"
+          >
+            <button
+              onClick={() => document.querySelector("#series")?.scrollIntoView({ behavior: "smooth" })}
+              className="inline-flex items-center gap-3 px-5 py-3 rounded-xl border border-primary/25 bg-primary/5 hover:bg-primary/10 transition-colors group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-primary/15 flex items-center justify-center shrink-0">
+                <BookOpen className="h-4 w-4 text-primary" />
+              </div>
+              <div className="text-left">
+                <p className="text-xs text-muted-foreground">Currently writing</p>
+                <p className="text-sm font-semibold text-foreground">{featuredSeries[0]} <span className="text-muted-foreground font-normal">· {featuredSeries[1].length} parts</span></p>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors ml-1" />
+            </button>
           </motion.div>
         )}
 
