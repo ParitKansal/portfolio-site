@@ -7,6 +7,7 @@ import { ProjectsSection } from "@/components/ProjectsSection";
 import { CertificationsSection } from "@/components/CertificationsSection";
 import { KnowledgeVaultSection } from "@/components/KnowledgeVaultSection";
 import { BlogSection } from "@/components/BlogSection";
+import { SeriesSection } from "@/components/SeriesSection";
 import { Footer } from "@/components/Footer";
 import { ContactSection } from "@/components/ContactSection";
 import { SectionWrapper } from "@/components/SectionWrapper";
@@ -35,6 +36,7 @@ export default function Home() {
         <SectionWrapper sectionKey="knowledge-vault" adminTab="knowledge">
           <KnowledgeVaultSection />
         </SectionWrapper>
+        <SeriesSection />
         <SectionWrapper sectionKey="blog" adminTab="blog">
           <BlogSection />
         </SectionWrapper>
