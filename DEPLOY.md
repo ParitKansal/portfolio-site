@@ -256,148 +256,91 @@ Here is exactly how to set up the free server:
     *   **Google OAuth**:
         *   Add `http://paritkansal.in/api/auth/google/callback` to Authorized Redirect URIs.
 
-## 🔄 Updating Your Live Site
+## 🔄 Deploying Changes to Live Site
 
-When you want to push new code changes to your live website:
-
-### Step 1: Push changes from your computer
-In your local terminal (where you are writing code), run:
+### Step 1 — Push from your Mac
 ```bash
 git add .
-git commit -m "Describe your changes"
+git commit -m "your message"
 git push
 ```
 
-### Step 2: Connect to the Server
-
-**Option A — Local terminal (recommended):**
+### Step 2 — SSH into server
 ```bash
 ssh portfolio
 ```
-This works because `~/.ssh/config` has the alias configured:
-- Host: `34.30.174.42`
-- User: `parit`
-- Key: `~/.ssh/id_ed25519`
 
-**Option B — Browser SSH (fallback):**
-1.  Open the **[Google Cloud Console](https://console.cloud.google.com/)**.
-2.  In the "Quick Access" grid, click **Compute Engine**.
-3.  On the left menu, ensure you are on **VM Instances**.
-4.  Find your server and click the **SSH** button in the row.
-
----
-
-### SSH Troubleshooting (if `ssh portfolio` stops working)
-
-#### Root Cause
-GCP browser SSH creates temporary `google-ssh` keys with an `expireOn` timestamp. These accumulate in the instance metadata. The `google_guest_agent` running on the VM processes all keys every minute — when it hits expired keys, it logs errors and may stop syncing your real key to `~/.ssh/authorized_keys`.
-
-#### Permanent Fix Applied (May 7, 2026)
-The `google_guest_agent` accounts daemon was disabled so it no longer overwrites `authorized_keys`:
-```
-/etc/default/instance_configs.cfg → accounts_daemon = false
-```
-The `parit` user was created via startup script with the permanent key hardcoded into `~/.ssh/authorized_keys`.
-
-#### If SSH breaks again — Step by step fix:
-
-**Step 1 — Clean up expired keys in GCP Console:**
-1. GCP Console → VM instances → `instance-20260112-102320` → **Edit**
-2. Under **SSH keys**, delete all entries containing `google-ssh` or `expireOn`
-3. Keep only: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDMNU/uFWDiM/F9wkqV9tG+com2b6CS42/CdFZFORWHe parit`
-4. Save
-
-**Step 2 — Re-disable the accounts daemon (if it got reset):**
+### Step 3 — Pull and rebuild
 ```bash
-ssh portfolio
-sudo sed -i 's/accounts_daemon = true/accounts_daemon = false/' /etc/default/instance_configs.cfg
-sudo systemctl restart google-guest-agent
-```
-
-**Step 3 — If `parit` user is missing (e.g. after VM recreation):**
-
-Add this to Edit → Automation → Startup script, then click **Reset** (safe reboot, no data loss):
-```bash
-#!/bin/bash
-useradd -m parit 2>/dev/null
-mkdir -p /home/parit/.ssh
-echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDMNU/uFWDiM/F9wkqV9tG+com2b6CS42/CdFZFORWHe parit" >> /home/parit/.ssh/authorized_keys
-chmod 700 /home/parit/.ssh
-chmod 600 /home/parit/.ssh/authorized_keys
-chown -R parit:parit /home/parit/.ssh
-```
-
-#### Key facts
-| Item | Value |
-|---|---|
-| VM name | `instance-20260112-102320` |
-| Zone | `us-central1-c` |
-| External IP | `34.30.174.42` |
-| SSH user | `parit` |
-| Local private key | `~/.ssh/id_ed25519` |
-| Local public key fingerprint | `SHA256:3yhsxfofShhQ6WPr7XhraE97WD0+g7xHd/Rgl9b4n1w` |
-| SSH config alias | `portfolio` (in `~/.ssh/config`) |
-
-#### Debugging tools
-View serial port logs (no SSH needed) — GCP Console → instance → **Serial port 1 (console)**
-
-Enable serial console if needed:
-- Edit instance → Remote access → check **"Enable connecting to serial ports"** → Save
-
-Check what the guest agent is doing on the VM:
-```bash
-sudo journalctl -u google-guest-agent -n 50 --no-pager
-```
-
-### Step 3: Pull and Rebuild
-In the SSH terminal window that opens, run:
-```bash
-cd portfolio-site
+cd /home/paritkansal121/portfolio-site
 git fetch origin
 git reset --hard origin/main
 nohup sudo docker-compose up -d --build > ~/build.log 2>&1 &
 ```
 
-This runs the build in the background — you can safely close the SSH window or lose internet and it will keep running.
-
-To check build progress anytime:
+The build runs in the background (~5-10 min). Check progress with:
 ```bash
 tail -f ~/build.log
 ```
-Press `Ctrl+C` to stop watching the log (the build keeps running).
+Press `Ctrl+C` to stop watching (build keeps running).
 
-Once the build is done (check log for "Done"), restart Caddy:
+### Step 4 — Restart Caddy when done
 ```bash
 sudo systemctl restart caddy
 ```
 
 ---
 
-## ⚠️ One-Time Server Git Setup
+## 🔑 SSH Troubleshooting
 
-Run these once on a fresh server to prevent git pull errors:
+**If `ssh portfolio` stops working**, follow these steps in order:
 
-```bash
-git config --global user.email "paritkansal121@gmail.com"
-git config --global user.name "paritkansal121"
-git config --global pull.rebase false
-```
+### Fix 1 — Clean expired GCP keys
+1. GCP Console → VM instances → `instance-20260112-102320` → **Edit**
+2. Under **SSH keys**, delete all entries with `google-ssh` or `expireOn`
+3. Keep only: `ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDMNU/uFWDiM/F9wkqV9tG+com2b6CS42/CdFZFORWHe parit`
+4. Save — then retry `ssh portfolio`
 
-This prevents the *"Need to specify how to reconcile divergent branches"* error on every pull.
-
-### If git pull says "divergent branches" anyway
-
-This happens when the server has local commits that aren't on GitHub (e.g. a manual edit or merge commit directly on the server). Fix it by resetting the server to exactly match GitHub:
+### Fix 2 — Use Cloud Shell to restore access
+Open Cloud Shell (GCP Console → terminal icon, top right), then run:
 
 ```bash
-git fetch origin
-git reset --hard origin/main
+# Get your Cloud Shell public key first
+cat ~/.ssh/google_compute_engine.pub
 ```
 
-Then do a full rebuild once:
 ```bash
-sudo docker-compose up -d --build
+# Add startup script (replace CLOUD_SHELL_KEY with output above)
+gcloud compute instances add-metadata instance-20260112-102320 --zone=us-central1-c --metadata=startup-script='#!/bin/bash
+useradd -m parit 2>/dev/null
+mkdir -p /home/parit/.ssh
+echo "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDMNU/uFWDiM/F9wkqV9tG+com2b6CS42/CdFZFORWHe parit" > /home/parit/.ssh/authorized_keys
+echo "CLOUD_SHELL_KEY" >> /home/parit/.ssh/authorized_keys
+chmod 700 /home/parit/.ssh
+chmod 600 /home/parit/.ssh/authorized_keys
+chown -R parit:parit /home/parit/.ssh'
+
+# Reboot (safe, no data loss)
+gcloud compute instances reset instance-20260112-102320 --zone=us-central1-c
 ```
 
-> **Rule:** Never edit files directly on the server. Always edit on your Mac → push to GitHub → `bash deploy.sh` on the server.
+Wait 30 seconds, then connect via Cloud Shell:
+```bash
+gcloud compute ssh parit@instance-20260112-102320 --zone=us-central1-c --project=portfolio-site-480613
+```
+
+Once in, re-disable the accounts daemon:
+```bash
+sudo sed -i 's/accounts_daemon = true/accounts_daemon = false/' /etc/default/instance_configs.cfg
+sudo systemctl restart google-guest-agent
+```
+
+### Key facts
+| Item | Value |
+|---|---|
+| VM | `instance-20260112-102320` — zone `us-central1-c` |
+| External IP | `34.30.174.42` |
+| SSH alias | `ssh portfolio` (configured in `~/.ssh/config`) |
+| SSH user | `parit` |
+| Repo path on server | `/home/paritkansal121/portfolio-site/` |
 
