@@ -379,11 +379,11 @@ export default function AdminDashboard() {
                                                         variant="ghost" size="icon"
                                                         disabled={idx === 0}
                                                         onClick={async () => {
-                                                            const above = chapters[idx - 1];
-                                                            await Promise.all([
-                                                                fetch(`/api/blog/${chapter.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: idx }) }),
-                                                                fetch(`/api/blog/${above.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: idx + 1 }) }),
-                                                            ]);
+                                                            const reordered = [...chapters];
+                                                            [reordered[idx - 1], reordered[idx]] = [reordered[idx], reordered[idx - 1]];
+                                                            await Promise.all(reordered.map((c, i) =>
+                                                                fetch(`/api/blog/${c.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: i + 1 }) })
+                                                            ));
                                                             queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
                                                         }}
                                                     >
@@ -393,11 +393,11 @@ export default function AdminDashboard() {
                                                         variant="ghost" size="icon"
                                                         disabled={idx === chapters.length - 1}
                                                         onClick={async () => {
-                                                            const below = chapters[idx + 1];
-                                                            await Promise.all([
-                                                                fetch(`/api/blog/${chapter.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: idx + 2 }) }),
-                                                                fetch(`/api/blog/${below.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: idx + 1 }) }),
-                                                            ]);
+                                                            const reordered = [...chapters];
+                                                            [reordered[idx], reordered[idx + 1]] = [reordered[idx + 1], reordered[idx]];
+                                                            await Promise.all(reordered.map((c, i) =>
+                                                                fetch(`/api/blog/${c.id}`, { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ seriesOrder: i + 1 }) })
+                                                            ));
                                                             queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
                                                         }}
                                                     >
