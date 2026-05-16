@@ -28,7 +28,12 @@ export function SeriesSection() {
     });
 
   seriesMap.forEach((list, name) => {
-    seriesMap.set(name, list.sort((a, b) => (a.seriesOrder ?? 999) - (b.seriesOrder ?? 999)));
+    seriesMap.set(name, list.sort((a, b) => {
+      if (a.seriesOrder != null && b.seriesOrder != null) return a.seriesOrder - b.seriesOrder;
+      if (a.seriesOrder != null) return -1;
+      if (b.seriesOrder != null) return 1;
+      return new Date(a.date).getTime() - new Date(b.date).getTime();
+    }));
   });
 
   if (!isLoading && seriesMap.size === 0) return null;
