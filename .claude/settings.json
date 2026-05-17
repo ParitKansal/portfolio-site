@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(sqlite3 sqlite.db \"ALTER TABLE blog_posts ADD COLUMN series_name TEXT; ALTER TABLE blog_posts ADD COLUMN series_order INTEGER;\")"
+      "Bash(sqlite3 sqlite.db \"ALTER TABLE blog_posts ADD COLUMN series_name TEXT; ALTER TABLE blog_posts ADD COLUMN series_order INTEGER;\")",
+      "Bash(xargs ls *)"
     ]
   }
 }

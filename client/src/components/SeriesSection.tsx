@@ -220,6 +220,7 @@ export function SeriesSection() {
               </div>
 
               <article>
+                <h1 className="text-3xl font-bold mb-4">{openPost.title}</h1>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {(openPost.tags || []).map((tag) => (
                     <Badge key={tag} variant="secondary">{tag}</Badge>
