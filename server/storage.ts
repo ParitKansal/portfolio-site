@@ -290,28 +290,22 @@ export class DatabaseStorage implements IStorage {
   // Section visibility
   async getSectionSettings(): Promise<SectionSetting[]> {
     const existing = await db.select().from(sectionSettings);
-    // Ensure all known sections have a row (upsert defaults on first call)
     const existingKeys = new Set(existing.map(s => s.section));
     const missing = SECTION_KEYS.filter(k => !existingKeys.has(k));
     if (missing.length > 0) {
-      await db.insert(sectionSettings)
-        .values(missing.map(section => ({ section, visible: true })));
-      return db.select().from(sectionSettings);
+      const newRows = missing.map(section => ({ section, visible: true }));
+      await db.insert(sectionSettings).values(newRows);
+      return [...existing, ...newRows.map((r, i) => ({ id: existing.length + i + 1, ...r }))];
     }
     return existing;
   }
 
   async setSectionVisibility(section: string, visible: boolean): Promise<SectionSetting> {
-    const [existing] = await db.select().from(sectionSettings).where(eq(sectionSettings.section, section));
-    if (existing) {
-      const [updated] = await db.update(sectionSettings)
-        .set({ visible })
-        .where(eq(sectionSettings.section, section))
-        .returning();
-      return updated;
-    }
-    const [created] = await db.insert(sectionSettings).values({ section, visible }).returning();
-    return created;
+    const [result] = await db.insert(sectionSettings)
+      .values({ section, visible })
+      .onConflictDoUpdate({ target: sectionSettings.section, set: { visible } })
+      .returning();
+    return result;
   }
 }
 

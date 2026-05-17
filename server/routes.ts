@@ -17,6 +17,13 @@ import { db } from "./db";
 import { asc } from "drizzle-orm";
 import nodemailer from "nodemailer";
 
+const emailTransporter = process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD
+  ? nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
+    })
+  : null;
+
 const updateKnowledgeEntrySchema = insertKnowledgeEntrySchema.partial();
 const updateBlogPostSchema = insertBlogPostSchema.partial();
 const updateEducationSchema = insertEducationSchema.partial();
@@ -250,16 +257,8 @@ export async function registerRoutes(
       const message = await storage.createMessage(parseResult.data);
 
       // Send email notification
-      if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.GMAIL_USER,
-            pass: process.env.GMAIL_APP_PASSWORD,
-          },
-        });
-
-        await transporter.sendMail({
+      if (emailTransporter) {
+        await emailTransporter.sendMail({
           from: process.env.GMAIL_USER,
           to: process.env.ADMIN_EMAIL || process.env.GMAIL_USER,
           subject: `New Portfolio Message from ${message.name}`,
