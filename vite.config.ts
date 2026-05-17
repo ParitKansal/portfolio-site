@@ -34,9 +34,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          if (id.includes("node_modules")) {
-            return "vendor";
-          }
+          if (id.includes("node_modules/react") || id.includes("node_modules/react-dom") || id.includes("node_modules/react-router") || id.includes("node_modules/wouter")) return "react";
+          if (id.includes("node_modules/@radix-ui")) return "ui";
+          if (id.includes("node_modules/framer-motion")) return "animation";
+          if (id.includes("node_modules/react-icons")) return "icons";
+          if (id.includes("node_modules/@tanstack")) return "query";
+          if (id.includes("node_modules")) return "vendor";
         }
       }
     }
