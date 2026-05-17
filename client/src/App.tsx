@@ -15,7 +15,7 @@ const NotFound = lazy(() => import("@/pages/not-found"));
 
 function Router() {
   return (
-    <Suspense fallback={null}>
+    <Suspense fallback={<div />}>
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/auth" component={AuthPage} />
