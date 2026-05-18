@@ -143,16 +143,6 @@ export function ExperienceForm({ value, onChange }: FormProps<InsertExperience>)
                 </div>
             </div>
             <div className="space-y-2">
-                <Label>Description (Markdown supported)</Label>
-                <Textarea
-                    className="min-h-[120px] font-mono text-sm"
-                    placeholder="e.g. **Key responsibilities:** led a team of 5 engineers..."
-                    value={value.description || ""}
-                    onChange={e => onChange({ ...value, description: e.target.value })}
-                />
-            </div>
-
-            <div className="space-y-2">
                 <Label>Projects / Achievements</Label>
                 <div className="space-y-4">
                     {(value.projects || []).map((project, index) => (
@@ -173,8 +163,10 @@ export function ExperienceForm({ value, onChange }: FormProps<InsertExperience>)
                                 />
                             </div>
                             <div className="space-y-2">
-                                <Label>Description</Label>
+                                <Label>Description (Markdown supported)</Label>
                                 <Textarea
+                                    className="font-mono text-sm min-h-[100px]"
+                                    placeholder="Supports **bold**, *italic*, `code`, lists, etc."
                                     value={project.description}
                                     onChange={e => updateProject(index, { ...project, description: e.target.value })}
                                 />

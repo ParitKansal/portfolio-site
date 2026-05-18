@@ -75,15 +75,6 @@ export function ExperienceSection() {
                     </div>
                   </div>
 
-                  {/* Description */}
-                  {experience.description && (
-                    <div className="px-6 md:px-8 py-5 border-b border-border prose prose-sm prose-neutral dark:prose-invert max-w-none">
-                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                        {experience.description}
-                      </ReactMarkdown>
-                    </div>
-                  )}
-
                   {/* Projects */}
                   <div className="divide-y divide-border">
                     {experience.projects.map((project, projIndex) => {
@@ -121,9 +112,11 @@ export function ExperienceSection() {
                                 className="overflow-hidden"
                               >
                                 <div className="px-6 md:px-8 pb-5 pt-1 border-l-2 border-primary">
-                                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                                    {project.description}
-                                  </p>
+                                  <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none mb-4 text-muted-foreground">
+                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                      {project.description}
+                                    </ReactMarkdown>
+                                  </div>
                                   <div className="flex flex-wrap gap-2">
                                     {project.tags.map((tag) => (
                                       <Badge key={tag} variant="secondary" className="text-xs">
