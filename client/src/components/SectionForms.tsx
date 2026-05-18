@@ -142,6 +142,15 @@ export function ExperienceForm({ value, onChange }: FormProps<InsertExperience>)
                     />
                 </div>
             </div>
+            <div className="space-y-2">
+                <Label>Description (Markdown supported)</Label>
+                <Textarea
+                    className="min-h-[120px] font-mono text-sm"
+                    placeholder="e.g. **Key responsibilities:** led a team of 5 engineers..."
+                    value={value.description || ""}
+                    onChange={e => onChange({ ...value, description: e.target.value })}
+                />
+            </div>
 
             <div className="space-y-2">
                 <Label>Projects / Achievements</Label>

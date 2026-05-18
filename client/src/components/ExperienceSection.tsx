@@ -7,6 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import { SectionHeader } from "./SectionHeader";
 import type { Experience } from "@shared/schema";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export function ExperienceSection() {
   const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set(["0-0"]));
@@ -72,6 +74,15 @@ export function ExperienceSection() {
                       </div>
                     </div>
                   </div>
+
+                  {/* Description */}
+                  {experience.description && (
+                    <div className="px-6 md:px-8 py-5 border-b border-border prose prose-sm prose-neutral dark:prose-invert max-w-none">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {experience.description}
+                      </ReactMarkdown>
+                    </div>
+                  )}
 
                   {/* Projects */}
                   <div className="divide-y divide-border">
