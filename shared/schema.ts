@@ -130,7 +130,6 @@ export const experience = sqliteTable("experience", {
   role: text("role").notNull(),
   period: text("period").notNull(),
   location: text("location").notNull(),
-  description: text("description"),
   projects: text("projects", { mode: "json" }).$type<{ title: string, description: string, tags: string[] }[]>().notNull(),
 });
 
