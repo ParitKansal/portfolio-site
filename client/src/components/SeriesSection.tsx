@@ -77,10 +77,35 @@ export function SeriesSection() {
       month: "long", day: "numeric", year: "numeric",
     });
 
+  const blocksToMarkdown = (blocks: BlogPost["content"]): string =>
+    (Array.isArray(blocks) ? blocks : []).map((block) => {
+      switch (block.type) {
+        case "text": return block.value ?? "";
+        case "code": return `\`\`\`${block.language ?? ""}\n${block.value ?? ""}\n\`\`\``;
+        case "image": return `<img src="${block.url}"${block.width ? ` width="${block.width}%"` : ""}${block.caption ? ` alt="${block.caption}"` : ""} />${block.caption ? `\n_${block.caption}_` : ""}`;
+        case "video": {
+          const ytMatch = block.url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+          if (ytMatch) {
+            const videoId = ytMatch[1];
+            const thumbnail = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+            return `<img src="${thumbnail}" style="max-width:100%;display:block;" alt="${block.caption ?? "YouTube Thumbnail"}" />\n<iframe width="560" height="315" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allowfullscreen></iframe>${block.caption ? `\n_${block.caption}_` : ""}`;
+          }
+          return `<video src="${block.url}" controls style="max-width:100%"></video>${block.caption ? `\n_${block.caption}_` : ""}`;
+        }
+        case "pdf": return `[PDF${block.caption ? `: ${block.caption}` : ""}](${block.url})`;
+        case "link": {
+          const label = block.icon && block.caption ? `${block.icon}: ${block.caption}` : (block.caption ?? "");
+          return `<a href="${block.url}" target="_blank" style="display:inline-block;text-decoration:none;">${block.thumbnail ? `\n  <img src="${block.thumbnail}" style="max-width:100%;display:block;" />` : ""}${label ? `\n  <span>${label}</span>` : ""}${block.url ? `\n  <small style="display:block;color:gray;">${block.url}</small>` : ""}\n</a>`;
+        }
+        case "iframe": return `[${block.caption ?? "Open Interactive Embed"}](${block.url}) _(interactive — open in browser)_`;
+        default: return "";
+      }
+    }).filter(Boolean).join("\n\n");
+
   const downloadSeries = (seriesName: string, seriesPosts: BlogPost[]) => {
     const content = seriesPosts.map((post, idx) => {
       const date = formatDate(post.date);
-      return `# Chapter ${idx + 1}: ${post.title}\n\n_${date} · ${post.readTime}_\n\n${post.content}`;
+      return `# Chapter ${idx + 1}: ${post.title}\n\n_${date} · ${post.readTime}_\n\n${blocksToMarkdown(post.content)}`;
     }).join("\n\n---\n\n");
 
     const fullContent = `# ${seriesName}\n\n_${seriesPosts.length} chapters · ${totalReadTime(seriesPosts) ?? ""}_\n\n---\n\n${content}`;
