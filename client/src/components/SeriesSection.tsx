@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { BookOpen, ArrowRight, Clock, Loader2, ChevronDown, ChevronRight, ArrowLeft, Pencil, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +14,11 @@ export function SeriesSection() {
   const [openPost, setOpenPost] = useState<BlogPost | null>(null);
   const [visibleCount, setVisibleCount] = useState(4);
   const { user } = useAuth();
+  const articleRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    if (openPost) articleRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  }, [openPost?.id]);
 
   const { data: posts = [], isLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog"],
@@ -263,7 +268,7 @@ export function SeriesSection() {
                 </div>
               </div>
 
-              <article>
+              <article ref={articleRef}>
                 <h1 className="text-3xl font-bold mb-4">{openPost.title}</h1>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {(openPost.tags || []).map((tag) => (
