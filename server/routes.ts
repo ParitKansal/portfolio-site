@@ -234,12 +234,12 @@ export async function registerRoutes(
 
   app.patch("/api/series-order", isAuthenticated, async (req, res) => {
     try {
-      const items = req.body as { name: string; displayOrder: number }[];
+      const items = req.body as { name: string; displayOrder: number; showInBlog?: boolean }[];
       if (!Array.isArray(items)) return res.status(400).json({ error: "Expected array" });
-      for (const { name, displayOrder } of items) {
+      for (const { name, displayOrder, showInBlog } of items) {
         await db.insert(seriesMetadata)
-          .values({ name, displayOrder })
-          .onConflictDoUpdate({ target: seriesMetadata.name, set: { displayOrder } });
+          .values({ name, displayOrder, showInBlog: showInBlog ?? true })
+          .onConflictDoUpdate({ target: seriesMetadata.name, set: { displayOrder, ...(showInBlog !== undefined ? { showInBlog } : {}) } });
       }
       res.json({ ok: true });
     } catch {

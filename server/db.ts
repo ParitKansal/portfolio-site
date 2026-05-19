@@ -16,9 +16,12 @@ sqlite.exec(`
 sqlite.exec(`
   CREATE TABLE IF NOT EXISTS series_metadata (
     name TEXT PRIMARY KEY,
-    display_order INTEGER NOT NULL DEFAULT 0
+    display_order INTEGER NOT NULL DEFAULT 0,
+    show_in_blog INTEGER NOT NULL DEFAULT 1
   );
 `);
+
+try { sqlite.exec(`ALTER TABLE series_metadata ADD COLUMN show_in_blog INTEGER NOT NULL DEFAULT 1;`); } catch { /* already exists */ }
 
 // Add missing columns to blog_posts if they don't exist yet
 const blogPostMigrations = [

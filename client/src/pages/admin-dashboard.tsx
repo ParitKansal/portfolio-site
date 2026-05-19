@@ -43,7 +43,7 @@ export default function AdminDashboard() {
 
     // --- Blog Management ---
     const { data: blogPosts, isLoading: isBlogLoading } = useQuery<BlogPost[]>({ queryKey: ["/api/blog"] });
-    const { data: seriesOrder = [] } = useQuery<{ name: string; displayOrder: number }[]>({ queryKey: ["/api/series-order"] });
+    const { data: seriesOrder = [] } = useQuery<{ name: string; displayOrder: number; showInBlog: boolean }[]>({ queryKey: ["/api/series-order"] });
     const { data: knowledgeEntries, isLoading: isKnowledgeLoading } = useQuery<KnowledgeEntry[]>({ queryKey: ["/api/knowledge"] });
     const { data: educationList, isLoading: isEducationLoading } = useQuery<Education[]>({ queryKey: ["/api/education"] });
     const { data: experienceList, isLoading: isExperienceLoading } = useQuery<Experience[]>({ queryKey: ["/api/experience"] });
@@ -366,13 +366,25 @@ export default function AdminDashboard() {
                                 return oa - ob;
                             });
 
+                            const showInBlogMap = new Map(seriesOrder.map(s => [s.name, s.showInBlog ?? true]));
+
                             const reorderSeries = async (entries: [string, BlogPost[]][], fromIdx: number, toIdx: number) => {
                                 const reordered = [...entries];
                                 [reordered[fromIdx], reordered[toIdx]] = [reordered[toIdx], reordered[fromIdx]];
                                 await fetch("/api/series-order", {
                                     method: "PATCH",
                                     headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify(reordered.map(([name], i) => ({ name, displayOrder: i }))),
+                                    body: JSON.stringify(reordered.map(([name], i) => ({ name, displayOrder: i, showInBlog: showInBlogMap.get(name) ?? true }))),
+                                });
+                                queryClient.invalidateQueries({ queryKey: ["/api/series-order"] });
+                            };
+
+                            const toggleSeriesVisibility = async (name: string) => {
+                                const current = showInBlogMap.get(name) ?? true;
+                                await fetch("/api/series-order", {
+                                    method: "PATCH",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify([{ name, displayOrder: orderMap.get(name) ?? 0, showInBlog: !current }]),
                                 });
                                 queryClient.invalidateQueries({ queryKey: ["/api/series-order"] });
                             };
@@ -381,8 +393,17 @@ export default function AdminDashboard() {
                                 <Card key={seriesName}>
                                     <CardHeader className="flex flex-row items-center gap-3 pb-3">
                                         <BookOpen className="h-5 w-5 text-primary shrink-0" />
-                                        <CardTitle className="text-lg">{seriesName}</CardTitle>
+                                        <CardTitle className={`text-lg ${!(showInBlogMap.get(seriesName) ?? true) ? "text-muted-foreground line-through" : ""}`}>{seriesName}</CardTitle>
                                         <span className="text-sm text-muted-foreground ml-auto">{chapters.length} chapters</span>
+                                        <Button
+                                            variant="ghost" size="icon"
+                                            title={(showInBlogMap.get(seriesName) ?? true) ? "Hide series (removes from Series & Blog sections)" : "Show series"}
+                                            onClick={() => toggleSeriesVisibility(seriesName)}
+                                        >
+                                            {(showInBlogMap.get(seriesName) ?? true)
+                                                ? <Eye className="h-4 w-4" />
+                                                : <EyeOff className="h-4 w-4 text-muted-foreground" />}
+                                        </Button>
                                         {/* Series-level reorder buttons */}
                                         <div className="flex items-center gap-0.5 ml-2">
                                             <Button
