@@ -22,10 +22,16 @@ export function BlogSection() {
     queryKey: ["/api/blog"],
   });
 
+  const { data: seriesOrder = [] } = useQuery<{ name: string; displayOrder: number; showInBlog: boolean }[]>({
+    queryKey: ["/api/series-order"],
+  });
+
+  const hiddenSeriesNames = new Set(seriesOrder.filter((s) => s.showInBlog === false).map((s) => s.name));
+
   const allTags = Array.from(new Set(posts.flatMap((p) => p.tags || [])));
 
   const filteredPosts = posts.filter((post) => {
-    if (post.seriesName && post.showInBlog === false) return false;
+    if (post.seriesName && (post.showInBlog === false || hiddenSeriesNames.has(post.seriesName))) return false;
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());
