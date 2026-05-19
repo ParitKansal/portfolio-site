@@ -25,6 +25,7 @@ const blogPostMigrations = [
   `ALTER TABLE blog_posts ADD COLUMN visible INTEGER NOT NULL DEFAULT 1;`,
   `ALTER TABLE blog_posts ADD COLUMN series_name TEXT;`,
   `ALTER TABLE blog_posts ADD COLUMN series_order INTEGER;`,
+  `ALTER TABLE blog_posts ADD COLUMN show_in_blog INTEGER NOT NULL DEFAULT 1;`,
 ];
 for (const sql of blogPostMigrations) {
   try { sqlite.exec(sql); } catch { /* column already exists — ignore */ }

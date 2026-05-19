@@ -25,6 +25,7 @@ export function BlogSection() {
   const allTags = Array.from(new Set(posts.flatMap((p) => p.tags || [])));
 
   const filteredPosts = posts.filter((post) => {
+    if (post.seriesName && post.showInBlog === false) return false;
     const matchesSearch =
       post.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       post.excerpt.toLowerCase().includes(searchQuery.toLowerCase());

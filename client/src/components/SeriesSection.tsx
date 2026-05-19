@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BookOpen, ArrowRight, Clock, Loader2, ChevronDown, ChevronRight, ArrowLeft, Pencil } from "lucide-react";
+import { BookOpen, ArrowRight, Clock, Loader2, ChevronDown, ChevronRight, ArrowLeft, Pencil, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,6 +73,22 @@ export function SeriesSection() {
     new Date(dateStr).toLocaleDateString("en-US", {
       month: "long", day: "numeric", year: "numeric",
     });
+
+  const downloadSeries = (seriesName: string, seriesPosts: BlogPost[]) => {
+    const content = seriesPosts.map((post, idx) => {
+      const date = formatDate(post.date);
+      return `# Chapter ${idx + 1}: ${post.title}\n\n_${date} · ${post.readTime}_\n\n${post.content}`;
+    }).join("\n\n---\n\n");
+
+    const fullContent = `# ${seriesName}\n\n_${seriesPosts.length} chapters · ${totalReadTime(seriesPosts) ?? ""}_\n\n---\n\n${content}`;
+    const blob = new Blob([fullContent], { type: "text/markdown" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${seriesName.toLowerCase().replace(/\s+/g, "-")}.md`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   // Full post reader view
   if (openPost) {
@@ -363,6 +379,14 @@ export function SeriesSection() {
                           {readTime}
                         </span>
                       )}
+                      <button
+                        className="ml-auto flex items-center gap-1 hover:text-foreground transition-colors"
+                        onClick={(e) => { e.stopPropagation(); downloadSeries(seriesName, seriesPosts); }}
+                        title="Download full series as Markdown"
+                      >
+                        <Download className="h-3 w-3" />
+                        Download
+                      </button>
                     </div>
                   </CardContent>
                 </Card>

@@ -672,6 +672,18 @@ export default function AdminDashboard() {
                                                     />
                                                 </div>
                                             </div>
+                                            {formData.seriesName && (
+                                                <div className="flex items-center gap-2">
+                                                    <Checkbox
+                                                        id="showInBlog"
+                                                        checked={formData.showInBlog ?? true}
+                                                        onCheckedChange={(checked) => setFormData({ ...formData, showInBlog: !!checked })}
+                                                    />
+                                                    <Label htmlFor="showInBlog" className="font-normal cursor-pointer">
+                                                        Show this chapter in Blog section
+                                                    </Label>
+                                                </div>
+                                            )}
                                         </>
                                     )}
 
