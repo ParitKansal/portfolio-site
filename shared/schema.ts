@@ -202,6 +202,7 @@ export const seriesMetadata = sqliteTable("series_metadata", {
   name: text("name").primaryKey(),
   displayOrder: integer("display_order").notNull().default(0),
   showInBlog: integer("show_in_blog", { mode: "boolean" }).notNull().default(true),
+  showInSeries: integer("show_in_series", { mode: "boolean" }).notNull().default(true),
 });
 
 export type SeriesMetadata = typeof seriesMetadata.$inferSelect;

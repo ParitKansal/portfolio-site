@@ -22,6 +22,7 @@ sqlite.exec(`
 `);
 
 try { sqlite.exec(`ALTER TABLE series_metadata ADD COLUMN show_in_blog INTEGER NOT NULL DEFAULT 1;`); } catch { /* already exists */ }
+try { sqlite.exec(`ALTER TABLE series_metadata ADD COLUMN show_in_series INTEGER NOT NULL DEFAULT 1;`); } catch { /* already exists */ }
 
 // Add missing columns to blog_posts if they don't exist yet
 const blogPostMigrations = [
