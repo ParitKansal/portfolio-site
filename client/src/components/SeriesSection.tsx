@@ -17,7 +17,10 @@ export function SeriesSection() {
   const articleRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    if (openPost) articleRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    if (openPost && articleRef.current) {
+      const top = articleRef.current.getBoundingClientRect().top + window.scrollY - 80;
+      window.scrollTo({ top, behavior: "smooth" });
+    }
   }, [openPost?.id]);
 
   const { data: posts = [], isLoading } = useQuery<BlogPost[]>({
