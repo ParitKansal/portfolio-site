@@ -9,7 +9,9 @@
       "Bash(curl -s http://localhost:5000/api/series-order)",
       "Bash(sqlite3 sqlite.db \"PRAGMA table_info\\(series_metadata\\);\")",
       "Bash(curl -s -X PATCH http://localhost:5000/api/series-order -H 'Content-Type: application/json' -d '[{\"name\":\"Test Series\",\"displayOrder\":0,\"showInBlog\":true,\"showInSeries\":true}]')",
-      "Bash(sqlite3 sqlite.db \"INSERT OR REPLACE INTO series_metadata \\(name, display_order, show_in_blog, show_in_series\\) VALUES \\('Test Series', 0, 1, 0\\);\")"
+      "Bash(sqlite3 sqlite.db \"INSERT OR REPLACE INTO series_metadata \\(name, display_order, show_in_blog, show_in_series\\) VALUES \\('Test Series', 0, 1, 0\\);\")",
+      "Bash(sqlite3 /Users/xelpmoc/Desktop/Projects/Portfolio-Site/sqlite.db 'INSERT OR REPLACE INTO series_metadata \\(name, display_order, show_in_blog, show_in_series\\) VALUES \\('\\\\''OldName'\\\\'', 0, 1, 1\\);')",
+      "Bash(sqlite3 /Users/xelpmoc/Desktop/Projects/Portfolio-Site/sqlite.db \"SELECT username FROM users LIMIT 3;\")"
     ]
   }
 }

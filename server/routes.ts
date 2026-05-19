@@ -12,9 +12,10 @@ import {
   insertCertificationSchema,
   insertResumeSchema,
   seriesMetadata,
+  blogPosts,
 } from "@shared/schema";
 import { db } from "./db";
-import { asc } from "drizzle-orm";
+import { asc, eq } from "drizzle-orm";
 import nodemailer from "nodemailer";
 
 const emailTransporter = process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD
@@ -251,6 +252,23 @@ export async function registerRoutes(
       res.json({ ok: true });
     } catch {
       res.status(500).json({ error: "Failed to update series order" });
+    }
+  });
+
+  app.post("/api/series-rename", isAuthenticated, async (req, res) => {
+    try {
+      const { oldName, newName } = req.body as { oldName: string; newName: string };
+      if (!oldName || !newName || oldName === newName) return res.status(400).json({ error: "Invalid names" });
+      await db.update(blogPosts).set({ seriesName: newName }).where(eq(blogPosts.seriesName, oldName));
+      const existing = await db.select().from(seriesMetadata).where(eq(seriesMetadata.name, oldName));
+      if (existing.length > 0) {
+        const row = existing[0];
+        await db.delete(seriesMetadata).where(eq(seriesMetadata.name, oldName));
+        await db.insert(seriesMetadata).values({ ...row, name: newName });
+      }
+      res.json({ ok: true });
+    } catch {
+      res.status(500).json({ error: "Failed to rename series" });
     }
   });
 

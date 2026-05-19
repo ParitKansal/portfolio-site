@@ -27,6 +27,44 @@ import { CalendarIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
+function SeriesNameEditor({ name, fullyHidden, onRename }: { name: string; fullyHidden: boolean; onRename: (oldName: string, newName: string) => Promise<void> }) {
+    const [editing, setEditing] = useState(false);
+    const [value, setValue] = useState(name);
+    const [saving, setSaving] = useState(false);
+
+    const save = async () => {
+        const trimmed = value.trim();
+        if (!trimmed || trimmed === name) { setEditing(false); setValue(name); return; }
+        setSaving(true);
+        await onRename(name, trimmed);
+        setSaving(false);
+        setEditing(false);
+    };
+
+    if (editing) return (
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Input
+                autoFocus
+                value={value}
+                onChange={(e) => setValue(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") save(); if (e.key === "Escape") { setEditing(false); setValue(name); } }}
+                className="h-8 text-base font-semibold"
+            />
+            <Button size="sm" onClick={save} disabled={saving}>{saving ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : "Save"}</Button>
+            <Button size="sm" variant="ghost" onClick={() => { setEditing(false); setValue(name); }}>Cancel</Button>
+        </div>
+    );
+
+    return (
+        <div className="flex items-center gap-2 min-w-0">
+            <span className={`text-lg font-semibold truncate ${fullyHidden ? "text-muted-foreground line-through" : ""}`}>{name}</span>
+            <Button variant="ghost" size="icon" className="h-6 w-6 shrink-0" onClick={() => setEditing(true)}>
+                <Pencil className="h-3.5 w-3.5" />
+            </Button>
+        </div>
+    );
+}
+
 export default function AdminDashboard() {
     const { user, isLoading: isAuthLoading } = useAuth();
     const [, setLocation] = useLocation();
@@ -409,7 +447,19 @@ export default function AdminDashboard() {
                                 <Card key={seriesName}>
                                     <CardHeader className="flex flex-row items-center gap-3 pb-3">
                                         <BookOpen className="h-5 w-5 text-primary shrink-0" />
-                                        <CardTitle className={`text-lg ${fullyHidden ? "text-muted-foreground line-through" : ""}`}>{seriesName}</CardTitle>
+                                        <SeriesNameEditor
+                                            name={seriesName}
+                                            fullyHidden={fullyHidden}
+                                            onRename={async (oldName, newName) => {
+                                                await fetch("/api/series-rename", {
+                                                    method: "POST",
+                                                    headers: { "Content-Type": "application/json" },
+                                                    body: JSON.stringify({ oldName, newName }),
+                                                });
+                                                queryClient.invalidateQueries({ queryKey: ["/api/blog"] });
+                                                queryClient.invalidateQueries({ queryKey: ["/api/series-order"] });
+                                            }}
+                                        />
                                         <span className="text-sm text-muted-foreground ml-auto">{chapters.length} chapters</span>
                                         <div className="flex items-center gap-1">
                                             <Button
