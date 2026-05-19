@@ -28,7 +28,8 @@ export function BlogSection() {
 
   const hiddenSeriesNames = new Set(seriesOrder.filter((s) => s.showInBlog === false).map((s) => s.name));
 
-  const allTags = Array.from(new Set(posts.flatMap((p) => p.tags || [])));
+  const blogVisiblePosts = posts.filter((p) => !(p.seriesName && (p.showInBlog === false || hiddenSeriesNames.has(p.seriesName))));
+  const allTags = Array.from(new Set(blogVisiblePosts.flatMap((p) => p.tags || [])));
 
   const filteredPosts = posts.filter((post) => {
     if (post.seriesName && (post.showInBlog === false || hiddenSeriesNames.has(post.seriesName))) return false;
