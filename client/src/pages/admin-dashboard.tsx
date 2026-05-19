@@ -43,7 +43,7 @@ export default function AdminDashboard() {
 
     // --- Blog Management ---
     const { data: blogPosts, isLoading: isBlogLoading } = useQuery<BlogPost[]>({ queryKey: ["/api/blog"] });
-    const { data: seriesOrder = [] } = useQuery<{ name: string; displayOrder: number; showInBlog: boolean }[]>({ queryKey: ["/api/series-order"] });
+    const { data: seriesOrder = [] } = useQuery<{ name: string; displayOrder: number; showInBlog: boolean; showInSeries: boolean }[]>({ queryKey: ["/api/series-order"] });
     const { data: knowledgeEntries, isLoading: isKnowledgeLoading } = useQuery<KnowledgeEntry[]>({ queryKey: ["/api/knowledge"] });
     const { data: educationList, isLoading: isEducationLoading } = useQuery<Education[]>({ queryKey: ["/api/education"] });
     const { data: experienceList, isLoading: isExperienceLoading } = useQuery<Experience[]>({ queryKey: ["/api/experience"] });
@@ -367,6 +367,7 @@ export default function AdminDashboard() {
                             });
 
                             const showInBlogMap = new Map(seriesOrder.map(s => [s.name, s.showInBlog ?? true]));
+                            const showInSeriesMap = new Map(seriesOrder.map(s => [s.name, s.showInSeries ?? true]));
 
                             const reorderSeries = async (entries: [string, BlogPost[]][], fromIdx: number, toIdx: number) => {
                                 const reordered = [...entries];
@@ -374,36 +375,62 @@ export default function AdminDashboard() {
                                 await fetch("/api/series-order", {
                                     method: "PATCH",
                                     headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify(reordered.map(([name], i) => ({ name, displayOrder: i, showInBlog: showInBlogMap.get(name) ?? true }))),
+                                    body: JSON.stringify(reordered.map(([name], i) => ({
+                                        name,
+                                        displayOrder: i,
+                                        showInBlog: showInBlogMap.get(name) ?? true,
+                                        showInSeries: showInSeriesMap.get(name) ?? true,
+                                    }))),
                                 });
                                 queryClient.invalidateQueries({ queryKey: ["/api/series-order"] });
                             };
 
-                            const toggleSeriesVisibility = async (name: string) => {
-                                const current = showInBlogMap.get(name) ?? true;
+                            const toggleFlag = async (name: string, flag: "showInBlog" | "showInSeries") => {
+                                const currentBlog = showInBlogMap.has(name) ? showInBlogMap.get(name)! : true;
+                                const currentSeries = showInSeriesMap.has(name) ? showInSeriesMap.get(name)! : true;
                                 await fetch("/api/series-order", {
                                     method: "PATCH",
                                     headers: { "Content-Type": "application/json" },
-                                    body: JSON.stringify([{ name, displayOrder: orderMap.get(name) ?? 0, showInBlog: !current }]),
+                                    body: JSON.stringify([{
+                                        name,
+                                        displayOrder: orderMap.get(name) ?? 0,
+                                        showInBlog: flag === "showInBlog" ? !currentBlog : currentBlog,
+                                        showInSeries: flag === "showInSeries" ? !currentSeries : currentSeries,
+                                    }]),
                                 });
                                 queryClient.invalidateQueries({ queryKey: ["/api/series-order"] });
                             };
 
-                            return sortedEntries.map(([seriesName, chapters], seriesIdx) => (
+                            return sortedEntries.map(([seriesName, chapters], seriesIdx) => {
+                                const visibleInSeries = showInSeriesMap.get(seriesName) ?? true;
+                                const visibleInBlog = showInBlogMap.get(seriesName) ?? true;
+                                const fullyHidden = !visibleInSeries && !visibleInBlog;
+                            return (
                                 <Card key={seriesName}>
                                     <CardHeader className="flex flex-row items-center gap-3 pb-3">
                                         <BookOpen className="h-5 w-5 text-primary shrink-0" />
-                                        <CardTitle className={`text-lg ${!(showInBlogMap.get(seriesName) ?? true) ? "text-muted-foreground line-through" : ""}`}>{seriesName}</CardTitle>
+                                        <CardTitle className={`text-lg ${fullyHidden ? "text-muted-foreground line-through" : ""}`}>{seriesName}</CardTitle>
                                         <span className="text-sm text-muted-foreground ml-auto">{chapters.length} chapters</span>
-                                        <Button
-                                            variant="ghost" size="icon"
-                                            title={(showInBlogMap.get(seriesName) ?? true) ? "Hide series (removes from Series & Blog sections)" : "Show series"}
-                                            onClick={() => toggleSeriesVisibility(seriesName)}
-                                        >
-                                            {(showInBlogMap.get(seriesName) ?? true)
-                                                ? <Eye className="h-4 w-4" />
-                                                : <EyeOff className="h-4 w-4 text-muted-foreground" />}
-                                        </Button>
+                                        <div className="flex items-center gap-1">
+                                            <Button
+                                                variant="ghost" size="sm"
+                                                className={`gap-1 text-xs px-2 ${!visibleInSeries ? "text-muted-foreground" : ""}`}
+                                                title={visibleInSeries ? "Hide from Series section" : "Show in Series section"}
+                                                onClick={() => toggleFlag(seriesName, "showInSeries")}
+                                            >
+                                                {visibleInSeries ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                                                Series
+                                            </Button>
+                                            <Button
+                                                variant="ghost" size="sm"
+                                                className={`gap-1 text-xs px-2 ${!visibleInBlog ? "text-muted-foreground" : ""}`}
+                                                title={visibleInBlog ? "Hide from Blog section" : "Show in Blog section"}
+                                                onClick={() => toggleFlag(seriesName, "showInBlog")}
+                                            >
+                                                {visibleInBlog ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
+                                                Blog
+                                            </Button>
+                                        </div>
                                         {/* Series-level reorder buttons */}
                                         <div className="flex items-center gap-0.5 ml-2">
                                             <Button
@@ -469,7 +496,8 @@ export default function AdminDashboard() {
                                         ))}
                                     </CardContent>
                                 </Card>
-                            ));
+                            );
+                            });
                         })()}
                     </TabsContent>
 

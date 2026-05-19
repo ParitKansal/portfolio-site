@@ -5,7 +5,11 @@
       "Bash(xargs ls *)",
       "Bash(grep -E \"\\\\.\\(ts|js|sql\\)$\")",
       "Bash(npm run *)",
-      "Bash(npx tsc *)"
+      "Bash(npx tsc *)",
+      "Bash(curl -s http://localhost:5000/api/series-order)",
+      "Bash(sqlite3 sqlite.db \"PRAGMA table_info\\(series_metadata\\);\")",
+      "Bash(curl -s -X PATCH http://localhost:5000/api/series-order -H 'Content-Type: application/json' -d '[{\"name\":\"Test Series\",\"displayOrder\":0,\"showInBlog\":true,\"showInSeries\":true}]')",
+      "Bash(sqlite3 sqlite.db \"INSERT OR REPLACE INTO series_metadata \\(name, display_order, show_in_blog, show_in_series\\) VALUES \\('Test Series', 0, 1, 0\\);\")"
     ]
   }
 }

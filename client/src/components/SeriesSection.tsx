@@ -19,7 +19,7 @@ export function SeriesSection() {
     queryKey: ["/api/blog"],
   });
 
-  const { data: seriesOrder = [] } = useQuery<{ name: string; displayOrder: number; showInBlog: boolean }[]>({
+  const { data: seriesOrder = [] } = useQuery<{ name: string; displayOrder: number; showInBlog: boolean; showInSeries: boolean }[]>({
     queryKey: ["/api/series-order"],
   });
 
@@ -41,9 +41,9 @@ export function SeriesSection() {
   });
 
   const orderMap = new Map(seriesOrder.map((s) => [s.name, s.displayOrder]));
-  const showInBlogMap = new Map(seriesOrder.map((s) => [s.name, s.showInBlog ?? true]));
+  const showInSeriesMap = new Map(seriesOrder.map((s) => [s.name, s.showInSeries ?? true]));
   const sortedSeriesEntries = Array.from(seriesMap.entries())
-    .filter(([name]) => showInBlogMap.get(name) !== false)
+    .filter(([name]) => showInSeriesMap.get(name) !== false)
     .sort(([a], [b]) => {
       const oa = orderMap.get(a) ?? Infinity;
       const ob = orderMap.get(b) ?? Infinity;
