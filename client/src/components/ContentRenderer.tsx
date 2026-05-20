@@ -43,9 +43,9 @@ function ScaledIframe({ url, height, caption, contentWidth }: { url: string; hei
                 />
             </div>
             {caption && (
-                <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t">
-                    {caption}
-                </p>
+                <div className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t prose prose-sm max-w-none [&>*]:my-0 [&>p]:my-0">
+                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{caption}</ReactMarkdown>
+                </div>
             )}
         </div>
     );
@@ -148,9 +148,9 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                                         className="w-full h-auto"
                                     />
                                     {block.caption && (
-                                        <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm">
-                                            {block.caption}
-                                        </p>
+                                        <div className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm prose prose-sm max-w-none [&>*]:my-0 [&>p]:my-0">
+                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{block.caption}</ReactMarkdown>
+                                        </div>
                                     )}
                                 </div>
                             </div>
@@ -168,9 +168,9 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                                     />
                                 </AspectRatio>
                                 {block.caption && (
-                                    <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm">
-                                        {block.caption}
-                                    </p>
+                                    <div className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm prose prose-sm max-w-none [&>*]:my-0 [&>p]:my-0">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{block.caption}</ReactMarkdown>
+                                    </div>
                                 )}
                             </div>
                         );
@@ -183,9 +183,9 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                                     className="w-full h-full"
                                 />
                                 {block.caption && (
-                                    <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t">
-                                        {block.caption}
-                                    </p>
+                                    <div className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t prose prose-sm max-w-none [&>*]:my-0 [&>p]:my-0">
+                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{block.caption}</ReactMarkdown>
+                                    </div>
                                 )}
                             </div>
                         );
@@ -224,7 +224,9 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                                 <div className="flex items-center justify-between p-4 gap-3">
                                     <div className="min-w-0">
                                         {block.caption && (
-                                            <p className="font-medium text-foreground truncate">{block.caption}</p>
+                                            <div className="font-medium text-foreground prose prose-sm max-w-none [&>*]:my-0 [&>p]:my-0 [&>p]:truncate">
+                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{block.caption}</ReactMarkdown>
+                                            </div>
                                         )}
                                         <p className="text-sm text-muted-foreground truncate">{block.url}</p>
                                     </div>
