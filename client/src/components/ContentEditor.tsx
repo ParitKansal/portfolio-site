@@ -72,7 +72,7 @@ export function ContentEditor({ value, onChange }: ContentEditorProps) {
         const newBlock = type === "text"
             ? { type, value: "" }
             : type === "code"
-                ? { type, value: "", language: "typescript" }
+                ? { type, value: "", language: "python" }
                 : type === "link"
                     ? { type, url: "", caption: "", thumbnail: "" }
                     : type === "iframe"
