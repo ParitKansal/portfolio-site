@@ -43,11 +43,25 @@ function ScaledIframe({ url, height, caption, contentWidth }: { url: string; hei
                 />
             </div>
             {caption && (
-                <div className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t prose prose-sm max-w-none [&>*]:my-0 [&>p]:my-0">
-                    <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{caption}</ReactMarkdown>
-                </div>
+                <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t">
+                    <CaptionMarkdown text={caption} />
+                </p>
             )}
         </div>
+    );
+}
+
+function CaptionMarkdown({ text }: { text: string }) {
+    return (
+        <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex]}
+            components={{
+                p: ({ children }) => <span className="inline">{children}</span>,
+            }}
+        >
+            {text}
+        </ReactMarkdown>
     );
 }
 
@@ -148,9 +162,9 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                                         className="w-full h-auto"
                                     />
                                     {block.caption && (
-                                        <div className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm prose prose-sm max-w-none [&>*]:my-0 [&>p]:my-0">
-                                            <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{block.caption}</ReactMarkdown>
-                                        </div>
+                                        <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm">
+                                            <CaptionMarkdown text={block.caption} />
+                                        </p>
                                     )}
                                 </div>
                             </div>
@@ -168,9 +182,9 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                                     />
                                 </AspectRatio>
                                 {block.caption && (
-                                    <div className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm prose prose-sm max-w-none [&>*]:my-0 [&>p]:my-0">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{block.caption}</ReactMarkdown>
-                                    </div>
+                                    <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm">
+                                        <CaptionMarkdown text={block.caption} />
+                                    </p>
                                 )}
                             </div>
                         );
@@ -183,9 +197,9 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                                     className="w-full h-full"
                                 />
                                 {block.caption && (
-                                    <div className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t prose prose-sm max-w-none [&>*]:my-0 [&>p]:my-0">
-                                        <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{block.caption}</ReactMarkdown>
-                                    </div>
+                                    <p className="p-3 text-sm text-center text-muted-foreground bg-background/50 backdrop-blur-sm border-t">
+                                        <CaptionMarkdown text={block.caption} />
+                                    </p>
                                 )}
                             </div>
                         );
@@ -224,9 +238,9 @@ export function ContentRenderer({ content }: ContentRendererProps) {
                                 <div className="flex items-center justify-between p-4 gap-3">
                                     <div className="min-w-0">
                                         {block.caption && (
-                                            <div className="font-medium text-foreground prose prose-sm max-w-none [&>*]:my-0 [&>p]:my-0 [&>p]:truncate">
-                                                <ReactMarkdown remarkPlugins={[remarkGfm, remarkMath]} rehypePlugins={[rehypeKatex]}>{block.caption}</ReactMarkdown>
-                                            </div>
+                                            <p className="font-medium text-foreground truncate">
+                                                <CaptionMarkdown text={block.caption} />
+                                            </p>
                                         )}
                                         <p className="text-sm text-muted-foreground truncate">{block.url}</p>
                                     </div>
