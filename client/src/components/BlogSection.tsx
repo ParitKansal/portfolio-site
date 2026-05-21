@@ -1,4 +1,9 @@
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { ContentRenderer } from "./ContentRenderer";
 import { PenLine, Clock, ArrowRight, ArrowLeft, Loader2, Plus, Pencil, Search, Tag, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -212,7 +217,13 @@ export function BlogSection() {
                     </CardHeader>
                     <CardContent>
                       <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
-                        {post.excerpt}
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm, remarkMath]}
+                          rehypePlugins={[rehypeKatex]}
+                          components={{ p: ({ children }) => <span>{children}</span> }}
+                        >
+                          {post.excerpt}
+                        </ReactMarkdown>
                       </p>
                       <div className="flex items-center justify-between mt-auto">
                         <div className="flex items-center gap-3 text-xs text-muted-foreground">

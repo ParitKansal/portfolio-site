@@ -1,4 +1,9 @@
 import { useState, useEffect, useRef } from "react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkMath from "remark-math";
+import rehypeKatex from "rehype-katex";
+import "katex/dist/katex.min.css";
 import { BookOpen, ArrowRight, Clock, Loader2, ChevronDown, ChevronRight, ArrowLeft, Pencil, Download } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -387,7 +392,13 @@ export function SeriesSection() {
                                 {post.title}
                               </p>
                               <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
-                                {post.excerpt}
+                                <ReactMarkdown
+                                  remarkPlugins={[remarkGfm, remarkMath]}
+                                  rehypePlugins={[rehypeKatex]}
+                                  components={{ p: ({ children }) => <span>{children}</span> }}
+                                >
+                                  {post.excerpt}
+                                </ReactMarkdown>
                               </p>
                             </div>
                             <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0 mt-0.5" />
