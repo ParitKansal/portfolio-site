@@ -17,7 +17,7 @@ export function EducationSection() {
         <SectionHeader
           icon={GraduationCap}
           label="Education"
-          title="Education"
+          title="Academic Background"
         />
 
         <div className="relative">
@@ -38,12 +38,12 @@ export function EducationSection() {
                 {/* Timeline dot */}
                 <div className="hidden sm:flex flex-col items-center shrink-0">
                   <div className="w-9 h-9 rounded-full bg-primary/10 border-2 border-primary/30 flex items-center justify-center mt-1 z-10">
-                    <GraduationCap className="h-4 w-4 text-primary" />
+                    <GraduationCap className="h-4 w-4 text-primary" aria-hidden="true" />
                   </div>
                 </div>
 
                 {/* Content card */}
-                <div className="flex-1 rounded-xl border border-border bg-card shadow-sm hover:shadow-md transition-shadow duration-200 p-5 md:p-6">
+                <div className="flex-1 surface-card surface-card-interactive p-5 md:p-6">
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
                     <h3 className="text-lg font-bold">{edu.institution}</h3>
                     <div className="flex items-center gap-1.5 text-sm text-muted-foreground shrink-0">

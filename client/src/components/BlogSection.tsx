@@ -14,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { BlogPost } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
+import { SectionHeader } from "./SectionHeader";
 
 export function BlogSection() {
   const [selectedBlogId, setSelectedBlogId] = useState<number | null>(null);
@@ -59,7 +60,7 @@ export function BlogSection() {
 
   if (selectedBlog) {
     return (
-      <section id="blog" className="py-16 md:py-24 px-4 sm:px-6">
+      <section id="blog" className="py-16 md:py-24 px-4 sm:px-6 bg-muted/30">
         <div className="max-w-5xl mx-auto">
           <div className="flex justify-between items-center mb-8">
             <Button
@@ -72,12 +73,12 @@ export function BlogSection() {
               Back to all posts
             </Button>
             {user && (
-              <Link href={`/admin?action=edit&type=blog&id=${selectedBlog.id}`}>
-                <Button variant="outline" size="sm" className="gap-2">
+              <Button asChild variant="outline" size="sm" className="gap-2">
+                <Link href={`/admin?action=edit&type=blog&id=${selectedBlog.id}`}>
                   <Pencil className="h-4 w-4" />
                   Edit Post
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
           </div>
 
@@ -115,34 +116,33 @@ export function BlogSection() {
   }
 
   return (
-    <section id="blog" className="py-16 md:py-24 px-4 sm:px-6">
+    <section id="blog" className="py-16 md:py-24 px-4 sm:px-6 bg-muted/30">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <PenLine className="h-8 w-8 text-primary" />
-            <h2 className="text-3xl md:text-4xl font-semibold">Blog</h2>
-          </div>
-          {user && (
-            <Link href="/admin?action=new&type=blog">
-              <Button size="sm" className="gap-2">
+        <SectionHeader
+          icon={PenLine}
+          label="Blog"
+          title="Latest Articles"
+          subtitle="Occasional deep dives into ML concepts, tutorials, and industry insights."
+          action={user ? (
+            <Button asChild size="sm" className="gap-2">
+              <Link href="/admin?action=new&type=blog">
                 <Plus className="h-4 w-4" />
                 Add Post
-              </Button>
-            </Link>
-          )}
-        </div>
-        <p className="text-muted-foreground mb-8">
-          Occasional deep dives into ML concepts, tutorials, and industry insights.
-        </p>
+              </Link>
+            </Button>
+          ) : undefined}
+        />
 
         <div className="mb-12 space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <Input
+              type="search"
               placeholder="Search blog posts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-10 h-11"
+              aria-label="Search blog posts"
               data-testid="input-blog-search"
             />
           </div>
@@ -183,19 +183,23 @@ export function BlogSection() {
               {visiblePosts.map((post) => (
                 <div key={post.id} className="relative group/card-wrapper">
                   {user && (
-                    <Link href={`/admin?action=edit&type=blog&id=${post.id}`}>
-                      <Button
-                        variant="secondary"
-                        size="icon"
-                        className="absolute top-2 right-2 z-10 opacity-0 group-hover/card-wrapper:opacity-100 transition-opacity shadow-sm"
-                        onClick={(e) => e.stopPropagation()}
+                    <Button
+                      asChild
+                      variant="secondary"
+                      size="icon"
+                      className="absolute top-2 right-2 z-10 opacity-0 group-hover/card-wrapper:opacity-100 transition-opacity shadow-sm"
+                    >
+                      <Link
+                        href={`/admin?action=edit&type=blog&id=${post.id}`}
+                        onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                        aria-label={`Edit ${post.title}`}
                       >
                         <Pencil className="h-4 w-4" />
-                      </Button>
-                    </Link>
+                      </Link>
+                    </Button>
                   )}
                   <Card
-                    className="hover-elevate cursor-pointer group h-full"
+                    className="surface-card-interactive cursor-pointer group h-full flex flex-col"
                     onClick={() => setSelectedBlogId(post.id)}
                     data-testid={`card-blog-${post.id}`}
                   >
@@ -213,10 +217,10 @@ export function BlogSection() {
                           </Badge>
                         ))}
                       </div>
-                      <CardTitle className="text-lg leading-snug">{post.title}</CardTitle>
+                      <CardTitle className="text-lg leading-snug group-hover:text-primary transition-colors">{post.title}</CardTitle>
                     </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-3">
+                    <CardContent className="flex-1 flex flex-col">
+                      <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3 flex-1">
                         <ReactMarkdown
                           remarkPlugins={[remarkGfm, remarkMath]}
                           rehypePlugins={[rehypeKatex]}
@@ -225,15 +229,15 @@ export function BlogSection() {
                           {post.excerpt}
                         </ReactMarkdown>
                       </p>
-                      <div className="flex items-center justify-between mt-auto">
+                      <div className="flex items-center justify-between mt-auto pt-3 border-t border-border/60">
                         <div className="flex items-center gap-3 text-xs text-muted-foreground">
                           <span>{formatDate(post.date)}</span>
                           <span className="flex items-center gap-1">
-                            <Clock className="h-3 w-3" />
+                            <Clock className="h-3 w-3" aria-hidden="true" />
                             {post.readTime}
                           </span>
                         </div>
-                        <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                        <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all" aria-hidden="true" />
                       </div>
                     </CardContent>
                   </Card>

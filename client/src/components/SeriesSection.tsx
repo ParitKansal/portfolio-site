@@ -13,6 +13,7 @@ import type { BlogPost } from "@shared/schema";
 import { ContentRenderer } from "./ContentRenderer";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
+import { SectionHeader } from "./SectionHeader";
 
 export function SeriesSection() {
   const [expandedSeries, setExpandedSeries] = useState<Set<string>>(new Set());
@@ -149,12 +150,12 @@ export function SeriesSection() {
             </Button>
             <div className="flex items-center gap-2">
               {user && (
-                <Link href={`/admin?action=edit&type=blog&id=${openPost.id}`}>
-                  <Button variant="outline" size="sm" className="gap-2">
+                <Button asChild variant="outline" size="sm" className="gap-2">
+                  <Link href={`/admin?action=edit&type=blog&id=${openPost.id}`}>
                     <Pencil className="h-4 w-4" />
                     Edit Post
-                  </Button>
-                </Link>
+                  </Link>
+                </Button>
               )}
             </div>
           </div>
@@ -277,7 +278,7 @@ export function SeriesSection() {
               </div>
 
               <article ref={articleRef}>
-                <h1 className="text-3xl font-bold mb-4">{openPost.title}</h1>
+                <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">{openPost.title}</h1>
                 <div className="flex flex-wrap gap-2 mb-4">
                   {(openPost.tags || []).map((tag) => (
                     <Badge key={tag} variant="secondary">{tag}</Badge>
@@ -332,13 +333,12 @@ export function SeriesSection() {
   return (
     <section id="series" className="py-16 md:py-24 px-4 sm:px-6">
       <div className="max-w-6xl mx-auto">
-        <div className="flex items-center gap-3 mb-4">
-          <BookOpen className="h-8 w-8 text-primary" />
-          <h2 className="text-3xl md:text-4xl font-semibold">Series</h2>
-        </div>
-        <p className="text-muted-foreground mb-10">
-          Multi-part deep dives on focused topics. Read them in order for the full picture.
-        </p>
+        <SectionHeader
+          icon={BookOpen}
+          label="Series"
+          title="Deep-Dive Series"
+          subtitle="Multi-part deep dives on focused topics. Read them in order for the full picture."
+        />
 
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
@@ -441,13 +441,14 @@ export function SeriesSection() {
             })}
           </div>
           {visibleCount < sortedSeriesEntries.length && (
-            <div className="flex justify-center mt-8">
-              <button
+            <div className="flex justify-center mt-10">
+              <Button
+                variant="outline"
+                size="lg"
                 onClick={() => setVisibleCount(prev => prev + 4)}
-                className="px-6 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
               >
                 Load More Series
-              </button>
+              </Button>
             </div>
           )}
           </>

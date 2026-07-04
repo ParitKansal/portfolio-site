@@ -4,33 +4,6 @@ import { motion } from "framer-motion";
 import { SectionHeader } from "./SectionHeader";
 import type { Skill } from "@shared/schema";
 
-const cardVariants = [
-  {
-    border: "border-border",
-    bg: "bg-card",
-    icon: "text-blue-400 dark:text-blue-300",
-    badge: "bg-blue-500/8 text-blue-600 border-blue-500/15 dark:text-blue-300 dark:border-blue-400/20",
-  },
-  {
-    border: "border-border",
-    bg: "bg-card",
-    icon: "text-blue-500 dark:text-blue-400",
-    badge: "bg-blue-500/8 text-blue-700 border-blue-500/15 dark:text-blue-400 dark:border-blue-400/20",
-  },
-  {
-    border: "border-border",
-    bg: "bg-card",
-    icon: "text-blue-600 dark:text-blue-500",
-    badge: "bg-blue-600/8 text-blue-800 border-blue-600/15 dark:text-blue-400 dark:border-blue-500/20",
-  },
-  {
-    border: "border-border",
-    bg: "bg-card",
-    icon: "text-blue-700 dark:text-blue-500",
-    badge: "bg-blue-700/8 text-blue-900 border-blue-700/15 dark:text-blue-400 dark:border-blue-600/20",
-  },
-];
-
 export function SkillsSection() {
   const { data: skills, isLoading } = useQuery<Skill[]>({
     queryKey: ["/api/skills"]
@@ -50,7 +23,6 @@ export function SkillsSection() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
           {skills?.map((category, index) => {
             const IconComponent = (Icons as any)[category.icon] || Icons.Circle;
-            const variant = cardVariants[index % cardVariants.length];
 
             return (
               <motion.div
@@ -59,13 +31,12 @@ export function SkillsSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-40px" }}
                 transition={{ duration: 0.4, delay: index * 0.08 }}
-                whileHover={{ y: -3, transition: { duration: 0.15 } }}
                 data-testid={`card-skill-category-${index}`}
-                className={`rounded-xl border p-5 shadow-sm hover:shadow-md transition-shadow duration-200 ${variant.border} ${variant.bg}`}
+                className="surface-card surface-card-interactive p-5"
               >
                 <div className="flex items-center gap-2.5 mb-4">
-                  <div className={`p-1.5 rounded-lg bg-current/10`}>
-                    <IconComponent className={`h-4 w-4 ${variant.icon}`} />
+                  <div className="p-2 rounded-lg bg-primary/10">
+                    <IconComponent className="h-4 w-4 text-primary" aria-hidden="true" />
                   </div>
                   <h3 className="font-semibold text-sm">{category.category}</h3>
                 </div>
@@ -73,7 +44,7 @@ export function SkillsSection() {
                   {category.skills.map((skill) => (
                     <span
                       key={skill}
-                      className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium border ${variant.badge}`}
+                      className="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium bg-muted/70 text-foreground/75 border border-border/60"
                     >
                       {skill}
                     </span>

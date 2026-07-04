@@ -1,5 +1,7 @@
 import { Switch, Route } from "wouter";
 import { lazy, Suspense } from "react";
+import { Loader2 } from "lucide-react";
+import { MotionConfig } from "framer-motion";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -15,7 +17,13 @@ const NotFound = lazy(() => import("@/pages/not-found"));
 
 function Router() {
   return (
-    <Suspense fallback={<div />}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" aria-label="Loading" />
+        </div>
+      }
+    >
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/auth" component={AuthPage} />
@@ -32,10 +40,12 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <ThemeProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Router />
-          </TooltipProvider>
+          <MotionConfig reducedMotion="user">
+            <TooltipProvider>
+              <Toaster />
+              <Router />
+            </TooltipProvider>
+          </MotionConfig>
         </ThemeProvider>
       </AuthProvider>
     </QueryClientProvider>

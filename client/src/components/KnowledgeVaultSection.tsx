@@ -9,6 +9,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { KnowledgeEntry } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
+import { SectionHeader } from "./SectionHeader";
 
 export function KnowledgeVaultSection() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -62,16 +63,16 @@ export function KnowledgeVaultSection() {
               Back to knowledge vault
             </Button>
             {user && (
-              <Link href={`/admin?action=edit&type=knowledge&id=${selectedEntry.id}`}>
-                <Button variant="outline" size="sm" className="gap-2">
+              <Button asChild variant="outline" size="sm" className="gap-2">
+                <Link href={`/admin?action=edit&type=knowledge&id=${selectedEntry.id}`}>
                   <Pencil className="h-4 w-4" />
                   Edit Entry
-                </Button>
-              </Link>
+                </Link>
+              </Button>
             )}
           </div>
 
-          <article className="bg-card rounded-lg border p-6 md:p-8 shadow-sm">
+          <article className="surface-card p-6 md:p-8">
             <div className="flex flex-wrap items-center gap-2 mb-4">
               {(selectedEntry.tags || []).map((tag) => (
                 <Badge key={tag} variant="secondary">
@@ -99,32 +100,31 @@ export function KnowledgeVaultSection() {
   return (
     <section id="knowledge-vault" className="py-16 md:py-24 px-4 sm:px-6 bg-muted/30">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <BookOpen className="h-8 w-8 text-primary" />
-            <h2 className="text-3xl md:text-4xl font-semibold">Knowledge Vault</h2>
-          </div>
-          {user && (
-            <Link href="/admin?action=new&type=knowledge">
-              <Button size="sm" className="gap-2">
+        <SectionHeader
+          icon={BookOpen}
+          label="Daily Notes"
+          title="Knowledge Vault"
+          subtitle="Daily learnings and insights from my journey in Machine Learning and AI."
+          action={user ? (
+            <Button asChild size="sm" className="gap-2">
+              <Link href="/admin?action=new&type=knowledge">
                 <Plus className="h-4 w-4" />
                 Add Entry
-              </Button>
-            </Link>
-          )}
-        </div>
-        <p className="text-muted-foreground mb-8">
-          Daily learnings and insights from my journey in Machine Learning and AI.
-        </p>
+              </Link>
+            </Button>
+          ) : undefined}
+        />
 
         <div className="mb-8 space-y-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
             <Input
+              type="search"
               placeholder="Search knowledge entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
+              className="pl-10 h-11"
+              aria-label="Search knowledge entries"
               data-testid="input-knowledge-search"
             />
           </div>
@@ -163,35 +163,39 @@ export function KnowledgeVaultSection() {
             {filteredEntries.map((entry) => (
               <div key={entry.id} className="relative group/card-wrapper">
                 {user && (
-                  <Link href={`/admin?action=edit&type=knowledge&id=${entry.id}`}>
-                    <Button
-                      variant="secondary"
-                      size="icon"
-                      className="absolute top-2 right-2 z-10 opacity-0 group-hover/card-wrapper:opacity-100 transition-opacity shadow-sm"
-                      onClick={(e) => e.stopPropagation()} // Prevent card click
+                  <Button
+                    asChild
+                    variant="secondary"
+                    size="icon"
+                    className="absolute top-2 right-2 z-10 opacity-0 group-hover/card-wrapper:opacity-100 transition-opacity shadow-sm"
+                  >
+                    <Link
+                      href={`/admin?action=edit&type=knowledge&id=${entry.id}`}
+                      onClick={(e: React.MouseEvent) => e.stopPropagation()}
+                      aria-label={`Edit ${entry.title}`}
                     >
                       <Pencil className="h-4 w-4" />
-                    </Button>
-                  </Link>
+                    </Link>
+                  </Button>
                 )}
                 <Card
                   data-testid={`card-knowledge-entry-${entry.id}`}
-                  className="hover-elevate cursor-pointer group transition-all h-full"
+                  className="surface-card-interactive cursor-pointer group h-full"
                   onClick={() => setSelectedEntryId(entry.id)}
                 >
                   <CardContent className="p-6">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground mb-3">
-                      <Calendar className="h-4 w-4" />
+                    <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground mb-3">
+                      <Calendar className="h-3.5 w-3.5" aria-hidden="true" />
                       <span>{formatDate(entry.date)}</span>
                     </div>
-                    <h3 className="text-lg font-semibold mb-3 group-hover:text-primary transition-colors">{entry.title}</h3>
-                    <p className="text-muted-foreground leading-relaxed mb-4 line-clamp-3">
+                    <h3 className="text-lg font-semibold mb-2.5 group-hover:text-primary transition-colors">{entry.title}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-3">
                       {entry.content.find(b => b.type === "text")?.value || "Click to view content"}
                     </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-1.5">
                       {(entry.tags || []).map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          <Tag className="h-3 w-3 mr-1" />
+                        <Badge key={tag} variant="secondary" className="text-xs font-medium">
+                          <Tag className="h-3 w-3 mr-1" aria-hidden="true" />
                           {tag}
                         </Badge>
                       ))}

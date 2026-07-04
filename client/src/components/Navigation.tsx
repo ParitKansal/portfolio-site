@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X, Download } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "@/hooks/use-auth";
@@ -21,6 +22,7 @@ const allNavItems = [
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState("#home");
   const { user, logoutMutation } = useAuth();
   const { data: resume } = useQuery<Resume>({ queryKey: ["/api/resume"] });
   const { data: sectionSettings = [] } = useQuery<SectionSetting[]>({ queryKey: ["/api/section-settings"] });
@@ -30,10 +32,27 @@ export function Navigation() {
   );
 
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 20);
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => {
+        setScrolled(window.scrollY > 20);
+
+        // Scroll spy: the active section is the last one whose top has passed the header
+        let current = "#home";
+        for (const item of allNavItems) {
+          const element = document.querySelector<HTMLElement>(item.href);
+          if (element && element.getBoundingClientRect().top <= 96) {
+            current = item.href;
+          }
+        }
+        setActiveSection(current);
+        ticking = false;
+      });
     };
-    window.addEventListener("scroll", handleScroll);
+    handleScroll();
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -47,44 +66,58 @@ export function Navigation() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-        ? "bg-background/90 backdrop-blur-xl border-b border-border shadow-sm"
-        : "bg-transparent"
+      aria-label="Main navigation"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled || isOpen
+        ? "bg-background/85 backdrop-blur-xl border-b border-border shadow-sm"
+        : "bg-transparent border-b border-transparent"
         }`}
     >
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        <div className="flex items-center justify-between h-24">
+        <div className="flex items-center justify-between h-16">
           <button
             onClick={() => scrollToSection("#home")}
-            className="font-bold text-xl tracking-tight hover:opacity-80 transition-opacity"
+            className="shrink-0 rounded-md hover:opacity-80 transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Scroll to top"
             data-testid="link-logo"
           >
-            <img src="/logo.png" alt="Logo" className="h-20 w-auto" />
+            <img src="/logo.png" alt="Parit Kansal" className="h-10 w-auto" />
           </button>
 
-          <div className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
-              <Button
-                key={item.href}
-                variant="ghost"
-                size="sm"
-                onClick={() => scrollToSection(item.href)}
-                className="text-muted-foreground hover:text-foreground"
-                data-testid={`link-nav-${item.label.toLowerCase().replace(" ", "-")}`}
-              >
-                {item.label}
-              </Button>
-            ))}
+          <div className="hidden md:flex items-center gap-0.5">
+            {navItems.map((item) => {
+              const isActive = activeSection === item.href;
+              return (
+                <button
+                  key={item.href}
+                  onClick={() => scrollToSection(item.href)}
+                  aria-current={isActive ? "true" : undefined}
+                  className={`relative px-3 py-2 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${isActive
+                    ? "text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  data-testid={`link-nav-${item.label.toLowerCase().replace(" ", "-")}`}
+                >
+                  {item.label}
+                  {isActive && (
+                    <motion.span
+                      layoutId="nav-active-indicator"
+                      transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                      className="absolute inset-x-2 -bottom-px h-0.5 rounded-full bg-primary"
+                    />
+                  )}
+                </button>
+              );
+            })}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
             <ThemeToggle />
 
-            {user ? (
+            {user && (
               <>
-                <Link href="/admin">
-                  <Button variant="ghost" size="sm">Dashboard</Button>
-                </Link>
+                <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
+                  <Link href="/admin">Dashboard</Link>
+                </Button>
                 <Button
                   variant="outline"
                   size="sm"
@@ -94,25 +127,23 @@ export function Navigation() {
                   Logout
                 </Button>
               </>
-            ) : (
-              <Link href="/auth">
-                <Button variant="ghost" size="sm">Login</Button>
-              </Link>
             )}
 
             {resume?.url && (
-              <a href={resume.url} target="_blank" rel="noopener noreferrer">
-                <Button size="sm" className="hidden sm:flex gap-2" data-testid="button-download-resume">
+              <Button asChild size="sm" className="hidden sm:inline-flex gap-2" data-testid="button-download-resume">
+                <a href={resume.url} target="_blank" rel="noopener noreferrer">
                   <Download className="h-4 w-4" />
                   Resume
-                </Button>
-              </a>
+                </a>
+              </Button>
             )}
             <Button
               variant="ghost"
               size="icon"
               className="md:hidden"
               onClick={() => setIsOpen(!isOpen)}
+              aria-expanded={isOpen}
+              aria-label={isOpen ? "Close menu" : "Open menu"}
               data-testid="button-mobile-menu"
             >
               {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -120,29 +151,50 @@ export function Navigation() {
           </div>
         </div>
 
-        {isOpen && (
-          <div className="md:hidden pb-4 flex flex-col gap-1 bg-background/95 backdrop-blur-xl rounded-b-lg">
-            {navItems.map((item) => (
-              <Button
-                key={item.href}
-                variant="ghost"
-                className="justify-start"
-                onClick={() => scrollToSection(item.href)}
-                data-testid={`link-mobile-nav-${item.label.toLowerCase().replace(" ", "-")}`}
-              >
-                {item.label}
-              </Button>
-            ))}
-            {resume?.url && (
-              <a href={resume.url} target="_blank" rel="noopener noreferrer" className="sm:hidden">
-                <Button className="w-full gap-2 mt-2" data-testid="button-download-resume-mobile">
-                  <Download className="h-4 w-4" />
-                  Download Resume
-                </Button>
-              </a>
-            )}
-          </div>
-        )}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="md:hidden overflow-hidden"
+            >
+              <div className="py-3 flex flex-col gap-0.5 border-t border-border">
+                {navItems.map((item) => {
+                  const isActive = activeSection === item.href;
+                  return (
+                    <button
+                      key={item.href}
+                      onClick={() => scrollToSection(item.href)}
+                      aria-current={isActive ? "true" : undefined}
+                      className={`flex items-center px-3 py-2.5 rounded-md text-sm font-medium text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${isActive
+                        ? "text-primary bg-primary/5"
+                        : "text-muted-foreground hover:text-foreground hover:bg-muted/60"
+                        }`}
+                      data-testid={`link-mobile-nav-${item.label.toLowerCase().replace(" ", "-")}`}
+                    >
+                      {item.label}
+                    </button>
+                  );
+                })}
+                {user && (
+                  <Button asChild variant="ghost" className="justify-start sm:hidden">
+                    <Link href="/admin">Dashboard</Link>
+                  </Button>
+                )}
+                {resume?.url && (
+                  <Button asChild className="w-full gap-2 mt-2 sm:hidden" data-testid="button-download-resume-mobile">
+                    <a href={resume.url} target="_blank" rel="noopener noreferrer">
+                      <Download className="h-4 w-4" />
+                      Download Resume
+                    </a>
+                  </Button>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   );

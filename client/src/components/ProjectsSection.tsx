@@ -12,8 +12,7 @@ function ProjectCard({ project, index, testId }: { project: Project; index: numb
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.4, delay: index * 0.08 }}
-      whileHover={{ y: -4, transition: { duration: 0.15 } }}
-      className="group rounded-xl border border-border bg-card shadow-sm hover:shadow-lg transition-shadow duration-200 flex flex-col"
+      className="group surface-card surface-card-interactive flex flex-col"
       data-testid={testId}
     >
       <div className="p-5 md:p-6 flex-1 flex flex-col">
@@ -64,14 +63,14 @@ export function ProjectsSection() {
         <SectionHeader
           icon={FolderGit2}
           label="Projects"
-          title="Projects"
+          title="Selected Projects"
         />
 
         {academicProjects.length > 0 && (
           <div className="mb-12">
             <div className="flex items-center gap-2 mb-6">
-              <FlaskConical className="h-4 w-4 text-muted-foreground" />
-              <h3 className="text-lg font-semibold text-muted-foreground tracking-wide uppercase text-sm">
+              <FlaskConical className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
+              <h3 className="text-sm font-semibold text-muted-foreground tracking-wide uppercase">
                 Academic
               </h3>
               <div className="flex-1 h-px bg-border ml-2" />
@@ -92,7 +91,7 @@ export function ProjectsSection() {
         {researchProjects.length > 0 && (
           <div>
             <div className="flex items-center gap-2 mb-6">
-              <Microscope className="h-4 w-4 text-muted-foreground" />
+              <Microscope className="h-4 w-4 text-muted-foreground" aria-hidden="true" />
               <h3 className="text-sm font-semibold text-muted-foreground tracking-wide uppercase">
                 Research
               </h3>

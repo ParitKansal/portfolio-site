@@ -9,35 +9,35 @@
   --opaque-button-border-intensity: -8;
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
-  --background: 210 20% 98%;
-  --foreground: 210 20% 12%;
-  --border: 210 15% 91%;
-  --card: 210 18% 96%;
-  --card-foreground: 210 18% 15%;
-  --card-border: 210 16% 93%;
-  --sidebar: 210 16% 94%;
-  --sidebar-foreground: 210 16% 18%;
-  --sidebar-border: 210 14% 89%;
-  --sidebar-primary: 210 85% 42%;
-  --sidebar-primary-foreground: 210 85% 98%;
-  --sidebar-accent: 210 18% 88%;
-  --sidebar-accent-foreground: 210 18% 22%;
-  --sidebar-ring: 210 85% 42%;
-  --popover: 210 20% 92%;
-  --popover-foreground: 210 20% 15%;
-  --popover-border: 210 18% 87%;
-  --primary: 210 85% 42%;
-  --primary-foreground: 210 85% 98%;
-  --secondary: 210 18% 87%;
-  --secondary-foreground: 210 18% 20%;
-  --muted: 210 16% 90%;
-  --muted-foreground: 210 16% 38%;
-  --accent: 195 18% 89%;
-  --accent-foreground: 195 18% 22%;
+  --background: 210 25% 99%;
+  --foreground: 216 28% 12%;
+  --border: 214 18% 90%;
+  --card: 0 0% 100%;
+  --card-foreground: 216 28% 13%;
+  --card-border: 214 20% 92%;
+  --sidebar: 212 22% 97%;
+  --sidebar-foreground: 216 22% 18%;
+  --sidebar-border: 214 16% 89%;
+  --sidebar-primary: 217 85% 44%;
+  --sidebar-primary-foreground: 210 100% 98%;
+  --sidebar-accent: 214 20% 91%;
+  --sidebar-accent-foreground: 216 20% 22%;
+  --sidebar-ring: 217 85% 44%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 216 24% 14%;
+  --popover-border: 214 18% 88%;
+  --primary: 217 85% 44%;
+  --primary-foreground: 210 100% 98%;
+  --secondary: 214 22% 93%;
+  --secondary-foreground: 216 22% 21%;
+  --muted: 214 22% 94%;
+  --muted-foreground: 215 15% 42%;
+  --accent: 202 30% 92%;
+  --accent-foreground: 204 28% 21%;
   --destructive: 0 72% 45%;
   --destructive-foreground: 0 72% 98%;
-  --input: 210 25% 78%;
-  --ring: 210 85% 42%;
+  --input: 214 20% 82%;
+  --ring: 217 85% 44%;
   --chart-1: 210 75% 35%;
   --chart-2: 195 70% 38%;
   --chart-3: 180 65% 42%;
@@ -93,35 +93,35 @@
   --opaque-button-border-intensity: 9;
   --elevate-1: rgba(255,255,255, .04);
   --elevate-2: rgba(255,255,255, .09);
-  --background: 210 18% 8%;
-  --foreground: 210 18% 95%;
-  --border: 210 15% 18%;
-  --card: 210 16% 10%;
-  --card-foreground: 210 16% 92%;
-  --card-border: 210 14% 13%;
-  --sidebar: 210 14% 12%;
-  --sidebar-foreground: 210 14% 88%;
-  --sidebar-border: 210 12% 16%;
-  --sidebar-primary: 210 82% 48%;
-  --sidebar-primary-foreground: 210 82% 98%;
-  --sidebar-accent: 210 16% 16%;
-  --sidebar-accent-foreground: 210 16% 85%;
-  --sidebar-ring: 210 82% 48%;
-  --popover: 210 18% 14%;
-  --popover-foreground: 210 18% 90%;
-  --popover-border: 210 16% 18%;
-  --primary: 210 82% 48%;
-  --primary-foreground: 210 82% 98%;
-  --secondary: 210 16% 18%;
-  --secondary-foreground: 210 16% 85%;
-  --muted: 210 14% 17%;
-  --muted-foreground: 210 14% 65%;
-  --accent: 195 16% 19%;
-  --accent-foreground: 195 16% 82%;
-  --destructive: 0 68% 42%;
+  --background: 220 24% 7%;
+  --foreground: 214 20% 93%;
+  --border: 217 16% 17%;
+  --card: 219 22% 9%;
+  --card-foreground: 214 18% 92%;
+  --card-border: 217 18% 14%;
+  --sidebar: 219 20% 10%;
+  --sidebar-foreground: 214 16% 88%;
+  --sidebar-border: 217 16% 16%;
+  --sidebar-primary: 213 90% 62%;
+  --sidebar-primary-foreground: 221 40% 8%;
+  --sidebar-accent: 217 18% 16%;
+  --sidebar-accent-foreground: 214 16% 86%;
+  --sidebar-ring: 213 90% 62%;
+  --popover: 219 22% 11%;
+  --popover-foreground: 214 18% 91%;
+  --popover-border: 217 18% 18%;
+  --primary: 213 90% 62%;
+  --primary-foreground: 221 40% 8%;
+  --secondary: 217 18% 16%;
+  --secondary-foreground: 214 16% 86%;
+  --muted: 217 18% 14%;
+  --muted-foreground: 215 14% 66%;
+  --accent: 213 20% 17%;
+  --accent-foreground: 212 18% 84%;
+  --destructive: 0 68% 46%;
   --destructive-foreground: 0 68% 97%;
-  --input: 210 22% 28%;
-  --ring: 210 82% 48%;
+  --input: 217 16% 25%;
+  --ring: 213 90% 62%;
   --chart-1: 210 75% 65%;
   --chart-2: 195 70% 68%;
   --chart-3: 180 65% 70%;
@@ -170,10 +170,46 @@
     @apply border-border;
   }
 
-  body {
-    @apply font-sans antialiased bg-background text-foreground;
+  html {
+    scroll-behavior: smooth;
   }
 
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  /* Keep anchored sections clear of the fixed header */
+  section[id] {
+    scroll-margin-top: 5rem;
+  }
+
+  ::selection {
+    background-color: hsl(var(--primary) / 0.18);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 /**
@@ -303,28 +339,18 @@
     animation: fade-up 0.5s ease-out forwards;
   }
 
-  /* Section label badge */
-  .section-label {
-    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase border border-primary/20 bg-primary/8 text-primary mb-3;
+  /* Shared card treatment: consistent surface, border, hover lift */
+  .surface-card {
+    @apply rounded-xl border border-card-border bg-card shadow-sm transition-all duration-200;
   }
 
-  /* Card hover lift */
-  .card-lift {
-    @apply transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5;
+  .surface-card-interactive {
+    @apply hover:shadow-md hover:-translate-y-0.5 hover:border-primary/25;
   }
 
-  /* Gradient skill card variants */
-  .skill-card-blue {
-    @apply bg-gradient-to-br from-blue-500/5 to-blue-500/[0.02] border-blue-500/20;
-  }
-  .skill-card-violet {
-    @apply bg-gradient-to-br from-violet-500/5 to-violet-500/[0.02] border-violet-500/20;
-  }
-  .skill-card-emerald {
-    @apply bg-gradient-to-br from-emerald-500/5 to-emerald-500/[0.02] border-emerald-500/20;
-  }
-  .skill-card-amber {
-    @apply bg-gradient-to-br from-amber-500/5 to-amber-500/[0.02] border-amber-500/20;
+  /* Section eyebrow pill used by SectionHeader */
+  .section-eyebrow {
+    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-[0.12em] uppercase border border-primary/20 bg-primary/5 text-primary;
   }
 }
 
