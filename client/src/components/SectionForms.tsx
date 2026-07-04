@@ -177,6 +177,24 @@ export function ExperienceForm({ value, onChange }: FormProps<InsertExperience>)
                                     onChange={e => updateProject(index, { ...project, tags: e.target.value.split(",") })}
                                 />
                             </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div className="space-y-2">
+                                    <Label>GitHub (Optional)</Label>
+                                    <Input
+                                        value={project.github || ""}
+                                        onChange={e => updateProject(index, { ...project, github: e.target.value })}
+                                        placeholder="https://github.com/..."
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label>Link (Optional)</Label>
+                                    <Input
+                                        value={project.link || ""}
+                                        onChange={e => updateProject(index, { ...project, link: e.target.value })}
+                                        placeholder="https://..."
+                                    />
+                                </div>
+                            </div>
                         </div>
                     ))}
                     <Button type="button" variant="outline" size="sm" onClick={addProject}>
@@ -236,6 +254,24 @@ export function ProjectForm({ value, onChange }: FormProps<InsertProject>) {
                     value={(value.tags || []).join(",")}
                     onChange={e => onChange({ ...value, tags: e.target.value.split(",") })}
                 />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label>GitHub (Optional)</Label>
+                    <Input
+                        value={value.github || ""}
+                        onChange={e => onChange({ ...value, github: e.target.value })}
+                        placeholder="https://github.com/..."
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label>Link (Optional)</Label>
+                    <Input
+                        value={value.link || ""}
+                        onChange={e => onChange({ ...value, link: e.target.value })}
+                        placeholder="https://..."
+                    />
+                </div>
             </div>
         </div>
     );

@@ -35,6 +35,9 @@ for (const sql of blogPostMigrations) {
   try { sqlite.exec(sql); } catch { /* column already exists — ignore */ }
 }
 
+// Optional GitHub link on projects — additive, existing rows keep NULL
+try { sqlite.exec(`ALTER TABLE projects ADD COLUMN github TEXT;`); } catch { /* already exists */ }
+
 // Performance indexes — CREATE IF NOT EXISTS is idempotent
 sqlite.exec(`
   CREATE INDEX IF NOT EXISTS idx_blog_posts_date ON blog_posts(date DESC);

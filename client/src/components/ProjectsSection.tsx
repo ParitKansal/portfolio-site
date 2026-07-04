@@ -1,4 +1,4 @@
-import { FolderGit2, FlaskConical, Microscope, ExternalLink } from "lucide-react";
+import { FolderGit2, FlaskConical, Microscope, ExternalLink, Github } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
@@ -42,6 +42,35 @@ function ProjectCard({ project, index, testId }: { project: Project; index: numb
             </span>
           ))}
         </div>
+
+        {(project.github || project.link) && (
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border">
+            {project.github && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
+                data-testid={`${testId}-github`}
+              >
+                <Github className="h-3.5 w-3.5" />
+                GitHub
+              </a>
+            )}
+            {project.link && (
+              <a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
+                data-testid={`${testId}-link`}
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                Link
+              </a>
+            )}
+          </div>
+        )}
       </div>
     </motion.div>
   );

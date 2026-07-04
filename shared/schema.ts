@@ -132,14 +132,16 @@ export const experience = sqliteTable("experience", {
   role: text("role").notNull(),
   period: text("period").notNull(),
   location: text("location").notNull(),
-  projects: text("projects", { mode: "json" }).$type<{ title: string, description: string, tags: string[] }[]>().notNull(),
+  projects: text("projects", { mode: "json" }).$type<{ title: string, description: string, tags: string[], github?: string, link?: string }[]>().notNull(),
 });
 
 export const insertExperienceSchema = createInsertSchema(experience, {
   projects: z.array(z.object({
     title: z.string(),
     description: z.string(),
-    tags: z.array(z.string())
+    tags: z.array(z.string()),
+    github: z.string().optional(),
+    link: z.string().optional()
   }))
 }).omit({ id: true });
 export type InsertExperience = z.infer<typeof insertExperienceSchema>;
@@ -154,6 +156,7 @@ export const projects = sqliteTable("projects", {
   category: text("category").notNull(), // "Academic" or "Research"
   status: text("status"), // Optional, e.g. "In Progress"
   link: text("link"),
+  github: text("github"),
 });
 
 export const insertProjectSchema = createInsertSchema(projects, {
