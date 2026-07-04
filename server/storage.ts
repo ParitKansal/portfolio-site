@@ -20,7 +20,7 @@ import {
   type SectionSetting, sectionSettings, SECTION_KEYS,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, like, or } from "drizzle-orm";
+import { eq, desc, asc, like, or, sql } from "drizzle-orm";
 import session from "express-session";
 import createMemoryStore from "memorystore";
 
@@ -218,7 +218,8 @@ export class DatabaseStorage implements IStorage {
 
   // Projects
   async getProjects(): Promise<Project[]> {
-    return db.select().from(projects).orderBy(desc(projects.id));
+    // Manually ordered items first (display_order ASC), unordered ones keep the old newest-first order
+    return db.select().from(projects).orderBy(sql`${projects.displayOrder} IS NULL`, asc(projects.displayOrder), desc(projects.id));
   }
 
   async createProject(proj: InsertProject): Promise<Project> {

@@ -121,6 +121,31 @@ export default function AdminDashboard() {
         },
     });
 
+    const reorderProjectsMutation = useMutation({
+        mutationFn: async ({ index, direction }: { index: number; direction: -1 | 1 }) => {
+            if (!projectList) return;
+            const target = index + direction;
+            if (target < 0 || target >= projectList.length) return;
+            const ordered = [...projectList];
+            [ordered[index], ordered[target]] = [ordered[target], ordered[index]];
+            // Persist a normalized sequence so every item gets an explicit position
+            await Promise.all(ordered.map((item, i) => {
+                if (item.displayOrder === i) return Promise.resolve();
+                return fetch(`/api/projects/${item.id}`, {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ displayOrder: i }),
+                }).then(res => { if (!res.ok) throw new Error("Failed to reorder"); });
+            }));
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["/api/projects"] });
+        },
+        onError: () => {
+            toast({ title: "Failed to reorder", variant: "destructive" });
+        },
+    });
+
     // --- Blog Selection State ---
     const [isSelectMode, setIsSelectMode] = useState(false);
     const [selectedBlogIds, setSelectedBlogIds] = useState<Set<number>>(new Set());
@@ -618,11 +643,13 @@ export default function AdminDashboard() {
                     <TabsContent value="projects" className="space-y-4">
                         <div className="flex justify-end"><Button onClick={() => openEditor("projects")}><Plus className="mr-2 h-4 w-4" /> Add Project</Button></div>
                         <div className="grid gap-4">
-                            {projectList?.map(item => (
+                            {projectList?.map((item, index) => (
                                 <Card key={item.id}>
                                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                         <CardTitle className="text-lg font-medium">{item.title}</CardTitle>
                                         <div className="flex gap-2">
+                                            <Button variant="ghost" size="icon" disabled={index === 0 || reorderProjectsMutation.isPending} onClick={() => reorderProjectsMutation.mutate({ index, direction: -1 })}><ChevronUp className="h-4 w-4" /></Button>
+                                            <Button variant="ghost" size="icon" disabled={index === (projectList?.length ?? 0) - 1 || reorderProjectsMutation.isPending} onClick={() => reorderProjectsMutation.mutate({ index, direction: 1 })}><ChevronDownIcon className="h-4 w-4" /></Button>
                                             <Button variant="ghost" size="icon" onClick={() => openEditor("projects", item)}><Pencil className="h-4 w-4" /></Button>
                                             <Button variant="ghost" size="icon" className="text-destructive" onClick={() => { if (confirm("Delete?")) deleteMutation.mutate({ id: item.id, type: "projects" }) }}><Trash2 className="h-4 w-4" /></Button>
                                         </div>

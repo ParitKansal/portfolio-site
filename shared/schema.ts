@@ -157,6 +157,7 @@ export const projects = sqliteTable("projects", {
   status: text("status"), // Optional, e.g. "In Progress"
   link: text("link"),
   github: text("github"),
+  displayOrder: integer("display_order"),
 });
 
 export const insertProjectSchema = createInsertSchema(projects, {

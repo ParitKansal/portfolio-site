@@ -35,8 +35,9 @@ for (const sql of blogPostMigrations) {
   try { sqlite.exec(sql); } catch { /* column already exists — ignore */ }
 }
 
-// Optional GitHub link on projects — additive, existing rows keep NULL
+// Optional GitHub link and manual ordering on projects — additive, existing rows keep NULL
 try { sqlite.exec(`ALTER TABLE projects ADD COLUMN github TEXT;`); } catch { /* already exists */ }
+try { sqlite.exec(`ALTER TABLE projects ADD COLUMN display_order INTEGER;`); } catch { /* already exists */ }
 
 // Performance indexes — CREATE IF NOT EXISTS is idempotent
 sqlite.exec(`
