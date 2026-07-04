@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Plus, X } from "lucide-react";
+import { Plus, X, ChevronUp, ChevronDown } from "lucide-react";
 import type {
     InsertEducation,
     InsertExperience,
@@ -110,6 +110,14 @@ export function ExperienceForm({ value, onChange }: FormProps<InsertExperience>)
         onChange({ ...value, projects });
     };
 
+    const moveProject = (index: number, direction: -1 | 1) => {
+        const projects = [...(value.projects || [])];
+        const target = index + direction;
+        if (target < 0 || target >= projects.length) return;
+        [projects[index], projects[target]] = [projects[target], projects[index]];
+        onChange({ ...value, projects });
+    };
+
     return (
         <div className="space-y-4">
             <div className="space-y-2">
@@ -147,14 +155,35 @@ export function ExperienceForm({ value, onChange }: FormProps<InsertExperience>)
                 <div className="space-y-4">
                     {(value.projects || []).map((project, index) => (
                         <div key={index} className="border p-4 rounded-md space-y-3 relative">
-                            <Button
-                                variant="ghost"
-                                size="icon"
-                                className="absolute top-2 right-2 text-destructive"
-                                onClick={() => removeProject(index)}
-                            >
-                                <X className="h-4 w-4" />
-                            </Button>
+                            <div className="absolute top-2 right-2 flex gap-1">
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    disabled={index === 0}
+                                    onClick={() => moveProject(index, -1)}
+                                >
+                                    <ChevronUp className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    disabled={index === (value.projects || []).length - 1}
+                                    onClick={() => moveProject(index, 1)}
+                                >
+                                    <ChevronDown className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon"
+                                    className="text-destructive"
+                                    onClick={() => removeProject(index)}
+                                >
+                                    <X className="h-4 w-4" />
+                                </Button>
+                            </div>
                             <div className="space-y-2">
                                 <Label>Title</Label>
                                 <Input
@@ -174,6 +203,7 @@ export function ExperienceForm({ value, onChange }: FormProps<InsertExperience>)
                             <div className="space-y-2">
                                 <Label>Tags (comma separated)</Label>
                                 <Input
+                                    value={(project.tags || []).join(",")}
                                     onChange={e => updateProject(index, { ...project, tags: e.target.value.split(",") })}
                                 />
                             </div>

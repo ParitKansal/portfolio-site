@@ -728,7 +728,16 @@ export default function AdminDashboard() {
                     <DialogContent className="max-w-[90vw] h-[90vh] overflow-y-auto">
                         <DialogHeader>
                             <DialogTitle>
-                                {currentId ? "Edit" : "Create"} {editingType === "blog" ? "Blog Post" : "Knowledge Entry"}
+                                {currentId ? "Edit" : "Create"} {{
+                                    blog: "Blog Post",
+                                    knowledge: "Knowledge Entry",
+                                    education: "Education",
+                                    experience: "Experience",
+                                    projects: "Project",
+                                    skills: "Skill Category",
+                                    certifications: "Certification",
+                                    resume: "Resume",
+                                }[editingType] ?? "Entry"}
                             </DialogTitle>
                         </DialogHeader>
 
