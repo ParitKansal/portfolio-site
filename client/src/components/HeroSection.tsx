@@ -20,7 +20,7 @@ export function HeroSection() {
   return (
     <section className="intro" id="about" data-toc="About">
       <div className="who" id="home">
-        <img className="avatar" src="/photo.jpg" alt="Photo of Parit Kansal" width={76} height={76} />
+        <img className="avatar" src="/photo.jpg" alt="Photo of Parit Kansal" width={128} height={128} />
         <div>
           <h1>Parit Kansal</h1>
           <div className="role">

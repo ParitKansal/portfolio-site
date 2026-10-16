@@ -311,8 +311,10 @@
 
 /* intro */
 .pp .intro { padding-top: 56px; scroll-margin-top: 70px; }
-.pp .intro .who { display: flex; align-items: center; gap: 18px; }
-.pp .intro .avatar { width: 76px; height: 76px; box-shadow: 0 0 0 1px var(--rule); }
+.pp .intro .who { display: flex; align-items: center; gap: 26px; }
+@media (max-width: 540px) { .pp .intro .who { gap: 16px; } }
+.pp .intro .avatar { width: 128px; height: 128px; box-shadow: 0 0 0 1px var(--rule); }
+@media (max-width: 540px) { .pp .intro .avatar { width: 88px; height: 88px; } }
 .pp .intro h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(34px, 5vw, 44px); line-height: 1.1; letter-spacing: -.015em; margin: 0; }
 .pp .intro .role { font-family: var(--sans); font-size: 15px; color: var(--soft); margin-top: 4px; }
 .pp .intro .open { font-family: var(--sans); font-size: 14px; margin-top: 2px; }
