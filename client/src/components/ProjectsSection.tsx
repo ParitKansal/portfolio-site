@@ -21,7 +21,11 @@ function ProjectItem({ project, testId }: { project: Project; testId: string }) 
         {(project.github || project.link) && (
           <div className="plinks">
             {project.github && <a href={project.github} target="_blank" rel="noopener noreferrer" data-testid={`${testId}-github`}>GitHub ↗</a>}
-            {project.link && <a href={project.link} target="_blank" rel="noopener noreferrer" data-testid={`${testId}-link`}>Link ↗</a>}
+            {project.link && (
+              <a href={project.link} target="_blank" rel="noopener noreferrer" data-testid={`${testId}-link`}>
+                {/doi\.org|zenodo|arxiv|openreview/i.test(project.link) ? "Paper ↗" : "Live demo ↗"}
+              </a>
+            )}
           </div>
         )}
       </div>
