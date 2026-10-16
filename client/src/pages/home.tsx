@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { SectionSetting } from "@shared/schema";
 import { Navigation } from "@/components/Navigation";
@@ -27,6 +28,29 @@ export default function Home() {
   const visible = (key: string) => settings.find((s) => s.section === key)?.visible ?? true;
   const isVisible = (key: (typeof ORDER)[number]) =>
     key === "series" ? true : visible(key);
+
+  // Coming back from the reader (e.g. "/#series"): scroll to that section once it has rendered
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash) return;
+    // Keep jumping to the section until the page height stops changing (sections load their data)
+    let tries = 0;
+    let lastHeight = -1;
+    let stable = 0;
+    const stop = () => { clearInterval(t); window.removeEventListener("wheel", stop); window.removeEventListener("touchstart", stop); };
+    const t = setInterval(() => {
+      const el = document.querySelector(hash);
+      const h = document.documentElement.scrollHeight;
+      if (el) el.scrollIntoView({ block: "start", behavior: "instant" as ScrollBehavior });
+      stable = el && h === lastHeight ? stable + 1 : 0;
+      lastHeight = h;
+      if (stable >= 3 || ++tries > 40) stop();
+    }, 100);
+    // Stop as soon as the visitor scrolls themselves
+    window.addEventListener("wheel", stop, { passive: true });
+    window.addEventListener("touchstart", stop, { passive: true });
+    return stop;
+  }, []);
 
   const num: Record<string, number | null> = {};
   let i = 0;

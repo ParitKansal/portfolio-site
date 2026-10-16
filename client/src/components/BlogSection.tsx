@@ -1,21 +1,18 @@
-import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Pencil, Plus } from "lucide-react";
+import { useState } from "react";
+import { Pencil, Plus } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { BlogPost } from "@shared/schema";
 import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
-import { ContentRenderer } from "./ContentRenderer";
-import { PaperSection, formatLongDate, formatMonthYear } from "./PaperSection";
+import { PaperSection, formatMonthYear } from "./PaperSection";
 
 const PAGE = 8;
 
 export function BlogSection() {
-  const [selectedBlogId, setSelectedBlogId] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(PAGE);
   const { user } = useAuth();
-  const articleRef = useRef<HTMLElement>(null);
 
   const { data: posts = [], isLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog"],
@@ -24,13 +21,6 @@ export function BlogSection() {
   const { data: seriesOrder = [] } = useQuery<{ name: string; displayOrder: number; showInBlog: boolean }[]>({
     queryKey: ["/api/series-order"],
   });
-
-  useEffect(() => {
-    if (selectedBlogId != null && articleRef.current) {
-      const top = articleRef.current.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top, behavior: "smooth" });
-    }
-  }, [selectedBlogId]);
 
   const hiddenSeriesNames = new Set(seriesOrder.filter((s) => s.showInBlog === false).map((s) => s.name));
   const isListed = (p: BlogPost) => !(p.seriesName && (p.showInBlog === false || hiddenSeriesNames.has(p.seriesName)));
@@ -51,7 +41,6 @@ export function BlogSection() {
     return matchesSearch && matchesTag;
   });
 
-  const selectedBlog = posts.find((p) => p.id === selectedBlogId);
   const visiblePosts = filteredPosts.slice(0, visibleCount);
 
   const adminAdd = user ? (
@@ -59,40 +48,6 @@ export function BlogSection() {
       <Plus className="h-3.5 w-3.5" /> Add post
     </Link>
   ) : undefined;
-
-  if (selectedBlog) {
-    return (
-      <PaperSection id="blog" title="Blog">
-        <div className="reader-top" style={{ marginTop: 18 }}>
-          <button type="button" className="back" onClick={() => setSelectedBlogId(null)} data-testid="button-back-to-blogs">
-            <ArrowLeft className="h-4 w-4" /> Back to all posts
-          </button>
-          {user && (
-            <Link href={`/admin?action=edit&type=blog&id=${selectedBlog.id}`} className="addbtn">
-              <Pencil className="h-3.5 w-3.5" /> Edit post
-            </Link>
-          )}
-        </div>
-        <article ref={articleRef} className="reader">
-          <h1 className="rt">{selectedBlog.title}</h1>
-          <div className="rmeta">
-            {selectedBlog.seriesName && (
-              <span>
-                {selectedBlog.seriesName}
-                {selectedBlog.seriesOrder != null && `, part ${selectedBlog.seriesOrder}`}
-              </span>
-            )}
-            <span>{formatLongDate(selectedBlog.date)}</span>
-            <span>{selectedBlog.readTime}</span>
-            {(selectedBlog.tags || []).length > 0 && <span>{(selectedBlog.tags || []).join(" · ")}</span>}
-          </div>
-          <div className="rbody">
-            <ContentRenderer content={selectedBlog.content} />
-          </div>
-        </article>
-      </PaperSection>
-    );
-  }
 
   return (
     <PaperSection
@@ -138,9 +93,9 @@ export function BlogSection() {
               <li key={post.id} data-testid={`card-blog-${post.id}`}>
                 <span className="k">[{i + 1}]</span>
                 <span>
-                  <button type="button" className="t" onClick={() => setSelectedBlogId(post.id)}>
+                  <Link href={`/read/${post.id}?from=blog`} className="t">
                     {post.title}
-                  </button>
+                  </Link>
                   <span className="d">
                     {post.seriesName
                       ? `${post.seriesName}${post.seriesOrder != null ? `, part ${post.seriesOrder}` : ""}`

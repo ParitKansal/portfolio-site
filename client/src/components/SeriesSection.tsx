@@ -1,9 +1,7 @@
-import { useState, useEffect, useRef } from "react";
-import { ArrowLeft, Pencil, Download } from "lucide-react";
+import { useState } from "react";
+import { Download } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import type { BlogPost } from "@shared/schema";
-import { ContentRenderer } from "./ContentRenderer";
-import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { PaperSection } from "./PaperSection";
 
@@ -21,17 +19,9 @@ const SERIES_DESCRIPTIONS: Record<string, string> = {
 const SERIES_COLORS = ["#0A3A6B", "#1068BD", "#3F86CF", "#3D5A27", "#6E9FD6", "#0B4F91"];
 
 export function SeriesSection() {
-  const [openPost, setOpenPost] = useState<BlogPost | null>(null);
   const [visibleCount, setVisibleCount] = useState(6);
-  const { user } = useAuth();
-  const articleRef = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    if (openPost && articleRef.current) {
-      const top = articleRef.current.getBoundingClientRect().top + window.scrollY - 80;
-      window.scrollTo({ top, behavior: "smooth" });
-    }
-  }, [openPost?.id]);
+  // Chapters open on their own full page (/read/:id), like turning to a page in a book
+  const readHref = (post: BlogPost) => `/read/${post.id}?from=series`;
 
   const { data: posts = [], isLoading } = useQuery<BlogPost[]>({
     queryKey: ["/api/blog"],
@@ -134,69 +124,6 @@ export function SeriesSection() {
     URL.revokeObjectURL(url);
   };
 
-  // Full post reader view
-  if (openPost) {
-    const seriesPosts = seriesMap.get(openPost.seriesName!) || [];
-    const currentIndex = seriesPosts.findIndex((p) => p.id === openPost.id);
-    const prevPost = seriesPosts[currentIndex - 1] ?? null;
-    const nextPost = seriesPosts[currentIndex + 1] ?? null;
-
-    return (
-      <PaperSection id="series" title="Deep-dive series">
-        <div className="reader-top" style={{ marginTop: 18 }}>
-          <button type="button" className="back" onClick={() => setOpenPost(null)}>
-            <ArrowLeft className="h-4 w-4" /> Back to all series
-          </button>
-          {user && (
-            <Link href={`/admin?action=edit&type=blog&id=${openPost.id}`} className="addbtn">
-              <Pencil className="h-3.5 w-3.5" /> Edit post
-            </Link>
-          )}
-        </div>
-
-        <details className="s" style={{ marginTop: 16 }}>
-          <summary>
-            <div>
-              <h4>{openPost.seriesName}</h4>
-              <span className="dsc">Chapter {currentIndex + 1} of {seriesPosts.length} · {currentIndex} read</span>
-            </div>
-            <span className="m"><b>All chapters</b>open list</span>
-          </summary>
-          <ol>
-            {seriesPosts.map((post) => (
-              <li key={post.id}>
-                <button type="button" onClick={() => setOpenPost(post)} style={post.id === openPost.id ? { color: "var(--ink)", fontWeight: 600 } : undefined}>
-                  {post.title}
-                </button>
-              </li>
-            ))}
-          </ol>
-        </details>
-
-        <article ref={articleRef} className="reader">
-          <h1 className="rt">{openPost.title}</h1>
-          <div className="rmeta">
-            <span>{openPost.seriesName}, part {openPost.seriesOrder ?? currentIndex + 1}</span>
-            <span>{formatDate(openPost.date)}</span>
-            <span>{openPost.readTime}</span>
-            {(openPost.tags || []).length > 0 && <span>{(openPost.tags || []).join(" · ")}</span>}
-          </div>
-          <div className="rbody">
-            <ContentRenderer content={openPost.content} />
-          </div>
-          <div className="chap">
-            {prevPost ? (
-              <button type="button" onClick={() => setOpenPost(prevPost)}><small>← Previous</small>{prevPost.title}</button>
-            ) : <span />}
-            {nextPost && (
-              <button type="button" onClick={() => setOpenPost(nextPost)}><small>Next →</small>{nextPost.title}</button>
-            )}
-          </div>
-        </article>
-      </PaperSection>
-    );
-  }
-
   // Series listing view
   return (
     <PaperSection id="series" title="Deep-dive series" lead="Multi-part deep dives on focused topics. Read in order for the full picture.">
@@ -231,12 +158,12 @@ export function SeriesSection() {
                   <ol>
                     {seriesPosts.map((post) => (
                       <li key={post.id}>
-                        <button type="button" onClick={() => setOpenPost(post)}>{post.title}</button>
+                        <Link href={readHref(post)}>{post.title}</Link>
                       </li>
                     ))}
                   </ol>
                   <div className="sfoot">
-                    <button type="button" onClick={() => setOpenPost(seriesPosts[0])}>Start reading →</button>
+                    <Link href={readHref(seriesPosts[0])}>Start reading →</Link>
                     <button type="button" onClick={() => downloadSeries(seriesName, seriesPosts)} title="Download full series as Markdown">
                       <Download className="h-3.5 w-3.5" /> Download
                     </button>

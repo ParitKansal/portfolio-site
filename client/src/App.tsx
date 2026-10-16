@@ -14,6 +14,7 @@ const AuthPage = lazy(() => import("@/pages/auth-page"));
 const AdminDashboard = lazy(() => import("@/pages/admin-dashboard"));
 const ImageTool = lazy(() => import("@/pages/image-tool"));
 const NotFound = lazy(() => import("@/pages/not-found"));
+const ReaderPage = lazy(() => import("@/pages/reader"));
 
 function Router() {
   return (
@@ -29,6 +30,7 @@ function Router() {
         <Route path="/auth" component={AuthPage} />
         <Route path="/admin" component={AdminDashboard} />
         <Route path="/image-tool" component={ImageTool} />
+        <Route path="/read/:id" component={ReaderPage} />
         <Route component={NotFound} />
       </Switch>
     </Suspense>
