@@ -48,10 +48,7 @@ export function formatLongDate(dateStr: string | Date) {
 
 /** Newest job first, using the start of "period" (e.g. "January 2025 – Present") */
 export function sortByPeriod<T extends { period: string }>(items: T[] | undefined): T[] {
-  const start = (p: string) => {
-    const t = new Date(p.split(/[–—-]/)[0].trim()).getTime();
-    return isNaN(t) ? 0 : t;
-  };
+  const start = (p: string) => parseLooseDate(p.split(/[–—-]/)[0]);
   return [...(items ?? [])].sort((a, b) => start(b.period) - start(a.period));
 }
 
@@ -61,14 +58,24 @@ export function sortByPeriod<T extends { period: string }>(items: T[] | undefine
  */
 export function dateKey(text: string | null | undefined): number {
   if (!text || /present|ongoing|current|now/i.test(text)) return Number.MAX_SAFE_INTEGER;
-  const last = text.split(/[–—-]/).pop()!.trim();
-  const t = new Date(last).getTime();
-  if (!isNaN(t)) return t;
-  const year = last.match(/\d{4}/);
-  return year ? new Date(`${year[0]}-12-31`).getTime() : 0;
+  return parseLooseDate(text.split(/[–—-]/).pop()!);
 }
 
 /** Latest first, by the given date field */
 export function newestFirst<T>(items: T[] | undefined, get: (item: T) => string | null | undefined): T[] {
   return [...(items ?? [])].sort((a, b) => dateKey(get(b)) - dateKey(get(a)));
+}
+
+const MONTHS = ["jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"];
+
+/**
+ * Parses "January 2025", "Jun 2024", "May 2018" or "2021" the same way in every browser
+ * (Firefox's Date() rejects "January 2025"). A year on its own sorts as December.
+ */
+export function parseLooseDate(text: string): number {
+  const t = text.trim().toLowerCase();
+  const year = t.match(/\d{4}/);
+  if (!year) return 0;
+  const m = MONTHS.findIndex((name) => t.includes(name));
+  return Date.UTC(Number(year[0]), m >= 0 ? m : 11, 1);
 }
