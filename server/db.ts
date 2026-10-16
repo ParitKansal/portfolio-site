@@ -39,6 +39,18 @@ for (const sql of blogPostMigrations) {
 try { sqlite.exec(`ALTER TABLE projects ADD COLUMN github TEXT;`); } catch { /* already exists */ }
 try { sqlite.exec(`ALTER TABLE projects ADD COLUMN display_order INTEGER;`); } catch { /* already exists */ }
 
+// Uploaded résumé PDFs live inside sqlite.db so they survive redeploys (only sqlite.db is a volume)
+sqlite.exec(`
+  CREATE TABLE IF NOT EXISTS resume_files (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    filename TEXT NOT NULL,
+    mime TEXT NOT NULL,
+    size INTEGER NOT NULL,
+    data BLOB NOT NULL,
+    uploaded_at INTEGER NOT NULL
+  );
+`);
+
 // Performance indexes — CREATE IF NOT EXISTS is idempotent
 sqlite.exec(`
   CREATE INDEX IF NOT EXISTS idx_blog_posts_date ON blog_posts(date DESC);
@@ -51,3 +63,4 @@ sqlite.exec(`
 `);
 
 export const db = drizzle(sqlite, { schema });
+export { sqlite };

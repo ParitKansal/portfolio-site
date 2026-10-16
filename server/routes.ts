@@ -14,7 +14,8 @@ import {
   seriesMetadata,
   blogPosts,
 } from "@shared/schema";
-import { db } from "./db";
+import { db, sqlite } from "./db";
+import multer from "multer";
 import { asc, eq } from "drizzle-orm";
 import nodemailer from "nodemailer";
 
@@ -24,6 +25,16 @@ const emailTransporter = process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWOR
       auth: { user: process.env.GMAIL_USER, pass: process.env.GMAIL_APP_PASSWORD },
     })
   : null;
+
+const resumeUpload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 10 * 1024 * 1024, files: 1 } });
+
+type ResumeFileRow = { id: number; filename: string; mime: string; data: Buffer };
+function sendResumeFile(row: ResumeFileRow, res: any) {
+  res.setHeader("Content-Type", "application/pdf");
+  res.setHeader("Content-Disposition", `inline; filename="${row.filename.replace(/[^\w.\- ]/g, "_")}"`);
+  res.setHeader("Cache-Control", "public, max-age=300");
+  res.send(row.data);
+}
 
 const updateKnowledgeEntrySchema = insertKnowledgeEntrySchema.partial();
 const updateBlogPostSchema = insertBlogPostSchema.partial();
@@ -363,6 +374,48 @@ export async function registerRoutes(
     } catch (error) {
       res.status(500).json({ error: "Failed to upload resume" });
     }
+  });
+
+  // Upload a résumé PDF from the admin dashboard (stored in the database)
+  app.post("/api/resume/upload", isAuthenticated, (req, res, next) => {
+    resumeUpload.single("file")(req, res, (err: any) => {
+      if (err) return res.status(400).json({ error: err.code === "LIMIT_FILE_SIZE" ? "The PDF must be 10 MB or smaller" : "Upload failed" });
+      next();
+    });
+  }, async (req, res) => {
+    try {
+      const file = (req as any).file as Express.Multer.File | undefined;
+      if (!file) return res.status(400).json({ error: "No file received" });
+      if (file.buffer.subarray(0, 5).toString("latin1") !== "%PDF-") {
+        return res.status(400).json({ error: "Please upload a PDF file" });
+      }
+      const filename = (file.originalname || "resume.pdf").replace(/[^\w.\- ]+/g, "_").slice(0, 120);
+      const info = sqlite
+        .prepare("INSERT INTO resume_files (filename, mime, size, data, uploaded_at) VALUES (?, ?, ?, ?, ?)")
+        .run(filename, "application/pdf", file.size, file.buffer, Date.now());
+      const id = Number(info.lastInsertRowid);
+      const resume = await storage.createResume({ url: `/api/resume/file/${id}`, filename });
+      res.status(201).json(resume);
+    } catch (error) {
+      console.error("Resume upload error:", error);
+      res.status(500).json({ error: "Failed to save resume" });
+    }
+  });
+
+  // Serve an uploaded résumé
+  app.get("/api/resume/file/:id", (req, res) => {
+    const id = parseInt(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ error: "Invalid ID" });
+    const row = sqlite.prepare("SELECT id, filename, mime, data FROM resume_files WHERE id = ?").get(id) as ResumeFileRow | undefined;
+    if (!row) return res.status(404).json({ error: "Resume not found" });
+    sendResumeFile(row, res);
+  });
+
+  // Stable link to the latest uploaded résumé: paritkansal.in/resume.pdf
+  app.get("/resume.pdf", (_req, res, next) => {
+    const row = sqlite.prepare("SELECT id, filename, mime, data FROM resume_files ORDER BY id DESC LIMIT 1").get() as ResumeFileRow | undefined;
+    if (!row) return next();
+    sendResumeFile(row, res);
   });
 
   // Section visibility routes

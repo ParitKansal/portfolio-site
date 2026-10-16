@@ -279,12 +279,12 @@ export class DatabaseStorage implements IStorage {
 
   // Resume
   async getResume(): Promise<Resume | undefined> {
-    const [resume] = await db.select().from(resumes).orderBy(desc(resumes.uploadedAt)).limit(1);
+    const [resume] = await db.select().from(resumes).orderBy(desc(resumes.id)).limit(1);
     return resume;
   }
 
   async createResume(resume: InsertResume): Promise<Resume> {
-    const [newResume] = await db.insert(resumes).values(resume).returning();
+    const [newResume] = await db.insert(resumes).values({ ...resume, uploadedAt: new Date() }).returning();
     return newResume;
   }
 

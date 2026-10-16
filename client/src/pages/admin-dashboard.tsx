@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ArrowLeft, Loader2, ExternalLink, Eye, EyeOff, Download, CheckSquare, Square, BookOpen, ChevronUp, ChevronDown as ChevronDownIcon } from "lucide-react";
+import { Upload, FileText, Plus, Pencil, Trash2, ArrowLeft, Loader2, ExternalLink, Eye, EyeOff, Download, CheckSquare, Square, BookOpen, ChevronUp, ChevronDown as ChevronDownIcon } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ContentEditor } from "@/components/ContentEditor";
 import { useToast } from "@/hooks/use-toast";
@@ -89,6 +89,29 @@ export default function AdminDashboard() {
     const { data: skillList, isLoading: isSkillLoading } = useQuery<Skill[]>({ queryKey: ["/api/skills"] });
     const { data: certificationList, isLoading: isCertLoading } = useQuery<Certification[]>({ queryKey: ["/api/certifications"] });
     const { data: resumeData, isLoading: isResumeLoading } = useQuery<Resume>({ queryKey: ["/api/resume"] });
+
+    // --- Résumé upload (PDF stored on the server) ---
+    const [resumeFile, setResumeFile] = useState<File | null>(null);
+    const [resumeInputKey, setResumeInputKey] = useState(0);
+    const uploadResumeMutation = useMutation({
+        mutationFn: async (file: File) => {
+            const body = new FormData();
+            body.append("file", file);
+            const res = await fetch("/api/resume/upload", { method: "POST", body, credentials: "include" });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || "Upload failed");
+            }
+            return res.json();
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ["/api/resume"] });
+            setResumeFile(null);
+            setResumeInputKey((k) => k + 1);
+            toast({ title: "Résumé uploaded", description: "The Résumé buttons on your site now open this PDF." });
+        },
+        onError: (e: Error) => toast({ title: "Upload failed", description: e.message, variant: "destructive" }),
+    });
 
     const deleteMutation = useMutation({
         mutationFn: async ({ id, type }: { id: number, type: string }) => {
@@ -697,11 +720,45 @@ export default function AdminDashboard() {
                     </TabsContent>
 
                     <TabsContent value="resume" className="space-y-4">
-                        <div className="flex justify-end">
-                            <Button onClick={() => openEditor("resume")}>
-                                <Plus className="mr-2 h-4 w-4" /> Update Resume
-                            </Button>
-                        </div>
+                        <Card>
+                            <CardHeader>
+                                <CardTitle>Upload Resume</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-3">
+                                <p className="text-sm text-muted-foreground">
+                                    Choose a PDF (up to 10 MB). It replaces the current résumé everywhere on the site.
+                                    The latest upload is also always at <code>/resume.pdf</code>.
+                                </p>
+                                <div className="flex flex-col sm:flex-row gap-3 sm:items-center">
+                                    <Input
+                                        key={resumeInputKey}
+                                        type="file"
+                                        accept="application/pdf,.pdf"
+                                        onChange={(e) => setResumeFile(e.target.files?.[0] ?? null)}
+                                        className="sm:max-w-sm"
+                                        data-testid="input-resume-file"
+                                    />
+                                    <Button
+                                        onClick={() => resumeFile && uploadResumeMutation.mutate(resumeFile)}
+                                        disabled={!resumeFile || uploadResumeMutation.isPending}
+                                        data-testid="button-upload-resume"
+                                    >
+                                        {uploadResumeMutation.isPending
+                                            ? <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                            : <Upload className="mr-2 h-4 w-4" />}
+                                        Upload
+                                    </Button>
+                                </div>
+                                {resumeFile && (
+                                    <p className="text-sm text-muted-foreground flex items-center gap-2">
+                                        <FileText className="h-4 w-4" /> {resumeFile.name} · {(resumeFile.size / 1024 / 1024).toFixed(2)} MB
+                                    </p>
+                                )}
+                                <button type="button" className="text-sm text-muted-foreground underline underline-offset-4" onClick={() => openEditor("resume")}>
+                                    Or use a link instead
+                                </button>
+                            </CardContent>
+                        </Card>
                         {resumeData && (
                             <Card>
                                 <CardHeader>
@@ -711,7 +768,10 @@ export default function AdminDashboard() {
                                     <div className="flex items-center justify-between">
                                         <div>
                                             <p className="font-medium">{resumeData.filename}</p>
-                                            <p className="text-sm text-muted-foreground">{resumeData.url}</p>
+                                            <p className="text-sm text-muted-foreground">
+                                                {resumeData.url.startsWith("/api/resume/file/") ? "Uploaded PDF" : resumeData.url}
+                                                {resumeData.uploadedAt ? ` · ${new Date(resumeData.uploadedAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}` : ""}
+                                            </p>
                                         </div>
                                         <Button variant="outline" asChild>
                                             <a href={resumeData.url} target="_blank" rel="noopener noreferrer">View</a>
