@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Education } from "@shared/schema";
-import { PaperSection } from "./PaperSection";
+import { PaperSection, newestFirst } from "./PaperSection";
 
 export function EducationSection() {
   const { data: education, isLoading } = useQuery<Education[]>({
@@ -10,7 +10,7 @@ export function EducationSection() {
   if (isLoading) return null;
 
   // Most recent first; school rows are shown smaller
-  const rows = [...(education ?? [])].reverse();
+  const rows = newestFirst(education, e => e.date);
   const isMinor = (e: Education) => /class|secondary|school/i.test(`${e.degree} ${e.institution}`);
 
   return (

@@ -35,7 +35,8 @@ export function BlogSection() {
   const hiddenSeriesNames = new Set(seriesOrder.filter((s) => s.showInBlog === false).map((s) => s.name));
   const isListed = (p: BlogPost) => !(p.seriesName && (p.showInBlog === false || hiddenSeriesNames.has(p.seriesName)));
 
-  const blogVisiblePosts = posts.filter(isListed);
+  // Latest first
+  const blogVisiblePosts = posts.filter(isListed).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   // Topic filters: the most used tags, so the row stays short
   const tagCounts = new Map<string, number>();

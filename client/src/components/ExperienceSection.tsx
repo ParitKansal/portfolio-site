@@ -3,21 +3,21 @@ import { useQuery } from "@tanstack/react-query";
 import type { Experience } from "@shared/schema";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import { PaperSection, useSectionNumber } from "./PaperSection";
+import { PaperSection, useSectionNumber, sortByPeriod } from "./PaperSection";
 
-// Figure 1 is drawn under the Docuxary project when it is present
-function DocuxaryFigure() {
+// Figure 1 is drawn under the FigureIQ (formerly Docuxary) project when it is present
+function PipelineFigure() {
   return (
     <figure className="fig">
       <div className="flow">
         <div className="stage"><b>Ingest</b><small>Invoices, receipts, statements</small></div><span className="join" />
-        <div className="stage k"><b>Extract</b><small>Gemini, extended thinking</small></div><span className="join" />
-        <div className="stage k"><b>VLM judge</b><small>Section cross-checks</small></div><span className="join" />
-        <div className="stage"><b>Review gate</b><small>Preflight checks</small></div><span className="join" />
-        <div className="stage last"><b>QuickBooks</b><small>Idempotent sync</small></div>
+        <div className="stage k"><b>Extract</b><small>VLM, schema-driven prompts</small></div><span className="join" />
+        <div className="stage k"><b>AI Judge</b><small>Checks against the image</small></div><span className="join" />
+        <div className="stage"><b>Vault</b><small>Files, attachments</small></div><span className="join" />
+        <div className="stage last"><b>QuickBooks</b><small>Entity resolution, sync</small></div>
       </div>
       <figcaption>
-        <b>Figure 1.</b> Docuxary pipeline. Highlighted stages are model-driven; work is distributed over RQ workers and Redis Streams.
+        <b>Figure 1.</b> FigureIQ pipeline. Highlighted stages are model-driven; AI-Judge corrections feed back into extraction automatically.
       </figcaption>
     </figure>
   );
@@ -35,7 +35,7 @@ export function ExperienceSection() {
 
   return (
     <PaperSection id="experience" title="Experience">
-      {experiences?.map((experience, expIndex) => (
+      {sortByPeriod(experiences).map((experience, expIndex) => (
         <Fragment key={expIndex}>
           <div className="org" data-testid={`card-experience-company-${expIndex}`}>
             <div>
@@ -77,7 +77,7 @@ export function ExperienceSection() {
                     </div>
                   )}
                 </div>
-                {/docuxary/i.test(project.title) && <DocuxaryFigure />}
+                {/figureiq|docuxary/i.test(project.title) && <PipelineFigure />}
               </Fragment>
             );
           })}

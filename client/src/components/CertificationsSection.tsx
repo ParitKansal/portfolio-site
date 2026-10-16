@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Certification } from "@shared/schema";
-import { useSectionNumber } from "./PaperSection";
+import { useSectionNumber, newestFirst } from "./PaperSection";
 
 // Shown as a subsection of Education ("7.1 Certifications"), but it keeps its
 // own section key so it can still be hidden separately from the admin bar.
@@ -19,7 +19,7 @@ export function CertificationsSection() {
         Certifications
       </h3>
       <div className="certs">
-        {certifications.map((cert, index) => {
+        {newestFirst(certifications, c => c.date).map((cert, index) => {
           const body = (
             <>
               <b>{cert.name}</b>

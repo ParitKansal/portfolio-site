@@ -1,14 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import type { BlogPost, Experience } from "@shared/schema";
+import { sortByPeriod } from "./PaperSection";
 
 // Right-hand "at a glance" cards on wide screens. Counts come from live data.
 export function MarginNotes() {
-  const { data: experience = [] } = useQuery<Experience[]>({ queryKey: ["/api/experience"] });
+  const { data: experienceRaw } = useQuery<Experience[]>({ queryKey: ["/api/experience"] });
+  const experience = sortByPeriod(experienceRaw);
   const { data: posts = [] } = useQuery<BlogPost[]>({ queryKey: ["/api/blog"] });
   const { data: seriesOrder = [] } = useQuery<{ name: string; showInSeries?: boolean }[]>({ queryKey: ["/api/series-order"] });
 
-  const shipped = experience.reduce((n, e) => n + e.projects.length, 0);
-  const since = experience[experience.length - 1]?.period?.split(/[–-]/)[0]?.trim();
+  // Client systems at the current job (the first entry)
+  const shipped = experience[0]?.projects.length ?? 0;
+  const since = experience[0]?.period?.split(/[–-]/)[0]?.trim();
   const hiddenSeries = new Set(seriesOrder.filter((s) => s.showInSeries === false).map((s) => s.name));
   const seriesCount = new Set(posts.filter((p) => p.seriesName && !hiddenSeries.has(p.seriesName)).map((p) => p.seriesName)).size;
 

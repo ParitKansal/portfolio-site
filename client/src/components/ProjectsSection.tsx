@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Project } from "@shared/schema";
-import { PaperSection, useSectionNumber } from "./PaperSection";
+import { PaperSection, useSectionNumber, newestFirst } from "./PaperSection";
 
 function ProjectItem({ project, testId }: { project: Project; testId: string }) {
   const inProgress = !!project.status && /progress|ongoing|writing/i.test(project.status);
@@ -38,8 +38,8 @@ export function ProjectsSection() {
   if (isLoading) return null;
 
   const groups = [
-    { name: "Research", items: projects?.filter(p => p.category === "Research") || [], key: "research" },
-    { name: "Academic", items: projects?.filter(p => p.category === "Academic") || [], key: "academic" },
+    { name: "Research", items: newestFirst(projects?.filter(p => p.category === "Research"), p => p.date), key: "research" },
+    { name: "Academic", items: newestFirst(projects?.filter(p => p.category === "Academic"), p => p.date), key: "academic" },
   ].filter(g => g.items.length > 0);
 
   return (

@@ -1,10 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Resume, BlogPost, Experience, Education } from "@shared/schema";
+import { sortByPeriod } from "./PaperSection";
 
 export function HeroSection() {
   const { data: resume } = useQuery<Resume>({ queryKey: ["/api/resume"] });
   const { data: posts = [] } = useQuery<BlogPost[]>({ queryKey: ["/api/blog"] });
-  const { data: experience = [] } = useQuery<Experience[]>({ queryKey: ["/api/experience"] });
+  const { data: experienceRaw } = useQuery<Experience[]>({ queryKey: ["/api/experience"] });
+  const experience = sortByPeriod(experienceRaw);
   const { data: education = [] } = useQuery<Education[]>({ queryKey: ["/api/education"] });
 
   // Pick the series with the most recent post as the featured one
@@ -18,7 +20,7 @@ export function HeroSection() {
 
   // "Affiliations", like a paper's author block: current employer, then university
   const university =
-    education.find(e => /universit|institute|college/i.test(e.institution)) ?? education[education.length - 1];
+    education.find(e => /universit|institute|college/i.test(e.institution)) ?? education[0];
   const affiliations = [experience[0]?.company, university?.institution].filter(Boolean) as string[];
 
   return (
@@ -71,12 +73,14 @@ export function HeroSection() {
       <div className="abstract" id="abstract" data-toc="Abstract" data-num="0">
         <h2>Abstract</h2>
         <p>
-          Machine learning scientist building production AI at Xelpmoc. Over two years I have shipped five client
-          systems across intelligent document processing, real-time video analytics and lead scoring, owning each
-          from model fine-tuning to fault-tolerant deployment. I also write long-form deep dives that derive machine
-          learning methods from first principles.
+          Production ML scientist at Xelpmoc, currently building FigureIQ, an AI-powered accounting automation
+          platform, and owning its VLM extraction and AI-Judge verification pipeline end to end through a deep
+          QuickBooks Online integration. In the last two years I have shipped five client-facing AI systems, including
+          a 100K+ documents/month IDP platform at 96–98% accuracy, real-time video analytics across 325 concurrent
+          RTSP streams for McDonald's Hyderabad, and lead scoring on 8M+ behavioural sessions. I also write long-form
+          deep dives that derive machine learning methods from first principles.
         </p>
-        <p className="kw"><b>Keywords:</b> document AI, VLM-as-judge, computer vision, model fine-tuning, LLMs, RAG</p>
+        <p className="kw"><b>Keywords:</b> document AI, VLMs, AI-judge verification, computer vision, multimodal AI, PEFT, RAG</p>
       </div>
     </>
   );

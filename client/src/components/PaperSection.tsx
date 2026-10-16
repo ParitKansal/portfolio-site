@@ -45,3 +45,30 @@ export function formatLongDate(dateStr: string | Date) {
   if (isNaN(d.getTime())) return String(dateStr);
   return d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 }
+
+/** Newest job first, using the start of "period" (e.g. "January 2025 – Present") */
+export function sortByPeriod<T extends { period: string }>(items: T[] | undefined): T[] {
+  const start = (p: string) => {
+    const t = new Date(p.split(/[–—-]/)[0].trim()).getTime();
+    return isNaN(t) ? 0 : t;
+  };
+  return [...(items ?? [])].sort((a, b) => start(b.period) - start(a.period));
+}
+
+/**
+ * Sort key for free-text dates like "May 2024", "2021 – 2025", "June 2024".
+ * Uses the last date in a range; empty or "Ongoing"/"Present" counts as newest.
+ */
+export function dateKey(text: string | null | undefined): number {
+  if (!text || /present|ongoing|current|now/i.test(text)) return Number.MAX_SAFE_INTEGER;
+  const last = text.split(/[–—-]/).pop()!.trim();
+  const t = new Date(last).getTime();
+  if (!isNaN(t)) return t;
+  const year = last.match(/\d{4}/);
+  return year ? new Date(`${year[0]}-12-31`).getTime() : 0;
+}
+
+/** Latest first, by the given date field */
+export function newestFirst<T>(items: T[] | undefined, get: (item: T) => string | null | undefined): T[] {
+  return [...(items ?? [])].sort((a, b) => dateKey(get(b)) - dateKey(get(a)));
+}
