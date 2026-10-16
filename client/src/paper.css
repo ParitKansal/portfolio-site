@@ -282,3 +282,112 @@
 
 /* admin bar from SectionWrapper sits flush in the column */
 .pp .paper > .relative > .flex:first-child { margin-top: 40px; border-radius: 8px; }
+
+/* =====================================================================
+   Simple reading layout (Oct 2026): one calm reading column, contents on
+   the left, no cards or badges where plain text works. These rules
+   override the paper styles above.
+   ===================================================================== */
+.pp { font-size: 18px; line-height: 1.65; --rule: #ECE8E1; }
+.pp .layout { max-width: 1060px; margin: 0 auto; grid-template-columns: 170px minmax(0, 1fr); gap: 56px; padding: 0 max(24px, env(safe-area-inset-left, 0px)); }
+@media (max-width: 1180px) { .pp .layout { grid-template-columns: 160px minmax(0, 1fr); gap: 40px; } }
+@media (max-width: 840px) { .pp .layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 540px) { .pp .layout { padding: 0 max(18px, env(safe-area-inset-left, 0px)); } }
+.pp .bar .in { max-width: 1060px; margin: 0 auto; padding: 0 max(24px, env(safe-area-inset-left, 0px)); }
+.pp .paper { max-width: 720px; padding-block: 8px 40px; }
+.pp .paper .rd, .pp .lead, .pp .proj .md, .pp .pitem p { max-width: none; }
+
+/* contents: plain list, no numbers */
+.pp .toc { padding-top: 64px; }
+.pp .toc ol { border-left: 0; }
+.pp .toc a { padding: 4px 0; margin: 0; border-left: 0; }
+.pp .toc a span { display: none; }
+.pp .toc a.on { background: none; color: var(--blue); }
+
+/* intro */
+.pp .intro { padding-top: 56px; scroll-margin-top: 70px; }
+.pp .intro .who { display: flex; align-items: center; gap: 18px; }
+.pp .intro .avatar { width: 76px; height: 76px; box-shadow: 0 0 0 1px var(--rule); }
+.pp .intro h1 { font-family: var(--serif); font-weight: 500; font-size: clamp(34px, 5vw, 44px); line-height: 1.1; letter-spacing: -.015em; margin: 0; }
+.pp .intro .role { font-family: var(--sans); font-size: 15px; color: var(--soft); margin-top: 4px; }
+.pp .intro .open { font-family: var(--sans); font-size: 14px; margin-top: 2px; }
+.pp .intro .bio { margin-top: 22px; }
+.pp .intro .bio p + p { margin-top: 12px; }
+.pp .intro .bio b { font-weight: 600; }
+.pp .intro .contact { margin-top: 18px; font-family: var(--sans); font-size: 15px; display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.pp .intro .contact a { color: var(--blue); }
+.pp .intro .contact a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.pp .intro .contact .cv { font-weight: 600; }
+.pp .intro .now { display: block; margin-top: 18px; border: 0; padding: 0; font-size: 15px; color: var(--soft); }
+.pp .intro .now b { color: var(--ink); }
+.pp .intro .now:hover { color: var(--blue); }
+
+/* section headings: plain serif title with a thin rule above */
+.pp .psec { padding-top: 52px; }
+.pp .ph2 { font-size: 26px; display: block; padding-top: 22px; border-top: 1px solid var(--rule); }
+.pp .ph2 .n, .pp .ph2::after, .pp .ph3 .n { display: none; }
+.pp .ph3 { font-size: 19px; margin-top: 26px; }
+.pp .lead { font-size: 16.5px; margin-top: 6px; }
+
+/* experience: plain text, no cards */
+.pp .job { margin-top: 22px; }
+.pp .job + .job { margin-top: 38px; }
+.pp .job-head { display: flex; justify-content: space-between; gap: 6px 16px; flex-wrap: wrap; align-items: baseline; }
+.pp .job-head h3 { font-family: var(--serif); font-weight: 600; font-size: 20px; margin: 0; }
+.pp .job-head .when { font: 13.5px var(--sans); color: var(--faint); }
+.pp .job-role { font: 15px var(--sans); color: var(--soft); margin-top: 2px; }
+.pp .proj { padding: 18px 0 0; border-bottom: 0; }
+.pp .proj h4 { font-size: 17.5px; font-weight: 600; display: block; }
+.pp .proj h4 .n { display: none; }
+.pp .proj .md { font-size: 16.5px; }
+.pp .proj .md b, .pp .proj .md strong { background: none; }
+.pp .meta-line { margin-top: 6px; font: 13px var(--sans); color: var(--faint); display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.pp .meta-line a { color: var(--blue); }
+
+/* skills: label + comma list */
+.pp .skill-list { margin-top: 16px; display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 8px 18px; font-size: 16.5px; }
+.pp .skill-list dt { font: 600 14px/1.9 var(--sans); color: var(--ink); }
+.pp .skill-list dd { margin: 0; color: var(--soft); }
+@media (max-width: 540px) { .pp .skill-list { grid-template-columns: 1fr; gap: 0; } .pp .skill-list dd { margin-bottom: 10px; } }
+
+/* projects, education, certificates: dated lists without boxes */
+.pp .plist, .pp .edu { border-top: 0; margin-top: 8px; }
+.pp .pitem, .pp .erow { border-bottom: 0; padding: 14px 0; grid-template-columns: 90px minmax(0, 1fr); }
+.pp .erow { grid-template-columns: 90px minmax(0, 1fr) auto; }
+.pp .pitem h4 { font-size: 17.5px; }
+.pp .pitem p { font-size: 16px; }
+.pp .badge, .pp .badge.prog { background: none; padding: 0; margin-left: 8px; font: 12.5px var(--sans); letter-spacing: 0; text-transform: none; color: var(--faint); vertical-align: 0; }
+.pp .badge::before { content: "· "; }
+.pp .tags { gap: 0 10px; }
+.pp .tags span { background: none; border: 0; padding: 0; font: 12.5px var(--sans); color: var(--faint); }
+.pp .plinks { margin-top: 6px; }
+.pp .plinks a { color: var(--blue); }
+.pp .certs { grid-template-columns: 1fr; gap: 6px; margin-top: 10px; }
+.pp .cert { border: 0; padding: 4px 0; background: none; }
+.pp .cert b { display: inline; font-size: 16px; }
+.pp .cert span::before { content: " — "; }
+
+/* series: light rows instead of heavy cards */
+.pp details.s { border: 0; border-bottom: 1px solid var(--rule); border-radius: 0; background: none; }
+.pp details.s[open] { border-color: var(--rule); }
+.pp details.s summary { padding: 14px 0; }
+.pp details.s[open] summary { border-bottom: 0; }
+.pp details.s summary h4 { font-size: 17.5px; }
+.pp details.s summary h4::before { width: 8px; height: 8px; border-radius: 50%; }
+.pp details.s ol { padding: 0 0 12px 36px; }
+.pp details.s .sfoot { padding: 0 0 14px; justify-content: flex-start; }
+.pp details.s .sfoot button { color: var(--blue); }
+.pp .series { gap: 0; margin-top: 8px; }
+
+/* blog */
+.pp .refs li { border-bottom: 0; padding: 9px 0; grid-template-columns: minmax(0, 1fr) auto; }
+.pp .refs .k { display: none; }
+.pp .refs .t { font-size: 17.5px; }
+.pp .filters button { padding: 3px 10px; font-size: 12.5px; }
+.pp .more { color: var(--blue); }
+
+/* contact */
+.pp .corr { border: 0; padding: 0; background: none; margin-top: 14px; }
+
+/* footer */
+.pp .foot { margin-top: 64px; }

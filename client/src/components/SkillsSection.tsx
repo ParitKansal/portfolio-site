@@ -11,23 +11,14 @@ export function SkillsSection() {
 
   return (
     <PaperSection id="skills" title="Skills">
-      <div className="tbl">
-        <table>
-          <tbody>
-            {skills?.map((category, index) => (
-              <tr key={index} data-testid={`card-skill-category-${index}`}>
-                <th style={{ width: 190 }}>{category.category}</th>
-                <td>
-                  <div className="chiprow">
-                    {category.skills.map((skill) => <span key={skill}>{skill}</span>)}
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <div className="tcap"><b>Table 2.</b> Technical skills by category.</div>
-      </div>
+      <dl className="skill-list">
+        {skills?.map((category, index) => (
+          <div key={category.id ?? index} style={{ display: "contents" }} data-testid={`card-skill-category-${index}`}>
+            <dt>{category.category}</dt>
+            <dd>{category.skills.join(", ")}</dd>
+          </div>
+        ))}
+      </dl>
     </PaperSection>
   );
 }

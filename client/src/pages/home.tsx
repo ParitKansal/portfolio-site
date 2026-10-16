@@ -4,7 +4,6 @@ import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { EducationSection } from "@/components/EducationSection";
 import { ExperienceSection } from "@/components/ExperienceSection";
-import { ResultsSection } from "@/components/ResultsSection";
 import { SkillsSection } from "@/components/SkillsSection";
 import { ProjectsSection } from "@/components/ProjectsSection";
 import { CertificationsSection } from "@/components/CertificationsSection";
@@ -16,19 +15,18 @@ import { ContactSection } from "@/components/ContactSection";
 import { SectionWrapper } from "@/components/SectionWrapper";
 import { SectionNumber } from "@/components/PaperSection";
 import { PaperToc } from "@/components/PaperToc";
-import { MarginNotes } from "@/components/MarginNotes";
 import "@/paper.css";
 
 // Section order on the page. Numbers are given only to sections visitors can see,
-// so hiding one renumbers the rest. "Results" follows Experience's visibility,
-// Series is always shown, Certifications sits under Education as n.1.
-const ORDER = ["experience", "results", "skills", "projects", "knowledge-vault", "series", "blog", "education", "contact"] as const;
+// so hiding one renumbers the rest. Series is always shown, Certifications sits
+// under Education. (Numbers are hidden in the simple reading layout.)
+const ORDER = ["experience", "skills", "projects", "knowledge-vault", "series", "blog", "education", "contact"] as const;
 
 export default function Home() {
   const { data: settings = [] } = useQuery<SectionSetting[]>({ queryKey: ["/api/section-settings"] });
   const visible = (key: string) => settings.find((s) => s.section === key)?.visible ?? true;
   const isVisible = (key: (typeof ORDER)[number]) =>
-    key === "results" ? visible("experience") : key === "series" ? true : visible(key);
+    key === "series" ? true : visible(key);
 
   const num: Record<string, number | null> = {};
   let i = 0;
@@ -44,7 +42,6 @@ export default function Home() {
           <SectionNumber.Provider value={num["experience"] ?? null}>
             <SectionWrapper sectionKey="experience" adminTab="experience">
               <ExperienceSection />
-              <SectionNumber.Provider value={num["results"] ?? null}><ResultsSection /></SectionNumber.Provider>
             </SectionWrapper>
           </SectionNumber.Provider>
           <SectionNumber.Provider value={num["skills"] ?? null}>
@@ -85,7 +82,6 @@ export default function Home() {
           </SectionNumber.Provider>
           <Footer />
         </main>
-        <MarginNotes />
       </div>
     </div>
   );
