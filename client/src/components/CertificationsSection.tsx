@@ -1,62 +1,37 @@
-import { Award, ExternalLink } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useQuery } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-import { SectionHeader } from "./SectionHeader";
 import type { Certification } from "@shared/schema";
+import { useSectionNumber } from "./PaperSection";
 
+// Shown as a subsection of Education ("7.1 Certifications"), but it keeps its
+// own section key so it can still be hidden separately from the admin bar.
 export function CertificationsSection() {
+  const n = useSectionNumber();
   const { data: certifications, isLoading } = useQuery<Certification[]>({
     queryKey: ["/api/certifications"]
   });
 
-  if (isLoading) return null;
+  if (isLoading || !certifications?.length) return null;
 
   return (
-    <section className="py-16 md:py-24 px-4 sm:px-6">
-      <div className="max-w-6xl mx-auto">
-        <SectionHeader
-          icon={Award}
-          label="Certifications"
-          title="Licenses & Certifications"
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {certifications?.map((cert, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.4, delay: index * 0.07 }}
-              className="flex items-start justify-between gap-4 p-5 surface-card surface-card-interactive"
-              data-testid={`card-certification-${index}`}
-            >
-              <div className="flex items-start gap-4">
-                <div className="p-2.5 rounded-lg bg-primary/10 shrink-0">
-                  <Award className="h-5 w-5 text-primary" aria-hidden="true" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-sm mb-0.5">{cert.name}</h3>
-                  <p className="text-sm text-muted-foreground">{cert.issuer}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{cert.date}</p>
-                </div>
-              </div>
-              {cert.link && (
-                <Button asChild variant="ghost" size="icon" className="h-8 w-8 shrink-0">
-                  <a
-                    href={cert.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label={`View credential for ${cert.name}`}
-                  >
-                    <ExternalLink className="h-3.5 w-3.5" />
-                  </a>
-                </Button>
-              )}
-            </motion.div>
-          ))}
-        </div>
+    <section id="certifications" style={{ scrollMarginTop: 70 }}>
+      <h3 className="ph3">
+        {n != null && <span className="n">{n}.1</span>}
+        Certifications
+      </h3>
+      <div className="certs">
+        {certifications.map((cert, index) => {
+          const body = (
+            <>
+              <b>{cert.name}</b>
+              <span>{cert.issuer} · {cert.date}{cert.link ? " ↗" : ""}</span>
+            </>
+          );
+          return cert.link ? (
+            <a key={cert.id ?? index} className="cert" href={cert.link} target="_blank" rel="noopener noreferrer" data-testid={`card-certification-${index}`}>{body}</a>
+          ) : (
+            <div key={cert.id ?? index} className="cert" data-testid={`card-certification-${index}`}>{body}</div>
+          );
+        })}
       </div>
     </section>
   );

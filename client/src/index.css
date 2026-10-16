@@ -2,59 +2,59 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE */
+/* LIGHT MODE — paper palette taken from the portrait background (light theme only) */
 :root {
   --button-outline: rgba(0,0,0, .10);
   --badge-outline: rgba(0,0,0, .05);
   --opaque-button-border-intensity: -8;
   --elevate-1: rgba(0,0,0, .03);
   --elevate-2: rgba(0,0,0, .08);
-  --background: 210 25% 99%;
-  --foreground: 216 28% 12%;
-  --border: 214 18% 90%;
+  --background: 0 0% 100%;
+  --foreground: 86 30% 14%;
+  --border: 39 20% 86%;
   --card: 0 0% 100%;
-  --card-foreground: 216 28% 13%;
-  --card-border: 214 20% 92%;
-  --sidebar: 212 22% 97%;
-  --sidebar-foreground: 216 22% 18%;
-  --sidebar-border: 214 16% 89%;
-  --sidebar-primary: 217 85% 44%;
-  --sidebar-primary-foreground: 210 100% 98%;
-  --sidebar-accent: 214 20% 91%;
-  --sidebar-accent-foreground: 216 20% 22%;
-  --sidebar-ring: 217 85% 44%;
+  --card-foreground: 86 30% 14%;
+  --card-border: 39 20% 86%;
+  --sidebar: 38 26% 92%;
+  --sidebar-foreground: 86 30% 14%;
+  --sidebar-border: 39 20% 86%;
+  --sidebar-primary: 211 84% 40%;
+  --sidebar-primary-foreground: 40 33% 98%;
+  --sidebar-accent: 211 65% 95%;
+  --sidebar-accent-foreground: 211 84% 30%;
+  --sidebar-ring: 211 84% 40%;
   --popover: 0 0% 100%;
-  --popover-foreground: 216 24% 14%;
-  --popover-border: 214 18% 88%;
-  --primary: 217 85% 44%;
-  --primary-foreground: 210 100% 98%;
-  --secondary: 214 22% 93%;
-  --secondary-foreground: 216 22% 21%;
-  --muted: 214 22% 94%;
-  --muted-foreground: 215 15% 42%;
-  --accent: 202 30% 92%;
-  --accent-foreground: 204 28% 21%;
+  --popover-foreground: 86 30% 14%;
+  --popover-border: 39 20% 86%;
+  --primary: 211 84% 40%;
+  --primary-foreground: 40 33% 98%;
+  --secondary: 38 26% 92%;
+  --secondary-foreground: 55 18% 27%;
+  --muted: 38 26% 92%;
+  --muted-foreground: 47 9% 40%;
+  --accent: 249 35% 92%;
+  --accent-foreground: 246 25% 36%;
   --destructive: 0 72% 45%;
   --destructive-foreground: 0 72% 98%;
-  --input: 214 20% 82%;
-  --ring: 217 85% 44%;
-  --chart-1: 210 75% 35%;
-  --chart-2: 195 70% 38%;
-  --chart-3: 180 65% 42%;
-  --chart-4: 165 60% 45%;
-  --chart-5: 150 55% 48%;
-  --font-sans: Inter, sans-serif;
-  --font-serif: Georgia, serif;
-  --font-mono: JetBrains Mono, monospace;
-  --radius: .5rem;
-  --shadow-2xs: 0px 1px 2px 0px hsl(210 30% 20% / 0.04);
-  --shadow-xs: 0px 1px 3px 0px hsl(210 30% 20% / 0.06), 0px 1px 2px -1px hsl(210 30% 20% / 0.04);
-  --shadow-sm: 0px 2px 4px 0px hsl(210 30% 20% / 0.07), 0px 1px 2px -1px hsl(210 30% 20% / 0.05);
-  --shadow: 0px 3px 6px 0px hsl(210 30% 20% / 0.08), 0px 2px 4px -1px hsl(210 30% 20% / 0.06);
-  --shadow-md: 0px 4px 8px -1px hsl(210 30% 20% / 0.10), 0px 2px 4px -2px hsl(210 30% 20% / 0.06);
-  --shadow-lg: 0px 8px 16px -2px hsl(210 30% 20% / 0.12), 0px 4px 6px -3px hsl(210 30% 20% / 0.06);
-  --shadow-xl: 0px 16px 32px -4px hsl(210 30% 20% / 0.14), 0px 8px 12px -4px hsl(210 30% 20% / 0.08);
-  --shadow-2xl: 0px 24px 48px -8px hsl(210 30% 20% / 0.18);
+  --input: 40 18% 80%;
+  --ring: 211 84% 40%;
+  --chart-1: 211 84% 40%;
+  --chart-2: 94 40% 25%;
+  --chart-3: 246 25% 52%;
+  --chart-4: 211 58% 53%;
+  --chart-5: 211 86% 30%;
+  --font-sans: Geist, 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: Newsreader, 'Iowan Old Style', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  --radius: .375rem;
+  --shadow-2xs: 0px 1px 2px 0px hsl(86 30% 14% / 0.04);
+  --shadow-xs: 0px 1px 3px 0px hsl(86 30% 14% / 0.06), 0px 1px 2px -1px hsl(86 30% 14% / 0.04);
+  --shadow-sm: 0px 2px 4px 0px hsl(86 30% 14% / 0.07), 0px 1px 2px -1px hsl(86 30% 14% / 0.05);
+  --shadow: 0px 3px 6px 0px hsl(86 30% 14% / 0.08), 0px 2px 4px -1px hsl(86 30% 14% / 0.06);
+  --shadow-md: 0px 4px 8px -1px hsl(86 30% 14% / 0.10), 0px 2px 4px -2px hsl(86 30% 14% / 0.06);
+  --shadow-lg: 0px 8px 16px -2px hsl(86 30% 14% / 0.12), 0px 4px 6px -3px hsl(86 30% 14% / 0.06);
+  --shadow-xl: 0px 16px 32px -4px hsl(86 30% 14% / 0.14), 0px 8px 12px -4px hsl(86 30% 14% / 0.08);
+  --shadow-2xl: 0px 24px 48px -8px hsl(86 30% 14% / 0.18);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
@@ -87,7 +87,7 @@
   --destructive-border: hsl(from hsl(var(--destructive)) h s calc(l + var(--opaque-button-border-intensity)) / alpha);
 }
 
-.dark {
+.dark-unused {
   --button-outline: rgba(255,255,255, .10);
   --badge-outline: rgba(255,255,255, .05);
   --opaque-button-border-intensity: 9;
@@ -174,10 +174,18 @@
     scroll-behavior: smooth;
   }
 
+  :root {
+    color-scheme: light;
+  }
+
   body {
     @apply font-sans antialiased bg-background text-foreground;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
     text-rendering: optimizeLegibility;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-serif);
+    letter-spacing: -0.01em;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -350,7 +358,21 @@
 
   /* Section eyebrow pill used by SectionHeader */
   .section-eyebrow {
-    @apply inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-[0.12em] uppercase border border-primary/20 bg-primary/5 text-primary;
+    @apply inline-flex items-center gap-2 font-mono text-[11px] font-medium tracking-[0.14em] uppercase text-primary;
+  }
+
+  .section-eyebrow > svg {
+    @apply h-5 w-5 p-[3px] rounded bg-primary text-primary-foreground;
+  }
+
+  .copper-button {
+    background: linear-gradient(180deg, #1068BD, #0B4F91);
+    color: #FFFDF9;
+    border: 1px solid #0B4F91;
+  }
+
+  .copper-button:hover {
+    background: linear-gradient(180deg, #0B4F91, #0A3A6B);
   }
 }
 
@@ -369,4 +391,34 @@
   text-align: center !important;
   margin: 0 auto !important;
   white-space: normal;
+}
+
+/* ---------- Paper layout (research-paper style) ---------- */
+.paper-hero {
+  background:
+    linear-gradient(rgba(36, 45, 24, .05) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(90deg, rgba(36, 45, 24, .05) 1px, transparent 1px) 0 0 / 24px 24px,
+    linear-gradient(135deg, #E9E8F2 0%, #F3EFE9 70%);
+}
+
+/* hairline rules between sections, no alternating bands */
+.paper-main section[id] {
+  border-top: 1px solid hsl(var(--border));
+  background: transparent;
+}
+
+.paper-main section#home {
+  border-top: 0;
+}
+
+/* highlighter on bold text in experience write-ups */
+#experience .prose strong {
+  color: hsl(var(--foreground));
+  background: linear-gradient(transparent 58%, #E6E4F2 58%);
+  padding: 0 1px;
+}
+
+.paper-toc a[aria-current="true"] {
+  color: hsl(var(--foreground));
+  border-left-color: hsl(var(--primary));
 }

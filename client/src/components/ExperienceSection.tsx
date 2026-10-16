@@ -1,171 +1,88 @@
-import { useState } from "react";
-import { Briefcase, ChevronDown, MapPin, Calendar, ExternalLink, Github } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { Fragment } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { motion, AnimatePresence } from "framer-motion";
-import { SectionHeader } from "./SectionHeader";
 import type { Experience } from "@shared/schema";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import { PaperSection, useSectionNumber } from "./PaperSection";
+
+// Figure 1 is drawn under the Docuxary project when it is present
+function DocuxaryFigure() {
+  return (
+    <figure className="fig">
+      <div className="flow">
+        <div className="stage"><b>Ingest</b><small>Invoices, receipts, statements</small></div><span className="join" />
+        <div className="stage k"><b>Extract</b><small>Gemini, extended thinking</small></div><span className="join" />
+        <div className="stage k"><b>VLM judge</b><small>Section cross-checks</small></div><span className="join" />
+        <div className="stage"><b>Review gate</b><small>Preflight checks</small></div><span className="join" />
+        <div className="stage last"><b>QuickBooks</b><small>Idempotent sync</small></div>
+      </div>
+      <figcaption>
+        <b>Figure 1.</b> Docuxary pipeline. Highlighted stages are model-driven; work is distributed over RQ workers and Redis Streams.
+      </figcaption>
+    </figure>
+  );
+}
 
 export function ExperienceSection() {
-  const [expandedProjects, setExpandedProjects] = useState<Set<string>>(new Set(["0-0"]));
-
+  const n = useSectionNumber();
   const { data: experiences, isLoading } = useQuery<Experience[]>({
     queryKey: ["/api/experience"]
   });
 
-  const toggleProject = (expIndex: number, projIndex: number) => {
-    const key = `${expIndex}-${projIndex}`;
-    setExpandedProjects((prev) => {
-      const next = new Set(prev);
-      if (next.has(key)) {
-        next.delete(key);
-      } else {
-        next.add(key);
-      }
-      return next;
-    });
-  };
-
   if (isLoading) return null;
 
+  let counter = 0;
+
   return (
-    <section id="experience" className="py-16 md:py-24 px-4 sm:px-6 bg-muted/30">
-      <div className="max-w-6xl mx-auto">
-        <SectionHeader
-          icon={Briefcase}
-          label="Experience"
-          title="Professional Experience"
-        />
+    <PaperSection id="experience" title="Experience">
+      {experiences?.map((experience, expIndex) => (
+        <Fragment key={expIndex}>
+          <div className="org" data-testid={`card-experience-company-${expIndex}`}>
+            <div>
+              <h3>{experience.company}</h3>
+              <div className="r">{experience.role}</div>
+            </div>
+            <div className="w">
+              {experience.period}
+              <br />
+              {experience.location}
+            </div>
+          </div>
 
-        <div className="space-y-8">
-          {experiences?.map((experience, expIndex) => (
-            <motion.div
-              key={expIndex}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.4, delay: expIndex * 0.1 }}
-            >
-              <Card
-                className="overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200"
-                data-testid={`card-experience-company-${expIndex}`}
-              >
-                <CardContent className="p-0">
-                  {/* Company header */}
-                  <div className="p-6 md:p-8 border-b border-border">
-                    <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-3">
-                      <div>
-                        <h3 className="text-xl font-bold">{experience.company}</h3>
-                        <p className="text-primary font-semibold mt-0.5">{experience.role}</p>
-                      </div>
-                      <div className="flex flex-col items-start md:items-end gap-1 shrink-0">
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                          <Calendar className="h-3.5 w-3.5" />
-                          {experience.period}
-                        </div>
-                        <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                          <MapPin className="h-3.5 w-3.5" />
-                          {experience.location}
-                        </div>
-                      </div>
+          {experience.projects.map((project, projIndex) => {
+            counter += 1;
+            return (
+              <Fragment key={projIndex}>
+                <div className="proj" data-testid={`card-project-${expIndex}-${projIndex}`}>
+                  <h4>
+                    <span className="n">{n != null ? `${n}.${counter}` : counter}</span>
+                    {project.title}
+                  </h4>
+                  <div className="md">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{project.description}</ReactMarkdown>
+                  </div>
+                  {project.tags.length > 0 && (
+                    <div className="tags">
+                      {project.tags.map((tag) => <span key={tag}>{tag}</span>)}
                     </div>
-                  </div>
-
-                  {/* Projects */}
-                  <div className="divide-y divide-border">
-                    {experience.projects.map((project, projIndex) => {
-                      const isExpanded = expandedProjects.has(`${expIndex}-${projIndex}`);
-                      return (
-                        <div
-                          key={projIndex}
-                          className={`transition-colors duration-150 ${isExpanded ? "bg-primary/[0.02]" : ""}`}
-                          data-testid={`card-project-${expIndex}-${projIndex}`}
-                        >
-                          <button
-                            className={`w-full flex items-center justify-between px-6 md:px-8 py-4 text-left group transition-colors hover:bg-muted/40 ${isExpanded ? "border-l-2 border-primary" : "border-l-2 border-transparent"}`}
-                            onClick={() => toggleProject(expIndex, projIndex)}
-                            data-testid={`button-toggle-project-${expIndex}-${projIndex}`}
-                          >
-                            <span className={`font-medium text-sm ${isExpanded ? "text-primary" : "text-foreground"}`}>
-                              {project.title}
-                            </span>
-                            <motion.div
-                              animate={{ rotate: isExpanded ? 180 : 0 }}
-                              transition={{ duration: 0.2 }}
-                              className="shrink-0 ml-4"
-                            >
-                              <ChevronDown className="h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors" />
-                            </motion.div>
-                          </button>
-
-                          <AnimatePresence initial={false}>
-                            {isExpanded && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: "auto", opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                transition={{ duration: 0.25, ease: "easeInOut" }}
-                                className="overflow-hidden"
-                              >
-                                <div className="px-6 md:px-8 pb-5 pt-1 border-l-2 border-primary">
-                                  <div className="prose prose-sm prose-neutral dark:prose-invert max-w-none mb-4 text-muted-foreground">
-                                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                                      {project.description}
-                                    </ReactMarkdown>
-                                  </div>
-                                  <div className="flex flex-wrap gap-2">
-                                    {project.tags.map((tag) => (
-                                      <Badge key={tag} variant="secondary" className="text-xs">
-                                        {tag}
-                                      </Badge>
-                                    ))}
-                                  </div>
-                                  {(project.github || project.link) && (
-                                    <div className="flex items-center gap-4 mt-4">
-                                      {project.github && (
-                                        <a
-                                          href={project.github}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
-                                          data-testid={`link-project-github-${expIndex}-${projIndex}`}
-                                        >
-                                          <Github className="h-3.5 w-3.5" />
-                                          GitHub
-                                        </a>
-                                      )}
-                                      {project.link && (
-                                        <a
-                                          href={project.link}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
-                                          data-testid={`link-project-link-${expIndex}-${projIndex}`}
-                                        >
-                                          <ExternalLink className="h-3.5 w-3.5" />
-                                          Link
-                                        </a>
-                                      )}
-                                    </div>
-                                  )}
-                                </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
+                  )}
+                  {(project.github || project.link) && (
+                    <div className="plinks">
+                      {project.github && (
+                        <a href={project.github} target="_blank" rel="noopener noreferrer" data-testid={`link-project-github-${expIndex}-${projIndex}`}>GitHub ↗</a>
+                      )}
+                      {project.link && (
+                        <a href={project.link} target="_blank" rel="noopener noreferrer" data-testid={`link-project-link-${expIndex}-${projIndex}`}>Link ↗</a>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {/docuxary/i.test(project.title) && <DocuxaryFigure />}
+              </Fragment>
+            );
+          })}
+        </Fragment>
+      ))}
+    </PaperSection>
   );
 }

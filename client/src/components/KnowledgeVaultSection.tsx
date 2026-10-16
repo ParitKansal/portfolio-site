@@ -50,8 +50,8 @@ export function KnowledgeVaultSection() {
 
   if (selectedEntry) {
     return (
-      <section id="knowledge-vault" className="py-16 md:py-24 px-4 sm:px-6 bg-muted/30">
-        <div className="max-w-3xl mx-auto">
+      <section id="knowledge-vault" className="psec" data-toc="Knowledge Vault">
+        <div className="mt-4">
           <div className="flex justify-between items-center mb-8">
             <Button
               variant="ghost"
@@ -98,8 +98,8 @@ export function KnowledgeVaultSection() {
   }
 
   return (
-    <section id="knowledge-vault" className="py-16 md:py-24 px-4 sm:px-6 bg-muted/30">
-      <div className="max-w-4xl mx-auto">
+    <section id="knowledge-vault" className="psec" data-toc="Knowledge Vault">
+      <div>
         <SectionHeader
           icon={BookOpen}
           label="Daily Notes"

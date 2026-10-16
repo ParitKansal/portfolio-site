@@ -1,7 +1,10 @@
+import { useQuery } from "@tanstack/react-query";
+import type { SectionSetting } from "@shared/schema";
 import { Navigation } from "@/components/Navigation";
 import { HeroSection } from "@/components/HeroSection";
 import { EducationSection } from "@/components/EducationSection";
 import { ExperienceSection } from "@/components/ExperienceSection";
+import { ResultsSection } from "@/components/ResultsSection";
 import { SkillsSection } from "@/components/SkillsSection";
 import { ProjectsSection } from "@/components/ProjectsSection";
 import { CertificationsSection } from "@/components/CertificationsSection";
@@ -11,40 +14,79 @@ import { SeriesSection } from "@/components/SeriesSection";
 import { Footer } from "@/components/Footer";
 import { ContactSection } from "@/components/ContactSection";
 import { SectionWrapper } from "@/components/SectionWrapper";
+import { SectionNumber } from "@/components/PaperSection";
+import { PaperToc } from "@/components/PaperToc";
+import { MarginNotes } from "@/components/MarginNotes";
+import "@/paper.css";
+
+// Section order on the page. Numbers are given only to sections visitors can see,
+// so hiding one renumbers the rest. "Results" follows Experience's visibility,
+// Series is always shown, Certifications sits under Education as n.1.
+const ORDER = ["experience", "results", "skills", "projects", "knowledge-vault", "series", "blog", "education", "contact"] as const;
 
 export default function Home() {
+  const { data: settings = [] } = useQuery<SectionSetting[]>({ queryKey: ["/api/section-settings"] });
+  const visible = (key: string) => settings.find((s) => s.section === key)?.visible ?? true;
+  const isVisible = (key: (typeof ORDER)[number]) =>
+    key === "results" ? visible("experience") : key === "series" ? true : visible(key);
+
+  const num: Record<string, number | null> = {};
+  let i = 0;
+  for (const key of ORDER) num[key] = isVisible(key) ? ++i : null;
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="pp" id="top">
       <Navigation />
-      <main>
-        <HeroSection />
-        <SectionWrapper sectionKey="education" adminTab="education">
-          <EducationSection />
-        </SectionWrapper>
-        <SectionWrapper sectionKey="experience" adminTab="experience">
-          <ExperienceSection />
-        </SectionWrapper>
-        <SectionWrapper sectionKey="skills" adminTab="skills">
-          <SkillsSection />
-        </SectionWrapper>
-        <SectionWrapper sectionKey="projects" adminTab="projects">
-          <ProjectsSection />
-        </SectionWrapper>
-        <SectionWrapper sectionKey="certifications" adminTab="certifications">
-          <CertificationsSection />
-        </SectionWrapper>
-        <SectionWrapper sectionKey="knowledge-vault" adminTab="knowledge">
-          <KnowledgeVaultSection />
-        </SectionWrapper>
-        <SeriesSection />
-        <SectionWrapper sectionKey="blog" adminTab="blog">
-          <BlogSection />
-        </SectionWrapper>
-        <SectionWrapper sectionKey="contact">
-          <ContactSection />
-        </SectionWrapper>
-      </main>
-      <Footer />
+      <div className="layout">
+        <PaperToc />
+        <main className="paper">
+          <HeroSection />
+          <SectionNumber.Provider value={num["experience"] ?? null}>
+            <SectionWrapper sectionKey="experience" adminTab="experience">
+              <ExperienceSection />
+              <SectionNumber.Provider value={num["results"] ?? null}><ResultsSection /></SectionNumber.Provider>
+            </SectionWrapper>
+          </SectionNumber.Provider>
+          <SectionNumber.Provider value={num["skills"] ?? null}>
+            <SectionWrapper sectionKey="skills" adminTab="skills">
+              <SkillsSection />
+            </SectionWrapper>
+          </SectionNumber.Provider>
+          <SectionNumber.Provider value={num["projects"] ?? null}>
+            <SectionWrapper sectionKey="projects" adminTab="projects">
+              <ProjectsSection />
+            </SectionWrapper>
+          </SectionNumber.Provider>
+          <SectionNumber.Provider value={num["knowledge-vault"] ?? null}>
+            <SectionWrapper sectionKey="knowledge-vault" adminTab="knowledge">
+              <KnowledgeVaultSection />
+            </SectionWrapper>
+          </SectionNumber.Provider>
+          <SectionNumber.Provider value={num["series"] ?? null}>
+            <SeriesSection />
+          </SectionNumber.Provider>
+          <SectionNumber.Provider value={num["blog"] ?? null}>
+            <SectionWrapper sectionKey="blog" adminTab="blog">
+              <BlogSection />
+            </SectionWrapper>
+          </SectionNumber.Provider>
+          <SectionNumber.Provider value={num["education"] ?? null}>
+            <SectionWrapper sectionKey="education" adminTab="education">
+              <EducationSection />
+            </SectionWrapper>
+            <SectionWrapper sectionKey="certifications" adminTab="certifications">
+              <CertificationsSection />
+            </SectionWrapper>
+          </SectionNumber.Provider>
+          <SectionNumber.Provider value={num["contact"] ?? null}>
+            <SectionWrapper sectionKey="contact">
+              <ContactSection />
+            </SectionWrapper>
+          </SectionNumber.Provider>
+          <Footer />
+        </main>
+        <MarginNotes />
+      </div>
     </div>
   );
 }
