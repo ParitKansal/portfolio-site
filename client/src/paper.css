@@ -289,12 +289,17 @@
    override the paper styles above.
    ===================================================================== */
 .pp { font-size: 18px; line-height: 1.65; --rule: #ECE8E1; }
-.pp .layout { max-width: 1060px; margin: 0 auto; grid-template-columns: 170px minmax(0, 1fr); gap: 56px; padding: 0 max(24px, env(safe-area-inset-left, 0px)); }
-@media (max-width: 1180px) { .pp .layout { grid-template-columns: 160px minmax(0, 1fr); gap: 40px; } }
+/* Standard layout: 1280px container, 32px gutters on desktop, 24px on tablet, 16px on phone, 8px spacing grid */
+.pp .layout { max-width: 1280px; margin: 0 auto; grid-template-columns: 220px minmax(0, 1fr); gap: 48px; padding: 0 max(32px, env(safe-area-inset-left, 0px)); }
+@media (max-width: 1180px) { .pp .layout { grid-template-columns: 200px minmax(0, 1fr); gap: 32px; padding: 0 max(24px, env(safe-area-inset-left, 0px)); } }
 @media (max-width: 840px) { .pp .layout { grid-template-columns: minmax(0, 1fr); } }
-@media (max-width: 540px) { .pp .layout { padding: 0 max(18px, env(safe-area-inset-left, 0px)); } }
-.pp .bar .in { max-width: 1060px; margin: 0 auto; padding: 0 max(24px, env(safe-area-inset-left, 0px)); }
-.pp .paper { max-width: 720px; padding-block: 8px 40px; }
+@media (max-width: 540px) { .pp .layout { padding: 0 max(16px, env(safe-area-inset-left, 0px)); } }
+.pp .bar .in { max-width: 1280px; margin: 0 auto; padding: 0 max(32px, env(safe-area-inset-left, 0px)); }
+@media (max-width: 1180px) { .pp .bar .in { padding: 0 max(24px, env(safe-area-inset-left, 0px)); } }
+@media (max-width: 540px) { .pp .bar .in { padding: 0 max(16px, env(safe-area-inset-left, 0px)); } }
+.pp .paper { max-width: none; padding-block: 8px 48px; }
+/* keep running paragraphs at a readable line length (~80 characters) */
+.pp .intro .bio, .pp .lead { max-width: 80ch; }
 .pp .paper .rd, .pp .lead, .pp .proj .md, .pp .pitem p { max-width: none; }
 
 /* contents: plain list, no numbers */
@@ -396,30 +401,47 @@
    Full-page reader (/read/:id): blog posts and series chapters open on
    their own page, laid out like a book page with page-turn navigation.
    ===================================================================== */
-.pp.book-wrap { background: #F4F1EC; min-height: 100vh; }
+.pp.book-wrap { background: var(--paper); min-height: 100vh; }
 .pp .book-progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: var(--blue); transform-origin: 0 50%; z-index: 60; transition: transform .1s linear; }
 
-.pp .book-bar { position: sticky; top: 0; z-index: 50; height: 54px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 max(20px, env(safe-area-inset-left, 0px)); background: color-mix(in srgb, #F4F1EC 88%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule); font-family: var(--sans); font-size: 14px; }
-.pp .book-back { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-weight: 500; min-width: 90px; }
+/* same bar, container and gutters as the home page: content lines up with a 1280px container */
+.pp .book-bar { position: sticky; top: 0; z-index: 50; height: 54px; background: color-mix(in srgb, var(--paper) 86%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--rule); font-family: var(--sans); font-size: 14px; }
+/* the bar uses the same grid as the page below, so the logo is centred over the article page */
+.pp .book-bar-in { position: relative; height: 100%; max-width: 1280px; margin: 0 auto; padding: 0 32px; display: grid; grid-template-columns: minmax(0, 1fr); align-items: center; }
+.pp .book-bar.has-toc .book-bar-in { grid-template-columns: 220px minmax(0, 1fr); column-gap: 48px; }
+.pp .book-bar-in .book-brand { grid-column: 1 / -1; justify-self: center; }
+.pp .book-bar.has-toc .book-bar-in .book-brand { grid-column: 2; }
+.pp .book-bar-in .book-back { position: absolute; left: 32px; top: 50%; transform: translateY(-50%); }
+.pp .book-bar-in .book-tools { position: absolute; right: 32px; top: 50%; transform: translateY(-50%); }
+.pp .book-back { display: inline-flex; align-items: center; gap: 6px; color: var(--blue); font-weight: 500; }
 .pp .book-back:hover { text-decoration: underline; text-underline-offset: 3px; }
 .pp .book-brand { display: inline-flex; align-items: center; gap: 8px; font: 500 12.5px var(--mono); color: var(--ink); }
 .pp .book-brand img { border-radius: 50%; }
 .pp .book-brand b { color: var(--blue); font-weight: 500; }
-.pp .book-tools { display: flex; gap: 8px; justify-content: flex-end; min-width: 90px; }
+.pp .book-tools { display: flex; gap: 8px; justify-content: flex-end; }
 .pp .book-icon { display: inline-flex; align-items: center; gap: 6px; padding: 6px 10px; border-radius: 8px; border: 1px solid var(--rule); background: #fff; color: var(--ink); cursor: pointer; font: 500 13px var(--sans); }
 .pp .book-icon:hover { border-color: var(--blue); color: var(--blue); }
 @media (max-width: 480px) { .pp .hide-xs { display: none; } .pp .book-brand span { display: none; } }
 
-.pp .book-shell { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 1180px; margin: 0 auto; padding: 36px max(20px, env(safe-area-inset-left, 0px)) 60px; gap: 40px; }
-.pp .book-shell.has-toc { grid-template-columns: 250px minmax(0, 1fr); }
+.pp .book-shell { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 1280px; margin: 0 auto; padding: 32px max(32px, env(safe-area-inset-left, 0px)) 64px; gap: 48px; }
+.pp .book-shell.has-toc { grid-template-columns: 220px minmax(0, 1fr); }
+@media (max-width: 1180px) {
+  .pp .book-shell { padding: 24px max(24px, env(safe-area-inset-left, 0px)) 56px; gap: 32px; }
+  .pp .book-shell.has-toc { grid-template-columns: 200px minmax(0, 1fr); }
+  .pp .book-bar-in { padding: 0 24px; }
+  .pp .book-bar.has-toc .book-bar-in { grid-template-columns: 200px minmax(0, 1fr); column-gap: 32px; }
+  .pp .book-bar-in .book-back { left: 24px; } .pp .book-bar-in .book-tools { right: 24px; }
+}
+@media (max-width: 1000px) { .pp .book-bar.has-toc .book-bar-in { grid-template-columns: minmax(0, 1fr); } .pp .book-bar.has-toc .book-bar-in .book-brand { grid-column: 1; } }
+@media (max-width: 540px) { .pp .book-bar-in { padding: 0 16px; } .pp .book-bar-in .book-back { left: 16px; } .pp .book-bar-in .book-tools { right: 16px; } }
 
 /* chapter list: sticky on wide screens, a slide-in drawer on small ones */
 .pp .book-toc { display: block; position: sticky; top: 84px; align-self: start; max-height: calc(100vh - 110px); overflow-y: auto; font-family: var(--sans); font-size: 14px; padding-right: 6px; }
 .pp .book-toc .lbl { font: 500 11px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin-bottom: 12px; }
 .pp .book-toc ol { list-style: none; margin: 0; padding: 0; }
 .pp .book-toc a { display: flex; gap: 10px; padding: 7px 10px; border-radius: 8px; color: var(--soft); line-height: 1.35; }
-.pp .book-toc a:hover { background: #fff; color: var(--ink); }
-.pp .book-toc a[aria-current="page"] { background: #fff; color: var(--blue); font-weight: 600; box-shadow: 0 1px 0 var(--rule); }
+.pp .book-toc a:hover { background: var(--blue-50); color: var(--ink); }
+.pp .book-toc a[aria-current="page"] { background: var(--blue-50); color: var(--blue); font-weight: 600; }
 .pp .book-toc .no { font: 12px var(--mono); color: var(--faint); width: 20px; flex: none; padding-top: 1px; }
 .pp .book-toc a[aria-current="page"] .no { color: var(--blue); }
 .pp .book-scrim { display: none; }
@@ -427,17 +449,17 @@
 
 @media (max-width: 1000px) {
   .pp .book-shell.has-toc { grid-template-columns: minmax(0, 1fr); }
-  .pp .book-toc { position: fixed; top: 54px; left: 0; bottom: 0; width: min(320px, 86vw); max-height: none; z-index: 45; background: #F4F1EC; padding: 20px 16px; border-right: 1px solid var(--rule); transform: translateX(-102%); transition: transform .25s ease; }
+  .pp .book-toc { position: fixed; top: 54px; left: 0; bottom: 0; width: min(320px, 86vw); max-height: none; z-index: 45; background: var(--paper); padding: 20px 16px; border-right: 1px solid var(--rule); transform: translateX(-102%); transition: transform .25s ease; }
   .pp .book-toc.open { transform: none; box-shadow: 0 0 40px rgba(0, 0, 0, .15); }
   .pp .book-scrim { display: block; position: fixed; inset: 54px 0 0 0; z-index: 44; background: rgba(20, 24, 16, .25); border: 0; }
 }
 
 /* the page itself */
 .pp .book-stage { perspective: 1800px; min-width: 0; }
-.pp .book-page { position: relative; max-width: 780px; margin: 0 auto; background: #fff; border-radius: 4px 10px 10px 4px; padding: 64px 72px 40px; box-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 24px 60px -28px rgba(36, 45, 24, .35), inset 6px 0 10px -8px rgba(0, 0, 0, .18); }
+.pp .book-page { position: relative; max-width: 880px; margin: 0 auto; background: #fff; border: 1px solid var(--rule); border-radius: 4px 10px 10px 4px; padding: 64px 64px 48px; box-shadow: 0 1px 2px rgba(0, 0, 0, .05), 0 24px 60px -28px rgba(36, 45, 24, .35), inset 6px 0 10px -8px rgba(0, 0, 0, .18); }
 /* page edges, like the stacked leaves of a book */
 .pp .book-page::after { content: ""; position: absolute; top: 6px; bottom: 6px; right: -6px; width: 6px; border-radius: 0 6px 6px 0; background: repeating-linear-gradient(90deg, #fff 0 1px, #E7E2D9 1px 2px); box-shadow: 2px 0 6px -3px rgba(0, 0, 0, .2); }
-@media (max-width: 700px) { .pp .book-page { padding: 36px 22px 28px; border-radius: 8px; } .pp .book-page::after { display: none; } }
+@media (max-width: 700px) { .pp .book-shell { padding: 16px 16px 40px; } .pp .book-page { padding: 32px 20px 24px; border-radius: 8px; } .pp .book-page::after { display: none; } }
 
 .pp .book-head { text-align: center; }
 .pp .book-head .kicker { font: 500 12px var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--blue); }
@@ -445,7 +467,7 @@
 .pp .book-head .meta { margin-top: 14px; font: 13.5px var(--sans); color: var(--faint); display: flex; justify-content: center; flex-wrap: wrap; gap: 4px 16px; }
 .pp .book-head .orn { margin: 22px 0 6px; color: var(--b200); font-size: 22px; }
 
-.pp .book-body { margin-top: 26px; font-size: 19px; line-height: 1.75; color: var(--ink); }
+.pp .book-body { margin-top: 24px; font-size: 19px; line-height: 1.75; color: var(--ink); }
 .pp .book-body img, .pp .book-body video, .pp .book-body iframe { max-width: 100%; }
 .pp .book-tags { margin-top: 36px; text-align: center; font: 13px var(--sans); color: var(--faint); }
 

@@ -112,13 +112,14 @@ export default function ReaderPage() {
     <div className="pp book-wrap">
       <div className="book-progress" style={{ transform: `scaleX(${progress})` }} aria-hidden="true" />
 
-      <header className="book-bar">
+      <header className={`book-bar${isSeries ? " has-toc" : ""}`}>
+        <div className="book-bar-in">
         <Link href={backHref} className="book-back" data-testid="button-back-from-reader">
           <ArrowLeft className="h-4 w-4" />
           <span>Back</span>
         </Link>
         <Link href="/" className="book-brand" aria-label="paritkansal.in home">
-          <img src="/logo.png" alt="" width={24} height={24} />
+          <img src="/logo.png" alt="" width={30} height={30} />
           <span>paritkansal<b>.in</b></span>
         </Link>
         <div className="book-tools">
@@ -133,6 +134,7 @@ export default function ReaderPage() {
               <span className="hide-xs">Chapters</span>
             </button>
           )}
+        </div>
         </div>
       </header>
 
